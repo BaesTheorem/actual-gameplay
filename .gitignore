@@ -1,0 +1,7 @@
+# generated
+*.xcodeproj
+build/
+# machine-local: Apple team id and the phone's UDID (see README)
+Config/Signing.xcconfig
+Config/device.env
+.DS_Store
