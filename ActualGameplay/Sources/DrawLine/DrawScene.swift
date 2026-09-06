@@ -5,7 +5,7 @@ import UIKit
 ///
 /// By default the world is frozen until the first stroke lands, so a level is a still picture the
 /// player gets to think about. Levels that want timing pressure set `liveStart`.
-final class DrawScene: GameSceneBase {
+final class DrawScene: GameSceneBase, ReplayableScene {
     /// Where strokes may go: the playfield minus the HUD band under the Dynamic Island.
     static let drawArea = CGRect(x: 0, y: 34, width: 402, height: 720)
 
@@ -25,6 +25,17 @@ final class DrawScene: GameSceneBase {
     let levelIndex: Int
     /// Strokes committed this attempt, for the developer solution logger.
     private(set) var committedStrokes: [[CGPoint]] = []
+
+    var levelID: String { level.id }
+    var levelName: String { level.name }
+    var hasSolution: Bool { level.solution != nil }
+    var replayWait: TimeInterval { level.solution?.waitSeconds ?? 6 }
+
+    func startReplay() {
+        if let solution = level.solution { replay(solution) }
+    }
+
+    func describe(score: Double?) -> String { "ink \(Int((score ?? 0).rounded()))" }
 
     private var capture: StrokeCapture!
     private var goals: GoalTracker!
@@ -478,6 +489,7 @@ final class DrawScene: GameSceneBase {
         if DeveloperFlags.shared.logSolutions { logSolution() }
         #endif
         finish(.won(stars: level.stars(forInk: ink), coins: 0, score: Double(ink)))
+        pushHUD()
     }
 
     private func lose(_ reason: String) {
@@ -503,12 +515,6 @@ final class DrawScene: GameSceneBase {
         setHUD(HUDState(title: "\(levelIndex + 1). \(level.name)",
                         readout: readout,
                         progress: Double(capture.inkLeft / max(1, level.inkBudget))))
-    }
-
-    /// The rendered scene as an image, for autoplay reports.
-    func snapshot() -> UIImage? {
-        guard let view, let texture = view.texture(from: self) else { return nil }
-        return UIImage(cgImage: texture.cgImage())
     }
 
     #if DEBUG

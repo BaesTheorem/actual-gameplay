@@ -55,6 +55,7 @@ struct LevelSelectView: View {
             .id(selection.index)
         }
         .onAppear {
+            MusicPlayer.shared.play(mode.track)
             if selected == nil, let level = LaunchArguments.level, level >= 1, level <= count {
                 selected = LevelSelection(index: level - 1)
             }
@@ -73,17 +74,11 @@ struct LevelSelectView: View {
     }
 
     private func makeScene(index: Int) -> GameSceneBase {
-        switch mode {
-        case .drawLine:
-            guard let level = try? catalog.load(DrawLevel.self, mode: mode, index: index) else {
-                return PlaceholderScene(mode: mode)
-            }
-            let scene = DrawScene(level: level, index: index)
-            if LaunchArguments.replay, let solution = level.solution { scene.replay(solution) }
-            return scene
-        case .pinPull, .runner:
+        guard let scene = SceneFactory.makeLevelScene(mode: mode, index: index) else {
             return PlaceholderScene(mode: mode)
         }
+        if LaunchArguments.replay { scene.startReplay() }
+        return scene
     }
 }
 

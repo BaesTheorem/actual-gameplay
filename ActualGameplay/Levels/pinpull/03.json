@@ -1,0 +1,9 @@
+{
+  "id": "03", "name": "Water first", "hint": "Lava next to the treasure. Douse it before you drop it.",
+  "parPins": 2, "winWhen": "treasureReachesHero",
+  "pins": [ {"id":"p1","x":38,"y":300,"w":326,"side":"right"}, {"id":"p2","x":38,"y":520,"w":326,"side":"left"} ],
+  "pools": [ {"liquid":"lava","x":200,"y":314,"w":80,"h":40,"count":50},
+             {"liquid":"water","x":160,"y":534,"w":180,"h":70,"count":150} ],
+  "actors": { "hero": {"x":310,"y":84}, "treasure": {"x":310,"y":325} },
+  "solution": ["p2","p1"], "settleSeconds": 5
+}

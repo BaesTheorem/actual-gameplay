@@ -1,0 +1,7 @@
+{
+  "id": "01", "name": "One pin", "hint": "Tap the pin. That is the whole trick.",
+  "parPins": 1, "winWhen": "treasureReachesHero",
+  "pins": [ {"id":"p1","x":38,"y":300,"w":326,"side":"right"} ],
+  "actors": { "hero": {"x":201,"y":84}, "treasure": {"x":201,"y":325} },
+  "solution": ["p1"], "settleSeconds": 4
+}

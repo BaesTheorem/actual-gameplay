@@ -82,6 +82,12 @@ class GameSceneBase: SKScene, SKPhysicsContactDelegate {
         }
     }
 
+    /// The rendered scene as an image, for autoplay reports.
+    func snapshot() -> UIImage? {
+        guard let view, let texture = view.texture(from: self) else { return nil }
+        return UIImage(cgImage: texture.cgImage())
+    }
+
     /// Report the outcome once. Later calls in the same attempt are ignored.
     func finish(_ outcome: GamePhase) {
         guard !finished else { return }

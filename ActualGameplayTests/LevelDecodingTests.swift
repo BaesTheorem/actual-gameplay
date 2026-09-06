@@ -60,4 +60,49 @@ final class LevelDecodingTests: XCTestCase {
             XCTAssertLessThanOrEqual(cost, level.stars[0] + 0.01, "\(id): the stored solution should earn three stars (\(cost) vs \(level.stars[0]))")
         }
     }
+
+    func testPinPullLevelsAreConsistent() throws {
+        let catalog = LevelCatalog.shared
+        let ids = catalog.ids(for: .pinPull)
+        XCTAssertEqual(ids.count, 12, "expected 12 pin-pull levels, found \(ids)")
+        XCTAssertEqual(Set(ids).count, ids.count, "duplicate level ids")
+        let winConditions: Set<String> = ["treasureReachesHero", "heroReachesGoal", "treasureReachesGoal", "both"]
+
+        for (index, id) in ids.enumerated() {
+            let level = try catalog.load(PinLevel.self, mode: .pinPull, index: index)
+            XCTAssertEqual(level.id, id, "level id must match its filename")
+            XCTAssertFalse(level.name.isEmpty)
+            XCTAssertTrue(winConditions.contains(level.winWhen), "\(id): unknown winWhen \(level.winWhen)")
+            XCTAssertGreaterThan(level.parPins, 0, "\(id): par")
+            XCTAssertLessThanOrEqual(level.totalParticles, 320, "\(id): \(level.totalParticles) particles is over the budget")
+
+            let pinIDs = level.pins.map(\.id)
+            XCTAssertEqual(Set(pinIDs).count, pinIDs.count, "\(id): duplicate pin ids")
+            for pin in level.pins {
+                XCTAssertTrue(pin.side == "left" || pin.side == "right", "\(id): pin \(pin.id) side")
+                XCTAssertGreaterThan(pin.w, 0, "\(id): pin \(pin.id) width")
+                XCTAssertTrue(canvas.contains(CGRect(x: pin.x, y: pin.y, width: pin.w, height: 14)), "\(id): pin \(pin.id) outside the canvas")
+            }
+            for pool in level.pools ?? [] {
+                XCTAssertTrue(pool.liquid == "water" || pool.liquid == "lava", "\(id): pool liquid \(pool.liquid)")
+                XCTAssertTrue(canvas.contains(pool.cgRect), "\(id): pool outside the canvas")
+            }
+            for rect in (level.walls ?? []).map(\.cgRect) + (level.drains ?? []).map(\.cgRect) {
+                XCTAssertTrue(canvas.contains(rect), "\(id): rect \(rect) outside the canvas")
+            }
+
+            let needsHero = level.winWhen != "treasureReachesGoal"
+            let needsTreasure = level.winWhen != "heroReachesGoal"
+            let needsGoal = level.winWhen == "heroReachesGoal" || level.winWhen == "treasureReachesGoal" || level.winWhen == "both"
+            if needsHero { XCTAssertNotNil(level.actors.hero, "\(id): win condition needs a hero") }
+            if needsTreasure { XCTAssertNotNil(level.actors.treasure, "\(id): win condition needs treasure") }
+            if needsGoal { XCTAssertNotNil(level.actors.goal, "\(id): win condition needs a goal") }
+
+            let solution = try XCTUnwrap(level.solution, "\(id): every level stores a solution")
+            XCTAssertFalse(solution.isEmpty, "\(id): solution has pulls")
+            XCTAssertEqual(Set(solution).count, solution.count, "\(id): solution pulls a pin twice")
+            for pinID in solution { XCTAssertTrue(pinIDs.contains(pinID), "\(id): solution pin \(pinID) missing") }
+            XCTAssertLessThanOrEqual(solution.count, level.parPins, "\(id): the stored solution should earn three stars")
+        }
+    }
 }

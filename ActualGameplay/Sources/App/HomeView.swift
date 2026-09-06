@@ -20,11 +20,14 @@ struct HomeView: View {
             .padding(20)
         }
         .fullScreenCover(item: $activeMode) { mode in
-            if mode.hasLevels {
-                LevelSelectView(mode: mode).environmentObject(store)
-            } else {
-                GameContainerView(mode: mode) { PlaceholderScene(mode: mode) }
+            Group {
+                if mode.hasLevels {
+                    LevelSelectView(mode: mode).environmentObject(store)
+                } else {
+                    GameContainerView(mode: mode) { PlaceholderScene(mode: mode) }
+                }
             }
+            .onDisappear { MusicPlayer.shared.play(.menu) }
         }
         .fullScreenCover(item: $autoplayMode) { mode in
             AutoplayView(mode: mode, only: LaunchArguments.only)
@@ -33,6 +36,7 @@ struct HomeView: View {
             SettingsView().environmentObject(store)
         }
         .onAppear {
+            MusicPlayer.shared.play(.menu)
             if let mode = LaunchArguments.autoplay {
                 autoplayMode = mode
             } else if let mode = LaunchArguments.mode {

@@ -60,27 +60,26 @@ final class AutoplayRunner: ObservableObject {
         let index = indices[position]
         current = position
         completed = false
-        guard mode == .drawLine, let level = try? catalog.load(DrawLevel.self, mode: mode, index: index) else {
+        guard let scene = SceneFactory.makeLevelScene(mode: mode, index: index) else {
             entries.append(Entry(id: catalog.id(for: mode, index: index), name: "?", outcome: "error",
                                  seconds: 0, stars: 0, detail: "could not load level"))
             run(position: position + 1)
             return
         }
-        let scene = DrawScene(level: level, index: index)
-        if let solution = level.solution { scene.replay(solution) }
+        scene.startReplay()
         let newSession = GameSession(mode: mode, scene: scene)
         session = newSession
         startedAt = Date()
-        let timeout = (level.solution?.waitSeconds ?? 6) + 2
+        let timeout = scene.replayWait + 2
         phaseWatch = newSession.$phase.sink { [weak self] phase in
-            if phase.isOver { self?.complete(level: level, position: position, phase: phase) }
+            if phase.isOver { self?.complete(scene: scene, position: position, phase: phase) }
         }
         timer = Timer.scheduledTimer(withTimeInterval: timeout, repeats: false) { [weak self] _ in
-            self?.complete(level: level, position: position, phase: nil)
+            self?.complete(scene: scene, position: position, phase: nil)
         }
     }
 
-    private func complete(level: DrawLevel, position: Int, phase: GamePhase?) {
+    private func complete(scene: GameSceneBase & ReplayableScene, position: Int, phase: GamePhase?) {
         guard !completed else { return }
         completed = true
         timer?.invalidate()
@@ -93,19 +92,19 @@ final class AutoplayRunner: ObservableObject {
         if case .won(let s, _, let score)? = phase {
             outcome = "won"
             stars = s
-            detail = "ink \(Int(score ?? 0))"
+            detail = scene.describe(score: score)
         } else if case .lost(let reason)? = phase {
             outcome = "lost"
             detail = reason
         }
-        if level.solution == nil {
+        if !scene.hasSolution {
             outcome = "no-solution"
             detail = "level has no stored solution"
         }
-        if let scene = session?.scene as? DrawScene, let image = scene.snapshot() {
-            save(image, name: "\(mode.rawValue)-\(level.id).png")
+        if let image = scene.snapshot() {
+            save(image, name: "\(mode.rawValue)-\(scene.levelID).png")
         }
-        entries.append(Entry(id: level.id, name: level.name, outcome: outcome,
+        entries.append(Entry(id: scene.levelID, name: scene.levelName, outcome: outcome,
                              seconds: (seconds * 100).rounded() / 100, stars: stars, detail: detail))
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
             self?.run(position: position + 1)

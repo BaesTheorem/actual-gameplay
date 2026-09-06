@@ -1,0 +1,11 @@
+{
+  "id": "07", "name": "Downhill", "hint": "Water flows downhill. Use that.",
+  "parPins": 2, "winWhen": "treasureReachesHero",
+  "walls": [ {"x":186,"y":68,"w":14,"h":332}, {"x":186,"y":470,"w":14,"h":270} ],
+  "slabs": [ {"x1":38,"y1":480,"x2":200,"y2":400,"t":14} ],
+  "pins": [ {"id":"p1","x":200,"y":260,"w":164,"side":"right"}, {"id":"p2","x":38,"y":560,"w":148,"side":"left"} ],
+  "pools": [ {"liquid":"lava","x":212,"y":274,"w":80,"h":40,"count":50},
+             {"liquid":"water","x":50,"y":574,"w":120,"h":80,"count":140} ],
+  "actors": { "hero": {"x":340,"y":84}, "treasure": {"x":340,"y":285} },
+  "solution": ["p2","p1"], "settleSeconds": 5
+}

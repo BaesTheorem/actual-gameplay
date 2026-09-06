@@ -39,12 +39,14 @@ struct RunnerProgress: Codable, Equatable {
 
 struct GameSettings: Codable, Equatable {
     var haptics: Bool = true
+    var music: Bool = true
 
     init() {}
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         haptics = try c.decodeIfPresent(Bool.self, forKey: .haptics) ?? true
+        music = try c.decodeIfPresent(Bool.self, forKey: .music) ?? true
     }
 }
 

@@ -73,7 +73,7 @@ def main() -> None:
     if results_dir.exists():
         shutil.rmtree(results_dir)
     run(["xcrun", "simctl", "terminate", udid, BUNDLE])
-    launch = ["xcrun", "simctl", "launch", udid, BUNDLE, "--autoplay", mode]
+    launch = ["xcrun", "simctl", "launch", udid, BUNDLE, "--autoplay", mode, "--silent"]
     if "--only" in args:
         launch += ["--only", args[args.index("--only") + 1]]
     result = run(launch)

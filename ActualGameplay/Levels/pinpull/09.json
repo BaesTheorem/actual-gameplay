@@ -1,0 +1,12 @@
+{
+  "id": "09", "name": "Decoy", "hint": "Three pins. One of them matters.",
+  "parPins": 1, "winWhen": "treasureReachesHero",
+  "walls": [ {"x":86,"y":100,"w":14,"h":640}, {"x":302,"y":100,"w":14,"h":640} ],
+  "pins": [ {"id":"p1","x":100,"y":400,"w":202,"side":"right"},
+            {"id":"p2","x":38,"y":140,"w":48,"side":"left"},
+            {"id":"p3","x":316,"y":140,"w":48,"side":"right"} ],
+  "pools": [ {"liquid":"lava","x":44,"y":154,"w":36,"h":50,"count":36},
+             {"liquid":"lava","x":322,"y":154,"w":36,"h":50,"count":36} ],
+  "actors": { "hero": {"x":130,"y":84}, "treasure": {"x":130,"y":425} },
+  "solution": ["p1"], "settleSeconds": 4
+}

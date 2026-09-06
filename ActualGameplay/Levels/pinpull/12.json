@@ -1,0 +1,116 @@
+{
+  "id": "12",
+  "name": "All of it",
+  "hint": "Everything you have learned. Two pulls.",
+  "parPins": 2,
+  "winWhen": "treasureReachesHero",
+  "walls": [
+    {
+      "x": 170,
+      "y": 68,
+      "w": 14,
+      "h": 232
+    },
+    {
+      "x": 170,
+      "y": 360,
+      "w": 14,
+      "h": 380
+    }
+  ],
+  "slabs": [
+    {
+      "x1": 364,
+      "y1": 400,
+      "x2": 184,
+      "y2": 314,
+      "t": 14
+    },
+    {
+      "x1": 184,
+      "y1": 296,
+      "x2": 90,
+      "y2": 220,
+      "t": 14
+    }
+  ],
+  "pins": [
+    {
+      "id": "p1",
+      "x": 184,
+      "y": 420,
+      "w": 180,
+      "side": "right"
+    },
+    {
+      "id": "p3",
+      "x": 38,
+      "y": 120,
+      "w": 132,
+      "side": "left"
+    },
+    {
+      "id": "p4",
+      "x": 38,
+      "y": 560,
+      "w": 132,
+      "side": "left"
+    },
+    {
+      "id": "p5",
+      "x": 184,
+      "y": 600,
+      "w": 180,
+      "side": "right"
+    }
+  ],
+  "pools": [
+    {
+      "liquid": "lava",
+      "x": 200,
+      "y": 434,
+      "w": 100,
+      "h": 40,
+      "count": 55
+    },
+    {
+      "liquid": "water",
+      "x": 200,
+      "y": 614,
+      "w": 100,
+      "h": 70,
+      "count": 90
+    },
+    {
+      "liquid": "lava",
+      "x": 50,
+      "y": 68,
+      "w": 110,
+      "h": 30,
+      "count": 50
+    },
+    {
+      "liquid": "lava",
+      "x": 50,
+      "y": 574,
+      "w": 110,
+      "h": 40,
+      "count": 40
+    }
+  ],
+  "actors": {
+    "hero": {
+      "x": 70,
+      "y": 150
+    },
+    "treasure": {
+      "x": 340,
+      "y": 445
+    }
+  },
+  "solution": [
+    "p5",
+    "p1"
+  ],
+  "settleSeconds": 6
+}

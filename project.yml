@@ -17,6 +17,8 @@ targets:
       - ActualGameplay/Fonts
       - path: ActualGameplay/Levels
         type: folder
+      - path: ActualGameplay/Audio
+        type: folder
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.baestheorem.actualgameplay

@@ -1,0 +1,13 @@
+{
+  "id": "05", "name": "Divert", "hint": "The lava has a path to him. Break it first.",
+  "parPins": 3, "winWhen": "treasureReachesHero",
+  "walls": [ {"x":170,"y":68,"w":14,"h":232}, {"x":170,"y":360,"w":14,"h":380} ],
+  "slabs": [ {"x1":364,"y1":400,"x2":300,"y2":328,"t":14} ],
+  "pins": [ {"id":"p1","x":184,"y":420,"w":180,"side":"right"},
+            {"id":"p2","x":184,"y":300,"w":116,"side":"right"},
+            {"id":"p3","x":38,"y":560,"w":132,"side":"left"} ],
+  "pools": [ {"liquid":"lava","x":200,"y":434,"w":150,"h":50,"count":100} ],
+  "drains": [ {"x":184,"y":68,"w":116,"h":24} ],
+  "actors": { "hero": {"x":100,"y":84}, "treasure": {"x":100,"y":585} },
+  "solution": ["p2","p1","p3"], "settleSeconds": 5
+}
