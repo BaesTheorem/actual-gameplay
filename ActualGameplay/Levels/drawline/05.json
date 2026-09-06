@@ -1,0 +1,9 @@
+{
+  "id": "05", "name": "Pinned", "hint": "Here your ink stays where you put it.",
+  "inkBudget": 360, "stars": [290, 320], "pinnedInk": true,
+  "statics": [ {"type":"rect","x":0,"y":34,"w":402,"h":20}, {"type":"rect","x":280,"y":380,"w":122,"h":14} ],
+  "dynamics": [ {"id":"ball","shape":"ball","x":80,"y":700,"r":14} ],
+  "targets": [ {"id":"goal","x":280,"y":394,"w":122,"h":30} ],
+  "goal": {"type":"contact","object":"ball","target":"goal"},
+  "solution": {"strokes":[{"points":[[40,560],[280,432]]}], "waitSeconds": 7}
+}

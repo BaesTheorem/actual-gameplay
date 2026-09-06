@@ -1,0 +1,11 @@
+{
+  "id": "08", "name": "Cradle", "hint": "Keep it on the platform for three seconds.",
+  "inkBudget": 260, "stars": [150, 200],
+  "statics": [ {"type":"rect","x":0,"y":34,"w":402,"h":20},
+    {"type":"chain","points":[[0,410],[120,340]]},
+    {"type":"rect","x":120,"y":324,"w":180,"h":16} ],
+  "dynamics": [ {"id":"ball","shape":"ball","x":20,"y":415,"r":14} ],
+  "zones": [ {"id":"rest","x":130,"y":340,"w":170,"h":60} ],
+  "goal": {"type":"dwell","object":"ball","zone":"rest","seconds":3},
+  "solution": {"strokes":[{"points":[[200,346],[294,346],[294,396]]}], "waitSeconds": 9}
+}

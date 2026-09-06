@@ -1,0 +1,14 @@
+{
+  "id": "02", "name": "Bridge", "hint": "Mind the gap.",
+  "inkBudget": 220, "stars": [130, 170],
+  "statics": [ {"type":"rect","x":0,"y":34,"w":402,"h":20},
+    {"type":"chain","points":[[0,380],[140,300]]},
+    {"type":"rect","x":140,"y":284,"w":14,"h":16},
+    {"type":"rect","x":154,"y":280,"w":14,"h":12},
+    {"type":"rect","x":262,"y":280,"w":14,"h":12},
+    {"type":"rect","x":276,"y":284,"w":126,"h":16} ],
+  "dynamics": [ {"id":"ball","shape":"ball","x":24,"y":383,"r":14} ],
+  "targets": [ {"id":"goal","x":360,"y":300,"w":42,"h":40} ],
+  "goal": {"type":"contact","object":"ball","target":"goal"},
+  "solution": {"strokes":[{"points":[[160,297],[270,297]]}], "waitSeconds": 7}
+}

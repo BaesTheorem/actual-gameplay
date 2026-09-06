@@ -48,6 +48,7 @@ class GameSceneBase: SKScene, SKPhysicsContactDelegate {
     func resetLevel() {
         removeAllActions()
         removeAllChildren()
+        physicsWorld.removeAllJoints()
         physicsBody = nil
         contacts.clear()
         finished = false

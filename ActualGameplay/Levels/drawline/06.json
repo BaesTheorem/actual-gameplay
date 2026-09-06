@@ -1,0 +1,11 @@
+{
+  "id": "06", "name": "A dot will do", "hint": "Barely any ink. A tap makes a dot.",
+  "inkBudget": 40, "stars": [10, 25],
+  "statics": [ {"type":"rect","x":0,"y":34,"w":402,"h":20},
+    {"type":"rect","x":0,"y":400,"w":140,"h":16},
+    {"type":"chain","points":[[10,500],[80,418]]} ],
+  "dynamics": [ {"id":"ball","shape":"ball","x":118,"y":430,"r":14} ],
+  "targets": [ {"id":"goal","x":140,"y":54,"w":262,"h":30} ],
+  "goal": {"type":"contact","object":"ball","target":"goal"},
+  "solution": {"strokes":[{"points":[[14,522]]}], "waitSeconds": 7}
+}

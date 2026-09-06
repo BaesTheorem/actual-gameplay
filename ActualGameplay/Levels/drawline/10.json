@@ -1,0 +1,13 @@
+{
+  "id": "10", "name": "Timing", "hint": "Nothing moves until you draw. Except the plate.",
+  "inkBudget": 200, "stars": [60, 120],
+  "statics": [ {"type":"rect","x":0,"y":34,"w":402,"h":20},
+    {"type":"rect","x":0,"y":430,"w":140,"h":16},
+    {"type":"rect","x":114,"y":54,"w":6,"h":30},
+    {"type":"rect","x":220,"y":54,"w":6,"h":30} ],
+  "dynamics": [ {"id":"ball","shape":"ball","x":118,"y":460,"r":14} ],
+  "movers": [ {"id":"plate","x":60,"y":300,"w":120,"h":14,"dx":160,"dy":0,"period":4} ],
+  "targets": [ {"id":"goal","x":120,"y":54,"w":100,"h":30} ],
+  "goal": {"type":"contact","object":"ball","target":"goal"},
+  "solution": {"delay":0.5,"strokes":[{"points":[[70,540],[112,540]]}], "waitSeconds": 8}
+}

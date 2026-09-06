@@ -7,11 +7,16 @@ struct GameContainerView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
     private let onNext: (() -> Void)?
+    private let onResult: ((GamePhase) -> Void)?
     private let debugOptions: SpriteView.DebugOptions
 
-    init(mode: GameMode, onNext: (() -> Void)? = nil, makeScene: @escaping () -> GameSceneBase) {
+    init(mode: GameMode,
+         onNext: (() -> Void)? = nil,
+         onResult: ((GamePhase) -> Void)? = nil,
+         makeScene: @escaping () -> GameSceneBase) {
         _session = StateObject(wrappedValue: GameSession(mode: mode, scene: makeScene()))
         self.onNext = onNext
+        self.onResult = onResult
         var options: SpriteView.DebugOptions = []
         #if DEBUG
         if DeveloperFlags.shared.showsStats { options.formUnion([.showsFPS, .showsNodeCount, .showsDrawCount]) }
@@ -34,6 +39,9 @@ struct GameContainerView: View {
         .defersSystemGestures(on: .bottom)
         .onChange(of: scenePhase) { _, phase in
             session.setPaused(phase != .active)
+        }
+        .onChange(of: session.phase) { _, phase in
+            if phase.isOver { onResult?(phase) }
         }
     }
 }

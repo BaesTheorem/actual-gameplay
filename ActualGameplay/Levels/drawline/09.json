@@ -1,0 +1,15 @@
+{
+  "id": "09", "name": "Both", "hint": "Two balls, one goal, one ink budget.",
+  "inkBudget": 200, "stars": [90, 140],
+  "statics": [ {"type":"rect","x":0,"y":34,"w":402,"h":20},
+    {"type":"rect","x":0,"y":500,"w":100,"h":16},
+    {"type":"rect","x":302,"y":500,"w":100,"h":16} ],
+  "dynamics": [
+    {"id":"ball","shape":"ball","x":60,"y":530,"r":14},
+    {"id":"ball2","shape":"ball","x":342,"y":530,"r":14} ],
+  "targets": [ {"id":"goal","x":60,"y":54,"w":282,"h":30} ],
+  "goal": {"type":"allOf","goals":[
+    {"type":"contact","object":"ball","target":"goal"},
+    {"type":"contact","object":"ball2","target":"goal"} ]},
+  "solution": {"strokes":[{"points":[[12,620],[52,620]]},{"delay":0.4,"points":[[350,620],[390,620]]}], "waitSeconds": 7}
+}

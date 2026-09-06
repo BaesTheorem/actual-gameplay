@@ -3,6 +3,7 @@ import SwiftUI
 struct HomeView: View {
     @EnvironmentObject private var store: ProgressStore
     @State private var activeMode: GameMode?
+    @State private var autoplayMode: GameMode?
     @State private var showSettings = false
 
     var body: some View {
@@ -19,13 +20,24 @@ struct HomeView: View {
             .padding(20)
         }
         .fullScreenCover(item: $activeMode) { mode in
-            GameContainerView(mode: mode) { PlaceholderScene(mode: mode) }
+            if mode.hasLevels {
+                LevelSelectView(mode: mode).environmentObject(store)
+            } else {
+                GameContainerView(mode: mode) { PlaceholderScene(mode: mode) }
+            }
+        }
+        .fullScreenCover(item: $autoplayMode) { mode in
+            AutoplayView(mode: mode, only: LaunchArguments.only)
         }
         .sheet(isPresented: $showSettings) {
             SettingsView().environmentObject(store)
         }
         .onAppear {
-            if let mode = LaunchArguments.mode { activeMode = mode }
+            if let mode = LaunchArguments.autoplay {
+                autoplayMode = mode
+            } else if let mode = LaunchArguments.mode {
+                activeMode = mode
+            }
         }
     }
 
@@ -57,8 +69,10 @@ struct HomeView: View {
     private func summary(for mode: GameMode) -> String {
         switch mode {
         case .drawLine, .pinPull:
+            let total = LevelCatalog.shared.count(for: mode)
             let cleared = store.progress.results(for: mode).values.filter(\.cleared).count
-            return cleared == 0 ? "Not started" : "\(cleared) cleared"
+            if total == 0 { return "Coming soon" }
+            return cleared == 0 ? "\(total) levels" : "\(cleared)/\(total) cleared"
         case .runner:
             let runner = store.progress.runner
             if runner.bestLevel == 0 && runner.coins == 0 { return "Not started" }

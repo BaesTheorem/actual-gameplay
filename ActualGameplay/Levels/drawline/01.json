@@ -1,0 +1,9 @@
+{
+  "id": "01", "name": "Nudge", "hint": "Anything you draw falls. Get the ball to the gold.",
+  "inkBudget": 200, "stars": [60, 120],
+  "statics": [ {"type":"rect","x":0,"y":34,"w":402,"h":20}, {"type":"rect","x":0,"y":400,"w":200,"h":16} ],
+  "dynamics": [ {"id":"ball","shape":"ball","x":120,"y":430,"r":14} ],
+  "targets": [ {"id":"goal","x":220,"y":54,"w":182,"h":30} ],
+  "goal": {"type":"contact","object":"ball","target":"goal"},
+  "solution": {"strokes":[{"points":[[75,520],[113,520]]}], "waitSeconds": 6}
+}

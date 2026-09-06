@@ -5,6 +5,7 @@ struct SettingsView: View {
     @ObservedObject private var dev = DeveloperFlags.shared
     @Environment(\.dismiss) private var dismiss
     @State private var confirmReset = false
+    @State private var autoplayMode: GameMode?
 
     var body: some View {
         ZStack {
@@ -28,6 +29,10 @@ struct SettingsView: View {
                     .tint(Theme.runner)
                 Toggle(isOn: $dev.showsPhysics) { Text("Show physics outlines").font(Theme.label()) }
                     .tint(Theme.runner)
+                Toggle(isOn: $dev.logSolutions) { Text("Copy solving strokes to clipboard").font(Theme.label()) }
+                    .tint(Theme.runner)
+                Button("Auto-play every Draw a Line level") { autoplayMode = .drawLine }
+                    .buttonStyle(OutlinedButtonStyle(tint: Theme.runner))
                 HairlineDivider()
                 #endif
                 Button("Reset all progress") { confirmReset = true }
@@ -42,6 +47,9 @@ struct SettingsView: View {
         }
         .confirmationDialog("Reset all progress?", isPresented: $confirmReset, titleVisibility: .visible) {
             Button("Reset everything", role: .destructive) { store.resetAll() }
+        }
+        .fullScreenCover(item: $autoplayMode) { mode in
+            AutoplayView(mode: mode)
         }
     }
 

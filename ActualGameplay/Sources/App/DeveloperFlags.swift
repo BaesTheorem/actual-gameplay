@@ -7,13 +7,24 @@ final class DeveloperFlags: ObservableObject {
 
     @Published var showsStats = false
     @Published var showsPhysics = false
+    /// Print and copy the strokes that solved a level, ready to paste into its JSON.
+    @Published var logSolutions = false
 }
 
-/// Process arguments that steer the app for automation: `--mode pinPull` opens that mode on launch.
+/// Process arguments that steer the app for automation.
+///
+///     --mode drawLine        open that mode on launch
+///     --level 3              with --mode, open level 3 straight away
+///     --replay               with --level, play the stored solution
+///     --autoplay drawLine    replay every level of the mode and write a results file
+///     --only 04,07           limit --autoplay to those level ids
 enum LaunchArguments {
-    static var mode: GameMode? {
-        value(after: "--mode").flatMap(GameMode.init(rawValue:))
-    }
+    static var mode: GameMode? { value(after: "--mode").flatMap(GameMode.init(rawValue:)) }
+    static var level: Int? { value(after: "--level").flatMap(Int.init) }
+    static var replay: Bool { ProcessInfo.processInfo.arguments.contains("--replay") }
+    static var autoplay: GameMode? { value(after: "--autoplay").flatMap(GameMode.init(rawValue:)) }
+    /// With --autoplay, only these level ids (comma separated), e.g. `--only 04,07`.
+    static var only: Set<String>? { value(after: "--only").map { Set($0.split(separator: ",").map(String.init)) } }
 
     static func value(after flag: String) -> String? {
         let args = ProcessInfo.processInfo.arguments

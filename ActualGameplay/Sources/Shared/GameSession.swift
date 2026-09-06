@@ -4,7 +4,7 @@ import Foundation
 enum GamePhase: Equatable {
     case playing
     case paused
-    case won(stars: Int, coins: Int)
+    case won(stars: Int, coins: Int, score: Double?)
     case lost(reason: String)
 
     var isOver: Bool {

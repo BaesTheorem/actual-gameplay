@@ -1,0 +1,110 @@
+{
+  "id": "07",
+  "name": "Spill",
+  "hint": "The bucket is balanced. Load one side.",
+  "inkBudget": 240,
+  "stars": [
+    120,
+    170
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 34,
+      "w": 402,
+      "h": 20
+    },
+    {
+      "type": "rect",
+      "x": 197,
+      "y": 54,
+      "w": 8,
+      "h": 120,
+      "solid": false
+    }
+  ],
+  "dynamics": [
+    {
+      "id": "bucket",
+      "shape": "cup",
+      "x": 201,
+      "y": 211,
+      "w": 100,
+      "h": 74,
+      "t": 8,
+      "friction": 0.7
+    },
+    {
+      "id": "ball",
+      "shape": "ball",
+      "x": 203,
+      "y": 196,
+      "r": 14
+    }
+  ],
+  "joints": [
+    {
+      "type": "pin",
+      "a": "bucket",
+      "b": "world",
+      "x": 201,
+      "y": 178
+    }
+  ],
+  "targets": [
+    {
+      "id": "goal",
+      "x": 240,
+      "y": 54,
+      "w": 162,
+      "h": 30
+    }
+  ],
+  "goal": {
+    "type": "contact",
+    "object": "ball",
+    "target": "goal"
+  },
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            224,
+            330
+          ],
+          [
+            238,
+            330
+          ],
+          [
+            224,
+            320
+          ],
+          [
+            238,
+            320
+          ],
+          [
+            224,
+            310
+          ],
+          [
+            238,
+            310
+          ],
+          [
+            224,
+            300
+          ],
+          [
+            238,
+            300
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 8
+  }
+}
