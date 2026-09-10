@@ -14,7 +14,7 @@ enum Audio {
 /// `Audio/` next to `CREDITS.txt`, named exactly as the track titles.
 enum MusicTrack: String, CaseIterable {
     case menu = "Wallpaper"
-    case drawLine = "Pixelland"
+    case saveDog = "Pixelland"
     case pinPull = "Investigations"
     case runner = "Digital Lemonade"
 
@@ -24,7 +24,7 @@ enum MusicTrack: String, CaseIterable {
 extension GameMode {
     var track: MusicTrack {
         switch self {
-        case .drawLine: return .drawLine
+        case .saveDog: return .saveDog
         case .pinPull: return .pinPull
         case .runner: return .runner
         }

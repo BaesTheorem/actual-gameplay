@@ -1,0 +1,85 @@
+{
+  "id": "08",
+  "name": "Under the roof",
+  "hint": "The roof is done. An L stands where a line falls.",
+  "inkBudget": 300,
+  "stars": [
+    240,
+    280
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 34,
+      "w": 402,
+      "h": 40,
+      "skin": "grass"
+    },
+    {
+      "type": "rect",
+      "x": 150,
+      "y": 150,
+      "w": 102,
+      "h": 20,
+      "skin": "stone"
+    }
+  ],
+  "dogs": [
+    {
+      "id": "dog",
+      "x": 201,
+      "y": 92
+    }
+  ],
+  "hives": [
+    {
+      "x": 30,
+      "y": 700,
+      "count": 10
+    },
+    {
+      "x": 372,
+      "y": 700,
+      "count": 10
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            110,
+            79
+          ],
+          [
+            150,
+            79
+          ],
+          [
+            150,
+            145
+          ]
+        ]
+      },
+      {
+        "delay": 0.3,
+        "points": [
+          [
+            292,
+            79
+          ],
+          [
+            252,
+            79
+          ],
+          [
+            252,
+            145
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 15
+  }
+}

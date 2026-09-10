@@ -14,7 +14,7 @@ final class LevelCatalog {
 
     static func folder(for mode: GameMode) -> String? {
         switch mode {
-        case .drawLine: return "drawline"
+        case .saveDog: return "savedog"
         case .pinPull: return "pinpull"
         case .runner: return nil
         }

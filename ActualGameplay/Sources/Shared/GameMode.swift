@@ -2,7 +2,7 @@ import SwiftUI
 import UIKit
 
 enum GameMode: String, CaseIterable, Identifiable, Codable {
-    case drawLine
+    case saveDog
     case pinPull
     case runner
 
@@ -10,7 +10,7 @@ enum GameMode: String, CaseIterable, Identifiable, Codable {
 
     var title: String {
         switch self {
-        case .drawLine: return "Draw a Line"
+        case .saveDog: return "Save the Dog"
         case .pinPull: return "Pull the Pin"
         case .runner: return "Crowd Run"
         }
@@ -18,7 +18,7 @@ enum GameMode: String, CaseIterable, Identifiable, Codable {
 
     var blurb: String {
         switch self {
-        case .drawLine: return "Sketch a shape. Physics does the rest."
+        case .saveDog: return "Draw a shield. Then the bees come."
         case .pinPull: return "Lava up top, hero down below. Mind the order."
         case .runner: return "Pick gates, grow the crowd, storm the finish."
         }
@@ -26,7 +26,7 @@ enum GameMode: String, CaseIterable, Identifiable, Codable {
 
     var icon: MSIconName {
         switch self {
-        case .drawLine: return .gesture
+        case .saveDog: return .shield
         case .pinPull: return .waterDrop
         case .runner: return .directionsRun
         }
@@ -34,13 +34,22 @@ enum GameMode: String, CaseIterable, Identifiable, Codable {
 
     var accent: Color {
         switch self {
-        case .drawLine: return Theme.draw
+        case .saveDog: return Theme.draw
         case .pinPull: return Theme.pin
         case .runner: return Theme.runner
         }
     }
 
     var uiAccent: UIColor { UIColor(accent) }
+
+    /// The sprite on the home card.
+    var preview: Sprite {
+        switch self {
+        case .saveDog: return .dog
+        case .pinPull: return .heroIdle
+        case .runner: return .runnerA
+        }
+    }
 
     /// Modes with hand-authored levels; the runner generates its own.
     var hasLevels: Bool { self != .runner }

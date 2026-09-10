@@ -1,0 +1,204 @@
+import SpriteKit
+import UIKit
+
+/// Save the Dog: draw a shield, then the bees come. Survive the swarm and the dog is safe.
+final class DogScene: StrokeScene, ReplayableScene {
+    let level: DogLevel
+    let levelIndex: Int
+
+    override var inkBudget: CGFloat { level.inkBudget }
+    override var pinnedInk: Bool { level.pinnedInk ?? false }
+    override var forbiddenRects: [LevelRect] { level.forbidden ?? [] }
+    override var hintText: String? { level.hint }
+    override var strokeColor: UIColor { UIColor(hex: 0x2B303A) }
+
+    var levelID: String { level.id }
+    var levelName: String { level.name }
+    var hasSolution: Bool { level.solution != nil }
+    var replayWait: TimeInterval { (level.solution?.delay ?? 0) + level.swarmDelay + level.surviveSeconds + 4 }
+
+    func startReplay() {
+        if let solution = level.solution { replay(solution) }
+    }
+
+    func describe(score: Double?) -> String { "ink \(Int((score ?? 0).rounded()))" }
+
+    private var dogs: [DogNode] = []
+    private var swarm: BeeSwarm!
+    private var launchAt: TimeInterval?
+    private var launchedAt: TimeInterval?
+    private var lastHUD = ""
+    private var freezeCountdown = 0
+
+    init(level: DogLevel, index: Int) {
+        self.level = level
+        self.levelIndex = index
+        super.init(size: GameSceneBase.canvas)
+        backgroundColor = UIColor(hex: 0xCDEBF7)
+    }
+
+    required init?(coder aDecoder: NSCoder) { fatalError("scenes are built in code") }
+
+    // MARK: - Build
+
+    override func buildLevel() {
+        resetStrokeState()
+        dogs = []
+        launchAt = nil
+        launchedAt = nil
+        lastHUD = ""
+        physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
+
+        addBackdrop()
+        addBounds(floor: false)
+        for item in level.statics ?? [] { addStatic(item) }
+        for rect in level.killers ?? [] { addKiller(rect.cgRect) }
+        for spot in level.dogs {
+            let dog = DogNode(id: spot.id)
+            dog.position = CGPoint(x: spot.x, y: spot.y)
+            addChild(dog)
+            dogs.append(dog)
+        }
+        for hive in level.hives { addHiveMarker(hive) }
+        swarm = BeeSwarm(hives: level.hives)
+        addChild(swarm.layer)
+        addHint()
+        pushHUD()
+    }
+
+    private func addBackdrop() {
+        let clouds = SKSpriteNode(texture: Sprite.cloudsBackdrop.texture, size: CGSize(width: 402, height: 402 * 0.7))
+        clouds.position = CGPoint(x: 201, y: 74 + 402 * 0.35 - 30)
+        clouds.alpha = 0.9
+        clouds.zPosition = -10
+        addChild(clouds)
+        for (i, sprite) in [Sprite.cloud1, .cloud3, .cloud2].enumerated() {
+            let cloud = SKSpriteNode(texture: sprite.texture)
+            let scale: CGFloat = 0.35 + 0.1 * CGFloat(i)
+            cloud.size = CGSize(width: cloud.size.width * scale, height: cloud.size.height * scale)
+            cloud.position = CGPoint(x: 60 + CGFloat(i) * 140, y: 660 - CGFloat(i) * 60)
+            cloud.alpha = 0.85
+            cloud.zPosition = -9
+            addChild(cloud)
+            if !Motion.reduced {
+                let drift = SKAction.moveBy(x: 12 + CGFloat(i) * 4, y: 0, duration: 6 + Double(i))
+                drift.timingMode = .easeInEaseOut
+                cloud.run(.repeatForever(.sequence([drift, drift.reversed()])))
+            }
+        }
+    }
+
+    private func addHiveMarker(_ hive: DogLevel.Hive) {
+        let marker = SKSpriteNode(texture: Sprite.beeRest.texture, size: CGSize(width: 26, height: 26))
+        marker.position = CGPoint(x: hive.x, y: hive.y)
+        marker.zPosition = 4
+        marker.alpha = 0.9
+        marker.name = "hive"
+        addChild(marker)
+        let count = SKLabelNode(fontNamed: "HelveticaNeue-Bold")
+        count.text = "\(hive.count)"
+        count.fontSize = 11
+        count.fontColor = UIColor(hex: 0x3B2A10)
+        count.verticalAlignmentMode = .center
+        count.position = CGPoint(x: hive.x, y: hive.y - 20)
+        count.zPosition = 4
+        count.name = "hive"
+        addChild(count)
+    }
+
+    // MARK: - Flow
+
+    override func strokeDidCommit() {
+        if launchAt == nil { launchAt = elapsed + level.swarmDelay }
+    }
+
+    override func tick(dt: TimeInterval) {
+        super.tick(dt: dt)
+        guard !finished else { return }
+        if let at = launchAt, launchedAt == nil, elapsed >= at { release() }
+        if let started = launchedAt {
+            let now = elapsed - started
+            let targets = dogs.map(\.position)
+            swarm.update(dt: dt, now: now, targets: targets)
+            freezeCountdown -= 1
+            if freezeCountdown <= 0 {
+                freezeSettledStrokes()
+                freezeCountdown = 30
+            }
+            if now >= level.surviveSeconds {
+                win()
+                return
+            }
+        }
+        for dog in dogs where dog.position.y < -60 {
+            lose("\(dog.dogID.capitalized) fell out of the world.")
+            return
+        }
+        pushHUD()
+    }
+
+    private func release() {
+        launchedAt = elapsed
+        freezeSettledStrokes()
+        freezeCountdown = 30
+        for dog in dogs { dog.panic() }
+        for child in children where child.name == "hive" {
+            child.run(.fadeAlpha(to: 0.35, duration: 0.3))
+        }
+        Haptics.shared.slam()
+        Audio.play(.pop)
+    }
+
+    override func handle(contacts: [ContactEvent]) {
+        guard !finished else { return }
+        for event in contacts {
+            if let (dog, _) = event.pair(StrokeCategory.actor, StrokeCategory.bee), let node = dog as? DogNode {
+                lose("The bees got \(node.dogID).")
+                return
+            }
+            if let (dog, _) = event.pair(StrokeCategory.actor, StrokeCategory.killer), let node = dog as? DogNode {
+                lose("\(node.dogID.capitalized) landed on the spikes.")
+                return
+            }
+        }
+    }
+
+    private func win() {
+        let ink = inkUsed
+        for dog in dogs { dog.relax() }
+        Haptics.shared.success()
+        Audio.play(.win)
+        finish(.won(stars: level.stars(forInk: ink), coins: 0, score: Double(ink)))
+        pushHUD()
+    }
+
+    private func lose(_ reason: String) {
+        Haptics.shared.failure()
+        Audio.play(.lose)
+        finish(.lost(reason: reason))
+        pushHUD()
+    }
+
+    override func pushHUD() {
+        let ink = Int(inkLeft.rounded())
+        var readout = "ink \(ink)"
+        if let started = launchedAt {
+            let left = max(0, level.surviveSeconds - (elapsed - started))
+            readout += String(format: "   hold %.1fs   bees %d/%d", left, swarm.spawned, swarm.total)
+        } else if let at = launchAt {
+            readout += String(format: "   bees in %.1fs", max(0, at - elapsed))
+        } else {
+            readout += "   draw a shield"
+        }
+        let key = readout
+        guard key != lastHUD else { return }
+        lastHUD = key
+        let progress: Double
+        if let started = launchedAt {
+            progress = min(1, (elapsed - started) / level.surviveSeconds)
+        } else {
+            progress = Double(inkLeft / max(1, level.inkBudget))
+        }
+        setHUD(HUDState(title: "\(levelIndex + 1). \(level.name)", readout: readout, progress: progress))
+    }
+}

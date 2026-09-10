@@ -6,9 +6,9 @@ Builds the Debug app for the simulator, installs it, launches it with
 container, prints a table, and copies the per-level snapshots to build/replay/.
 Exits nonzero if any level did not end in a win.
 
-    scripts/replay.py drawLine             build, install, run
-    scripts/replay.py drawLine --no-build  reuse the last simulator build
-    scripts/replay.py drawLine --only 04,07   just those level ids
+    scripts/replay.py saveDog             build, install, run
+    scripts/replay.py saveDog --no-build  reuse the last simulator build
+    scripts/replay.py saveDog --only 04,07   just those level ids
 """
 from __future__ import annotations
 
@@ -80,7 +80,7 @@ def install(udid: str) -> pathlib.Path:
 def main() -> None:
     args = sys.argv[1:]
     positional = [a for i, a in enumerate(args) if not a.startswith("--") and (i == 0 or args[i - 1] != "--only")]
-    mode = positional[0] if positional else "drawLine"
+    mode = positional[0] if positional else "saveDog"
     os.chdir(ROOT)
     (ROOT / "build").mkdir(exist_ok=True)
     udid = sim_udid()

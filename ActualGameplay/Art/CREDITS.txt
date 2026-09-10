@@ -1,0 +1,8 @@
+Art in Actual Gameplay
+
+Sprites and tiles from Kenney (kenney.nl), released under Creative Commons Zero (CC0):
+  New Platformer Pack 1.1 (enemies, hazards, items, terrain, characters, backgrounds)
+  Background Elements (clouds)
+  Animal Pack Remastered (the dog)
+No attribution is required by the license; it is given because the work is good.
+Files are renamed to what they are used as; nothing is modified except naming.

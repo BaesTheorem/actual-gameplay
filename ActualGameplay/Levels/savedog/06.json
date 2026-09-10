@@ -1,0 +1,84 @@
+{
+  "id": "06",
+  "name": "Two dogs",
+  "hint": "One shield can cover both. Two shields cost more.",
+  "inkBudget": 520,
+  "stars": [
+    320,
+    440
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 34,
+      "w": 402,
+      "h": 40,
+      "skin": "grass"
+    }
+  ],
+  "dogs": [
+    {
+      "id": "dog",
+      "x": 150,
+      "y": 92
+    },
+    {
+      "id": "pup",
+      "x": 252,
+      "y": 92
+    }
+  ],
+  "hives": [
+    {
+      "x": 201,
+      "y": 700,
+      "count": 16
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            109,
+            78
+          ],
+          [
+            116,
+            122
+          ],
+          [
+            136,
+            155
+          ],
+          [
+            166,
+            176
+          ],
+          [
+            201,
+            183
+          ],
+          [
+            236,
+            176
+          ],
+          [
+            266,
+            155
+          ],
+          [
+            286,
+            122
+          ],
+          [
+            293,
+            78
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 15
+  }
+}

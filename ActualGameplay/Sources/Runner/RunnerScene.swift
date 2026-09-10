@@ -5,9 +5,9 @@ import UIKit
 /// Pure kinematics in lane space; nothing here uses the physics engine.
 final class RunnerScene: GameSceneBase, ReplayableScene {
     private enum Palette {
-        static let road = UIColor(hex: 0x1B1E24)
-        static let edge = UIColor(hex: 0x3F4553)
-        static let stripe = UIColor(hex: 0x2B303A)
+        static let road = UIColor(hex: 0x2B303A)
+        static let edge = UIColor(hex: 0x4A5160)
+        static let stripe = UIColor(hex: 0xC9CDD6)
         static let good = UIColor(hex: 0x9CE37D)
         static let bad = UIColor(hex: 0xFF5C5C)
         static let runner = UIColor(hex: 0x9CE37D)
@@ -70,23 +70,24 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
             self.obstacle = obstacle
             switch obstacle.hazard {
             case .wall:
-                sprite = SKSpriteNode(color: Palette.bad, size: CGSize(width: 100, height: 44))
-            case .blade:
-                sprite = SKSpriteNode(color: .clear, size: CGSize(width: 60, height: 60))
-                let disc = SKShapeNode(circleOfRadius: 30)
-                disc.fillColor = Palette.bad
-                disc.strokeColor = .clear
-                sprite.addChild(disc)
-                for angle in [0, CGFloat.pi / 2] {
-                    let bar = SKShapeNode(rectOf: CGSize(width: 58, height: 8))
-                    bar.fillColor = UIColor(hex: 0x111318)
-                    bar.strokeColor = .clear
-                    bar.zRotation = angle
-                    sprite.addChild(bar)
+                sprite = SKSpriteNode(color: .clear, size: CGSize(width: 100, height: 44))
+                for i in 0..<3 {
+                    let block = SKSpriteNode(texture: Sprite.dangerBlock.texture, size: CGSize(width: 34, height: 44))
+                    block.position = CGPoint(x: -33 + CGFloat(i) * 33, y: 0)
+                    sprite.addChild(block)
                 }
-                if !Motion.reduced { sprite.run(.repeatForever(.rotate(byAngle: .pi * 2, duration: 1.2))) }
+            case .blade:
+                sprite = SKSpriteNode(texture: Sprite.sawA.texture, size: CGSize(width: 64, height: 64))
+                if !Motion.reduced {
+                    sprite.run(.repeatForever(.animate(with: [Sprite.sawA.texture, Sprite.sawB.texture], timePerFrame: 0.08)))
+                }
             case .spikes:
-                sprite = SKSpriteNode(color: Palette.bad.withAlphaComponent(0.85), size: CGSize(width: 100, height: 18))
+                sprite = SKSpriteNode(color: .clear, size: CGSize(width: 100, height: 24))
+                for i in 0..<4 {
+                    let spike = SKSpriteNode(texture: Sprite.spikes.texture, size: CGSize(width: 25, height: 24))
+                    spike.position = CGPoint(x: -37.5 + CGFloat(i) * 25, y: 0)
+                    sprite.addChild(spike)
+                }
             }
             super.init()
             addChild(sprite)
@@ -179,10 +180,19 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
         let roadPath = CGMutablePath()
         roadPath.addLines(between: Projection.roadPolygon)
         roadPath.closeSubpath()
+        let sky = SKSpriteNode(texture: Sprite.hills.texture, size: CGSize(width: 402, height: 260))
+        sky.position = CGPoint(x: 201, y: Projection.horizonY + 130 - 60)
+        sky.zPosition = -20
+        addChild(sky)
+        let ground = SKSpriteNode(color: UIColor(hex: 0x4E8A3A), size: CGSize(width: 402, height: Projection.horizonY))
+        ground.position = CGPoint(x: 201, y: Projection.horizonY / 2)
+        ground.zPosition = -19
+        addChild(ground)
         let road = SKShapeNode(path: roadPath)
         road.fillColor = Palette.road
         road.strokeColor = Palette.edge
         road.lineWidth = 1
+        road.zPosition = -18
         addChild(road)
         let horizon = SKShapeNode(rectOf: CGSize(width: 402, height: 1))
         horizon.position = CGPoint(x: 201, y: Projection.horizonY)
@@ -212,31 +222,22 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
         }
 
         guard let view else { return }
-        let runnerTexture = NodeFactory.shared.figure(color: Palette.runner, view: view)
-        crowd = Crowd(count: track.startCrowd, anchorZ: Projection.anchorZ, texture: runnerTexture, size: CGSize(width: 14, height: 30))
+        _ = view
+        let runnerFrames = [Sprite.runnerA.texture, Sprite.runnerB.texture]
+        crowd = Crowd(count: track.startCrowd, anchorZ: Projection.anchorZ, frames: runnerFrames, size: CGSize(width: 22, height: 26))
         addChild(crowd.layer)
 
         enemyStrength = track.finale.strength
         switch track.finale {
         case .crowd(let n):
-            let enemyTexture = NodeFactory.shared.figure(color: Palette.enemy, view: view)
-            let foes = Crowd(count: n, anchorZ: track.finaleZ + 4, texture: enemyTexture, size: CGSize(width: 14, height: 30))
+            let foes = Crowd(count: n, anchorZ: track.finaleZ + 4, frames: [Sprite.enemyA.texture, Sprite.enemyB.texture], size: CGSize(width: 22, height: 26))
             addChild(foes.layer)
             enemy = foes
         case .boss(let hp):
             let node = SKNode()
-            let body = SKShapeNode(circleOfRadius: 40)
-            body.fillColor = Palette.boss
-            body.strokeColor = .clear
+            let body = SKSpriteNode(texture: Sprite.boss.texture, size: CGSize(width: 96, height: 96))
+            body.position = CGPoint(x: 0, y: 8)
             node.addChild(body)
-            for dx in [-14.0, 14.0] as [CGFloat] {
-                let eye = SKShapeNode(rectOf: CGSize(width: 10, height: 6))
-                eye.fillColor = UIColor(hex: 0x111318)
-                eye.strokeColor = .clear
-                eye.position = CGPoint(x: dx, y: 10)
-                eye.zRotation = dx < 0 ? 0.4 : -0.4
-                node.addChild(eye)
-            }
             let track = SKSpriteNode(color: UIColor(hex: 0x262A32), size: CGSize(width: 90, height: 8))
             track.position = CGPoint(x: 0, y: 56)
             node.addChild(track)

@@ -26,7 +26,7 @@ struct RunnerHubView: View {
                     }
                     Spacer()
                     HStack(spacing: 6) {
-                        MSIcon(.paid, size: 20).foregroundStyle(Theme.gold)
+                        SpriteImage(sprite: .coin, size: 22)
                         Text("\(runner.coins)").font(Theme.mono(16)).foregroundStyle(Theme.gold)
                     }
                 }

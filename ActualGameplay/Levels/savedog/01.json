@@ -1,0 +1,79 @@
+{
+  "id": "01",
+  "name": "First shield",
+  "hint": "Draw a roof over him. Then the bees come.",
+  "inkBudget": 500,
+  "stars": [
+    300,
+    400
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 34,
+      "w": 402,
+      "h": 40,
+      "skin": "grass"
+    }
+  ],
+  "dogs": [
+    {
+      "id": "dog",
+      "x": 201,
+      "y": 92
+    }
+  ],
+  "hives": [
+    {
+      "x": 201,
+      "y": 700,
+      "count": 12
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            149,
+            78
+          ],
+          [
+            153,
+            118
+          ],
+          [
+            164,
+            148
+          ],
+          [
+            181,
+            166
+          ],
+          [
+            201,
+            173
+          ],
+          [
+            221,
+            166
+          ],
+          [
+            238,
+            148
+          ],
+          [
+            249,
+            118
+          ],
+          [
+            253,
+            78
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 14
+  }
+}

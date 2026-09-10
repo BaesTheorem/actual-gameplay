@@ -1,0 +1,78 @@
+{
+  "id": "05",
+  "name": "Sticky ink",
+  "hint": "Here your ink stays where you put it. Close the sides.",
+  "inkBudget": 200,
+  "stars": [
+    180,
+    195
+  ],
+  "pinnedInk": true,
+  "statics": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 34,
+      "w": 402,
+      "h": 40,
+      "skin": "grass"
+    },
+    {
+      "type": "rect",
+      "x": 130,
+      "y": 170,
+      "w": 142,
+      "h": 20,
+      "skin": "stone"
+    }
+  ],
+  "dogs": [
+    {
+      "id": "dog",
+      "x": 201,
+      "y": 92
+    }
+  ],
+  "hives": [
+    {
+      "x": 30,
+      "y": 120,
+      "count": 8
+    },
+    {
+      "x": 372,
+      "y": 120,
+      "count": 8
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            150,
+            79
+          ],
+          [
+            150,
+            165
+          ]
+        ]
+      },
+      {
+        "delay": 0.3,
+        "points": [
+          [
+            252,
+            79
+          ],
+          [
+            252,
+            165
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 14
+  }
+}

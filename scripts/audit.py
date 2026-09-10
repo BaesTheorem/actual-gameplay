@@ -7,7 +7,7 @@ trials per level and reports the ones that look trivial (a naive move wins), fra
 (a slightly imprecise version of the solution loses), or broken (nothing wins).
 
     scripts/audit.py pinPull            singles, ordered pairs, everything in order and reversed
-    scripts/audit.py drawLine           solution jittered eight ways plus five dumb strokes
+    scripts/audit.py saveDog           solution jittered eight ways plus five dumb strokes
     scripts/audit.py runner             greedy, straight, always-left, and random steering
     scripts/audit.py <mode> --no-build  reuse the last simulator build
     scripts/audit.py <mode> --only 05,07
@@ -81,25 +81,16 @@ def draw_trials(levels: list[dict], only: set[str] | None) -> list[dict]:
         for scale in (0.85, 1.15):
             trials.append({"id": f"{lid}/scale:{scale}", "level": index,
                            "transform": {"dx": 0, "dy": 0, "scale": scale}})
-        objects = level.get("dynamics") or []
-        goal_ids = set()
-        stack = [level["goal"]]
-        while stack:
-            g = stack.pop()
-            if g.get("type") == "allOf":
-                stack.extend(g["goals"])
-            elif "object" in g:
-                goal_ids.add(g["object"])
-        target = next((o for o in objects if o["id"] in goal_ids), objects[0] if objects else None)
-        if target:
-            x, y = target["x"], target["y"]
-            top = min(y + 70, 740)
+        dogs = level.get("dogs") or []
+        if dogs:
+            x, y = dogs[0]["x"], dogs[0]["y"]
+            top = min(y + 60, 740)
             dumb = {
                 "drop": [[x - 20, top], [x + 20, top]],
-                "drop-left": [[x - 60, top], [x - 20, top]],
-                "drop-right": [[x + 20, top], [x + 60, top]],
-                "bar": [[40, 450], [360, 450]],
-                "ramp": [[30, 700], [370, 120]],
+                "bar": [[x - 90, top], [x + 90, top]],
+                "wall-left": [[x - 40, y - 12], [x - 40, y + 70]],
+                "wall-right": [[x + 40, y - 12], [x + 40, y + 70]],
+                "roof": [[x - 60, y + 40], [x + 60, y + 40]],
             }
             for name, stroke in dumb.items():
                 trials.append({"id": f"{lid}/dumb:{name}", "level": index, "strokes": [stroke]})
@@ -159,7 +150,7 @@ def verdicts(mode: str, entries: list[dict], levels: list[dict] | None = None) -
                 flags.append(f"LOOSE: {len(pair_at_par)}/{len(pairs)} ordered pairs win at par")
             if not won:
                 flags.append("UNWINNABLE: nothing tested wins")
-        elif mode == "drawLine":
+        elif mode == "saveDog":
             jit = {n for n in trials if n.startswith(("jitter:", "scale:"))}
             dumb = {n for n in trials if n.startswith("dumb:")}
             if "solution" not in won:
@@ -192,8 +183,8 @@ def main() -> None:
     only = set(args[args.index("--only") + 1].split(",")) if "--only" in args else None
     if mode == "pinPull":
         trials = pin_trials(load_levels("pinpull"), only)
-    elif mode == "drawLine":
-        trials = draw_trials(load_levels("drawline"), only)
+    elif mode == "saveDog":
+        trials = draw_trials(load_levels("savedog"), only)
     elif mode == "runner":
         trials = runner_trials(only)
     else:

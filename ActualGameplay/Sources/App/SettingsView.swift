@@ -41,7 +41,7 @@ struct SettingsView: View {
                 Toggle(isOn: $dev.logSolutions) { Text("Copy solving strokes to clipboard").font(Theme.label()) }
                     .tint(Theme.runner)
                 HStack(spacing: 10) {
-                    Button("Auto-play Draw a Line") { autoplayMode = .drawLine }
+                    Button("Auto-play Save the Dog") { autoplayMode = .saveDog }
                         .buttonStyle(OutlinedButtonStyle(tint: Theme.runner))
                     Button("Auto-play Pull the Pin") { autoplayMode = .pinPull }
                         .buttonStyle(OutlinedButtonStyle(tint: Theme.runner))

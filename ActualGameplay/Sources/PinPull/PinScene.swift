@@ -135,12 +135,9 @@ final class PinScene: GameSceneBase, ReplayableScene {
     }
 
     private func addWall(_ rect: CGRect) {
-        let node = SKShapeNode(rectOf: rect.size)
-        node.position = CGPoint(x: rect.midX, y: rect.midY)
-        node.fillColor = Palette.wall
-        node.strokeColor = Palette.outline
-        node.lineWidth = 1
-        node.physicsBody = wallBody(SKPhysicsBody(rectangleOf: rect.size))
+        let node = Terrain.node(rect: rect, skin: "stone")
+        node.zPosition = 2
+        node.physicsBody = wallBody(SKPhysicsBody(rectangleOf: rect.size, center: CGPoint(x: rect.midX, y: rect.midY)))
         addChild(node)
     }
 
@@ -151,9 +148,11 @@ final class PinScene: GameSceneBase, ReplayableScene {
         path.addLines(between: quad)
         path.closeSubpath()
         let node = SKShapeNode(path: path)
-        node.fillColor = Palette.wall
+        node.fillColor = .white
+        node.fillTexture = Sprite.texture(named: "terrain_stone_block_center")
         node.strokeColor = Palette.outline
         node.lineWidth = 1
+        node.zPosition = 2
         node.physicsBody = wallBody(SKPhysicsBody(polygonFrom: path))
         addChild(node)
     }
@@ -190,12 +189,10 @@ final class PinScene: GameSceneBase, ReplayableScene {
         node.lineWidth = 1
         node.fillColor = Palette.goal.withAlphaComponent(0.08)
         addChild(node)
-        let label = SKLabelNode(fontNamed: "Menlo-Bold")
-        label.text = "EXIT"
-        label.fontSize = 11
-        label.fontColor = Palette.goal.withAlphaComponent(0.8)
-        label.position = CGPoint(x: rect.midX, y: rect.minY + 6)
-        addChild(label)
+        let sign = SKSpriteNode(texture: Sprite.signExit.texture, size: CGSize(width: 30, height: 30))
+        sign.position = CGPoint(x: rect.maxX - 20, y: rect.minY + 16)
+        sign.zPosition = 1
+        addChild(sign)
         let body = SKPhysicsBody(rectangleOf: rect.size, center: CGPoint(x: rect.midX, y: rect.midY))
         body.isDynamic = false
         body.categoryBitMask = PinCategory.goal
@@ -211,17 +208,7 @@ final class PinScene: GameSceneBase, ReplayableScene {
     }
 
     private func addHint() {
-        guard let hint = level.hint, !hint.isEmpty else { return }
-        let label = SKLabelNode(fontNamed: "Menlo")
-        label.text = hint
-        label.fontSize = 12
-        label.fontColor = Palette.muted
-        label.numberOfLines = 2
-        label.preferredMaxLayoutWidth = 360
-        label.horizontalAlignmentMode = .center
-        label.verticalAlignmentMode = .top
-        label.position = CGPoint(x: 201, y: 742)
-        addChild(label)
+        addHintLabel(level.hint, color: Palette.muted, backdrop: backgroundColor)
     }
 
     // MARK: - Input

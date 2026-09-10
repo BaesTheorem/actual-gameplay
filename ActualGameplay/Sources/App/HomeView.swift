@@ -72,7 +72,7 @@ struct HomeView: View {
 
     private func summary(for mode: GameMode) -> String {
         switch mode {
-        case .drawLine, .pinPull:
+        case .saveDog, .pinPull:
             let total = LevelCatalog.shared.count(for: mode)
             let cleared = store.progress.results(for: mode).values.filter(\.cleared).count
             if total == 0 { return "Coming soon" }
@@ -93,8 +93,7 @@ struct ModeCard: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 14) {
-                MSIcon(mode.icon, size: 30)
-                    .foregroundStyle(Theme.surface)
+                SpriteImage(sprite: mode.preview, size: 44)
                     .frame(width: 60, height: 60)
                     .background(mode.accent)
                 VStack(alignment: .leading, spacing: 3) {

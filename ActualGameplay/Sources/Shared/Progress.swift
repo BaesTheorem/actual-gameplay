@@ -55,7 +55,7 @@ struct Progress: Codable, Equatable {
     static let currentSchema = 1
 
     var schemaVersion: Int = Progress.currentSchema
-    var drawLine: [String: LevelResult] = [:]
+    var saveDog: [String: LevelResult] = [:]
     var pinPull: [String: LevelResult] = [:]
     var runner = RunnerProgress()
     var settings = GameSettings()
@@ -65,7 +65,7 @@ struct Progress: Codable, Equatable {
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         schemaVersion = try c.decodeIfPresent(Int.self, forKey: .schemaVersion) ?? 1
-        drawLine = try c.decodeIfPresent([String: LevelResult].self, forKey: .drawLine) ?? [:]
+        saveDog = try c.decodeIfPresent([String: LevelResult].self, forKey: .saveDog) ?? [:]
         pinPull = try c.decodeIfPresent([String: LevelResult].self, forKey: .pinPull) ?? [:]
         runner = try c.decodeIfPresent(RunnerProgress.self, forKey: .runner) ?? RunnerProgress()
         settings = try c.decodeIfPresent(GameSettings.self, forKey: .settings) ?? GameSettings()
@@ -73,7 +73,7 @@ struct Progress: Codable, Equatable {
 
     func results(for mode: GameMode) -> [String: LevelResult] {
         switch mode {
-        case .drawLine: return drawLine
+        case .saveDog: return saveDog
         case .pinPull: return pinPull
         case .runner: return [:]
         }
@@ -88,7 +88,7 @@ struct Progress: Codable, Equatable {
             result.bestScore = result.bestScore.map { min($0, score) } ?? score
         }
         switch mode {
-        case .drawLine: drawLine[levelID] = result
+        case .saveDog: saveDog[levelID] = result
         case .pinPull: pinPull[levelID] = result
         case .runner: break
         }

@@ -1,15 +1,15 @@
 # Actual Gameplay
 
-The three games that only exist in mobile ads, built for real: draw-a-line physics puzzles,
+The three games that only exist in mobile ads, built for real: save-the-dog drawing puzzles,
 pin-pull liquid puzzles, and a crowd runner with gates. No ads, no purchases, no network.
 iPhone, SwiftUI shell, SpriteKit scenes.
 
 ## The games
 
-**Draw a Line.** Sketch a stroke and it becomes a rigid body: it falls, wedges, bridges, tips
-levers. Get the ball to the gold. Ink is limited, the world is frozen until your first stroke
-lands, and running out of ink with nothing moving is a loss. Twelve levels, three stars for a
-low-ink clear.
+**Save the Dog.** A dog, a limited pot of ink, and hives full of bees. Draw a shield; it
+falls like anything you draw; a moment later the bees stream in and hunt him for ten
+seconds. Bees bounce off your line, so a closed shape that lands where you meant it is the
+whole game. Twelve levels, three stars for a low-ink clear.
 
 **Pull the Pin.** Chambers of water and lava held up by pins. Tap a pin to slide it out.
 Water and lava cancel each other, lava ends the hero, drains swallow whatever reaches them.
@@ -42,15 +42,15 @@ Then:
 Every hand-authored level stores its own solution (strokes for Draw a Line, a pull order for
 Pull the Pin), and two scripts drive the app on the simulator through them:
 
-    scripts/replay.py drawLine|pinPull|runner   play every stored solution, report pass/fail
-    scripts/audit.py  drawLine|pinPull|runner   stress the levels
+    scripts/replay.py saveDog|pinPull|runner   play every stored solution, report pass/fail
+    scripts/audit.py  saveDog|pinPull|runner   stress the levels
 
 The replay is the regression suite: after touching physics or a level file, it must be 12/12.
 The audit asks the questions a replay cannot. For Pull the Pin it tries every single pin,
 every ordered pair, and everything in order and reversed, and flags a level where a naive
-sequence wins. For Draw a Line it replays the solution shifted and scaled eight ways and
-tries five dumb strokes, and flags levels that are fragile (the wobbled solution loses) or
-trivial (a dumb stroke wins). For Crowd Run it compares greedy steering against never
+sequence wins. For Save the Dog it replays the solution shifted and scaled eight ways and tries five
+naive strokes (a bar over the dog, walls beside him, a roof), and flags levels that are
+fragile (the wobbled solution loses) or trivial (a naive stroke wins). For Crowd Run it compares greedy steering against never
 steering, always-left, and random. Both write per-trial snapshots under `build/`.
 
 Both scripts wait for the simulator to finish booting and warm it up with a throwaway
@@ -65,12 +65,20 @@ physics overlays in Settings.
 
 ## Adding a level
 
-Drop a JSON file into `ActualGameplay/Levels/<drawline|pinpull>/NN.json`. The folder is
+Drop a JSON file into `ActualGameplay/Levels/<savedog|pinpull>/NN.json`. The folder is
 copied into the bundle as a folder reference, so no project change is needed. Coordinates
 are a fixed 402 x 874 point canvas, origin bottom-left, and the scene letterboxes on other
-screens so a stored solution behaves the same everywhere. Solve the level once with
-"Copy solving strokes to clipboard" on in Settings (Draw a Line) or note the pull order
-(Pull the Pin), paste that in as `solution`, then run the replay and the audit.
+screens so a stored solution behaves the same everywhere. Store the solving strokes (Save the Dog) or the pull order (Pull the Pin) as `solution`,
+then run the replay and the audit. The retired ball-physics levels the draw mode started
+with are kept under `attic/` for reference.
+
+## Art
+
+Sprites, tiles, and backgrounds are from [Kenney](https://kenney.nl) (New Platformer Pack,
+Animal Pack Remastered, Background Elements), all CC0. They live in `ActualGameplay/Art/`
+next to a `CREDITS.txt`, renamed to what they are used as. Strokes, liquids, and the road
+are still drawn in code on purpose: they are the parts the player makes or that behave like
+fluids, and a texture would only get in the way.
 
 ## Music
 
@@ -83,9 +91,10 @@ and in the app's settings screen. Launch with `--silent` to keep automation quie
 
 - `ActualGameplay/Sources/App`: SwiftUI shell (home, level select, the game container and HUD, settings, autoplay).
 - `ActualGameplay/Sources/Shared`: scene base class, session contract, progress store, replay protocol.
-- `ActualGameplay/Sources/{DrawLine,PinPull,Runner}`: one folder per mode.
+- `ActualGameplay/Sources/{SaveDog,PinPull,Runner}`: one folder per mode.
 - `ActualGameplay/Levels/<mode>/NN.json`: hand-authored levels, copied into the bundle as a folder.
 - `ActualGameplay/Audio/`: the soundtrack and its credits, also copied as a folder.
+- `ActualGameplay/Art/`: Kenney sprites and their credits, also copied as a folder.
 - `ActualGameplayTests/`: geometry, stroke bodies, level invariants, generator determinism and survivability, progress round trips.
 - `scripts/gen-icons.py`: regenerates the Material Symbols glyph enum.
 - `scripts/make-icon.py`: draws the app icon.

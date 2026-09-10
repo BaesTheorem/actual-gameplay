@@ -19,6 +19,8 @@ targets:
         type: folder
       - path: ActualGameplay/Audio
         type: folder
+      - path: ActualGameplay/Art
+        type: folder
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.baestheorem.actualgameplay

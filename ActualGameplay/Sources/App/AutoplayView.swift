@@ -130,12 +130,12 @@ final class AutoplayRunner: ObservableObject {
         switch scene {
         case let pin as PinScene:
             pin.replay(pins: audit.pins ?? [])
-        case let draw as DrawScene:
+        case let dog as DogScene:
             if let strokes = audit.strokes {
-                draw.replay(strokes: strokes.map { $0.map { CGPoint(x: $0[0], y: $0[1]) } })
-            } else if let solution = draw.level.solution {
+                dog.replay(strokes: strokes.map { $0.map { CGPoint(x: $0[0], y: $0[1]) } })
+            } else if let solution = dog.level.solution {
                 let t = audit.transform.map { StrokeTransform(dx: $0.dx, dy: $0.dy, scale: $0.scale) } ?? .identity
-                draw.replay(solution, transform: t)
+                dog.replay(solution, transform: t)
             }
         case let runner as RunnerScene:
             runner.configure(policy: audit.policy.flatMap(RunnerScene.SteerPolicy.init(rawValue:)) ?? .greedy)

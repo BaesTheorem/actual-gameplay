@@ -82,6 +82,28 @@ class GameSceneBase: SKScene, SKPhysicsContactDelegate {
         }
     }
 
+    /// A two-line hint under the HUD, on a backdrop so tall geometry cannot swallow it.
+    func addHintLabel(_ text: String?, color: UIColor, backdrop: UIColor) {
+        guard let text, !text.isEmpty else { return }
+        let label = SKLabelNode(fontNamed: "Menlo")
+        label.text = text
+        label.fontSize = 12
+        label.fontColor = color
+        label.numberOfLines = 2
+        label.preferredMaxLayoutWidth = 350
+        label.horizontalAlignmentMode = .center
+        label.verticalAlignmentMode = .top
+        label.position = CGPoint(x: 201, y: 742)
+        label.zPosition = 31
+        let frame = label.calculateAccumulatedFrame().insetBy(dx: -10, dy: -6)
+        let plate = SKShapeNode(rect: frame)
+        plate.fillColor = backdrop.withAlphaComponent(0.88)
+        plate.strokeColor = .clear
+        plate.zPosition = 30
+        addChild(plate)
+        addChild(label)
+    }
+
     /// The rendered scene as an image, for autoplay reports.
     func snapshot() -> UIImage? {
         guard let view, let texture = view.texture(from: self) else { return nil }

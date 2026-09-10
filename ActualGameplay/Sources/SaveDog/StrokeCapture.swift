@@ -8,6 +8,7 @@ final class StrokeCapture {
 
     let drawArea: CGRect
     let budget: CGFloat
+    var color: UIColor = StrokeBody.color
     private(set) var inkUsed: CGFloat = 0
     private(set) var isDrawing = false
     private weak var scene: SKScene?
@@ -31,7 +32,7 @@ final class StrokeCapture {
         node.lineWidth = StrokeBody.width
         node.lineCap = .round
         node.lineJoin = .round
-        node.strokeColor = StrokeBody.color.withAlphaComponent(0.7)
+        node.strokeColor = color.withAlphaComponent(0.7)
         node.zPosition = 50
         scene?.addChild(node)
         live = node

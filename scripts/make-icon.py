@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Draw the app icon: a pin holding lava above a hero, flat and sharp, no text.
+"""Draw the app icon: the dog under a drawn shield with bees on the way. Flat, no text.
 
-Writes ActualGameplay/Assets.xcassets/AppIcon.appiconset/icon.png at 1024 px.
-Drawn at 2x and downsampled so the edges are clean without a browser.
+Composites the Kenney dog and bee sprites (CC0) over a sky and a grass strip, plus the
+player's stroke drawn in code the way the game draws it. Writes the 1024 px icon into the
+asset catalog. Drawn at 2x and downsampled so the stroke edges are clean.
 """
 from __future__ import annotations
 
@@ -12,53 +13,48 @@ import pathlib
 from PIL import Image, ImageDraw
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+ART = ROOT / "ActualGameplay/Art"
 OUT = ROOT / "ActualGameplay/Assets.xcassets/AppIcon.appiconset/icon.png"
-S = 2  # supersample
-BG, INK, LAVA, WATER, WALL = "#111318", "#E2E4EA", "#FF6A3D", "#4FB8FF", "#262A32"
+S = 2
+SKY, GRASS, DIRT, INK = "#CDEBF7", "#7BC950", "#8A5A2B", "#F4F6FA"
 
 
-def circle(d: ImageDraw.ImageDraw, cx: float, cy: float, r: float, fill: str) -> None:
-    d.ellipse([(cx - r) * S, (cy - r) * S, (cx + r) * S, (cy + r) * S], fill=fill)
-
-
-def rect(d: ImageDraw.ImageDraw, x: float, y: float, w: float, h: float, fill: str) -> None:
-    d.rectangle([x * S, y * S, (x + w) * S, (y + h) * S], fill=fill)
-
-
-def heap(d: ImageDraw.ImageDraw, x0: float, x1: float, y_floor: float, rows: int, r: float, fill: str) -> None:
-    """Hex-packed circles resting on y_floor, each row narrower than the one below."""
-    dy = r * math.sqrt(3)
-    for row in range(rows):
-        inset = row * r * 1.6
-        left, right = x0 + inset, x1 - inset
-        y = y_floor - r - row * dy
-        x = left + r + (r if row % 2 else 0)
-        while x + r <= right:
-            circle(d, x, y, r, fill)
-            x += 2 * r
+def paste_sprite(canvas: Image.Image, name: str, center: tuple[float, float], size: int, flip: bool = False) -> None:
+    sprite = Image.open(ART / f"{name}.png").convert("RGBA")
+    scale = size * S / max(sprite.size)
+    sprite = sprite.resize((max(1, int(sprite.width * scale)), max(1, int(sprite.height * scale))), Image.LANCZOS)
+    if flip:
+        sprite = sprite.transpose(Image.FLIP_LEFT_RIGHT)
+    x = int(center[0] * S - sprite.width / 2)
+    y = int(center[1] * S - sprite.height / 2)
+    canvas.alpha_composite(sprite, (x, y))
 
 
 def main() -> None:
-    img = Image.new("RGB", (1024 * S, 1024 * S), BG)
+    img = Image.new("RGBA", (1024 * S, 1024 * S), SKY)
     d = ImageDraw.Draw(img)
-    # chamber: left wall and floor
-    rect(d, 72, 96, 36, 856, WALL)
-    rect(d, 72, 916, 880, 36, WALL)
-    # lava heaped on the pin
-    heap(d, 108, 792, 512, 5, 30, LAVA)
-    # the pin, with its knob poking out the right side
-    rect(d, 108, 512, 700, 52, INK)
-    circle(d, 852, 538, 64, INK)
-    # a little water in the corner
-    heap(d, 108, 440, 916, 3, 24, WATER)
-    # hero standing on the floor, right of the water
-    hx = 720
-    circle(d, hx, 690, 40, INK)
-    rect(d, hx - 22, 740, 44, 110, INK)
-    rect(d, hx - 78, 768, 156, 24, INK)
-    rect(d, hx - 40, 850, 26, 66, INK)
-    rect(d, hx + 14, 850, 26, 66, INK)
-    img = img.resize((1024, 1024), Image.LANCZOS)
+    # ground: grass over dirt, flat and sharp
+    d.rectangle([0, 860 * S, 1024 * S, 1024 * S], fill=DIRT)
+    d.rectangle([0, 860 * S, 1024 * S, 900 * S], fill=GRASS)
+    # the shield: a dome drawn in the game's stroke style, feet on the grass
+    cx, base, half, height = 512, 862, 300, 330
+    points = []
+    for i in range(0, 41):
+        t = i / 40
+        ang = math.pi * (1 - t)
+        points.append((cx + half * math.cos(ang), base - height * math.sin(ang) ** 0.9))
+    points[0] = (cx - half, base)
+    points[-1] = (cx + half, base)
+    d.line([(x * S, y * S) for x, y in points], fill=INK, width=56 * S, joint="curve")
+    for x, y in (points[0], points[-1]):
+        d.ellipse([(x - 28) * S, (y - 28) * S, (x + 28) * S, (y + 28) * S], fill=INK)
+    # the dog, sitting on the grass under the shield
+    paste_sprite(img, "dog", (512, 745), 250)
+    # bees, inbound
+    paste_sprite(img, "bee_a", (150, 260), 150, flip=True)
+    paste_sprite(img, "bee_b", (880, 190), 130)
+    paste_sprite(img, "bee_a", (760, 420), 110)
+    img = img.resize((1024, 1024), Image.LANCZOS).convert("RGB")
     OUT.parent.mkdir(parents=True, exist_ok=True)
     img.save(OUT, "PNG")
     print(f"wrote {OUT.relative_to(ROOT)}")

@@ -26,13 +26,13 @@ final class Crowd {
     private(set) var members: [Member] = []
     var anchorX: CGFloat = 0
     var anchorZ: CGFloat
-    private let texture: SKTexture
+    private let frames: [SKTexture]
     private let size: CGSize
 
-    init(count: Int, anchorZ: CGFloat, texture: SKTexture, size: CGSize) {
+    init(count: Int, anchorZ: CGFloat, frames: [SKTexture], size: CGSize) {
         self.count = 0
         self.anchorZ = anchorZ
-        self.texture = texture
+        self.frames = frames
         self.size = size
         setCount(count, animated: false)
     }
@@ -56,7 +56,10 @@ final class Crowd {
     }
 
     private func addMember(index: Int, animated: Bool) {
-        let node = SKSpriteNode(texture: texture, size: size)
+        let node = SKSpriteNode(texture: frames.first, size: size)
+        if frames.count > 1 {
+            node.run(.repeatForever(.animate(with: frames, timePerFrame: 0.12)))
+        }
         let slot = Crowd.slot(index)
         let member = Member(node: node,
                             x: anchorX + (animated ? 0 : slot.dx),
@@ -121,30 +124,5 @@ final class Crowd {
         layer.removeAllChildren()
         members = []
         count = 0
-    }
-}
-
-extension NodeFactory {
-    /// A small runner figure: round head, tapered body. Rendered once per color.
-    func figure(color: UIColor, view: SKView) -> SKTexture {
-        let root = SKNode()
-        let body = SKShapeNode(path: {
-            let path = CGMutablePath()
-            path.move(to: CGPoint(x: -6, y: -14))
-            path.addLine(to: CGPoint(x: 6, y: -14))
-            path.addLine(to: CGPoint(x: 4, y: 4))
-            path.addLine(to: CGPoint(x: -4, y: 4))
-            path.closeSubpath()
-            return path
-        }())
-        body.fillColor = color
-        body.strokeColor = .clear
-        root.addChild(body)
-        let head = SKShapeNode(circleOfRadius: 5)
-        head.fillColor = color
-        head.strokeColor = .clear
-        head.position = CGPoint(x: 0, y: 9)
-        root.addChild(head)
-        return view.texture(from: root) ?? SKTexture()
     }
 }

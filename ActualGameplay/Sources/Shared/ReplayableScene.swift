@@ -19,9 +19,9 @@ enum SceneFactory {
     static func makeLevelScene(mode: GameMode, index: Int) -> (GameSceneBase & ReplayableScene)? {
         let catalog = LevelCatalog.shared
         switch mode {
-        case .drawLine:
-            guard let level = try? catalog.load(DrawLevel.self, mode: mode, index: index) else { return nil }
-            return DrawScene(level: level, index: index)
+        case .saveDog:
+            guard let level = try? catalog.load(DogLevel.self, mode: mode, index: index) else { return nil }
+            return DogScene(level: level, index: index)
         case .pinPull:
             guard let level = try? catalog.load(PinLevel.self, mode: mode, index: index) else { return nil }
             return PinScene(level: level, index: index)

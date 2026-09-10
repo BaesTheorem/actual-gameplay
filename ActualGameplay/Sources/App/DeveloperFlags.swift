@@ -13,10 +13,10 @@ final class DeveloperFlags: ObservableObject {
 
 /// Process arguments that steer the app for automation.
 ///
-///     --mode drawLine        open that mode on launch
+///     --mode saveDog        open that mode on launch
 ///     --level 3              with --mode, open level 3 straight away
 ///     --replay               with --level, play the stored solution
-///     --autoplay drawLine    replay every level of the mode and write a results file
+///     --autoplay saveDog    replay every level of the mode and write a results file
 ///     --only 04,07           limit --autoplay to those level ids
 ///     --audit pinPull        run scripts/audit.py's trial plan instead of the stored solutions
 ///     --silent               never start the music

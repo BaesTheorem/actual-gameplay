@@ -15,6 +15,10 @@ struct HUDOverlay: View {
                         Text(session.hud.readout).font(Theme.mono(12)).foregroundStyle(session.mode.accent)
                     }
                 }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(Theme.surfaceContainer.opacity(0.92))
+                .overlay(Rectangle().stroke(Theme.outline, lineWidth: 1))
                 .allowsHitTesting(false)
                 Spacer(minLength: 0).allowsHitTesting(false)
                 IconButton(icon: .refresh) { session.reset() }

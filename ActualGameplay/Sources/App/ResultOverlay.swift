@@ -47,7 +47,7 @@ struct ResultOverlay: View {
 
     private func scoreLabel(_ score: Double) -> String {
         switch session.mode {
-        case .drawLine: return "ink used \(Int(score.rounded()))"
+        case .saveDog: return "ink used \(Int(score.rounded()))"
         case .pinPull: return "pins pulled \(Int(score.rounded()))"
         case .runner: return "survivors \(Int(score.rounded()))"
         }

@@ -1,0 +1,79 @@
+{
+  "id": "11",
+  "name": "Low ceiling",
+  "hint": "No ink in the band. Draw low and tight.",
+  "inkBudget": 300,
+  "stars": [
+    200,
+    260
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 34,
+      "w": 402,
+      "h": 40,
+      "skin": "grass"
+    }
+  ],
+  "forbidden": [
+    {
+      "x": 120,
+      "y": 132,
+      "w": 162,
+      "h": 100
+    }
+  ],
+  "dogs": [
+    {
+      "id": "dog",
+      "x": 201,
+      "y": 92
+    }
+  ],
+  "hives": [
+    {
+      "x": 201,
+      "y": 700,
+      "count": 14
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            150,
+            78
+          ],
+          [
+            156,
+            104
+          ],
+          [
+            172,
+            120
+          ],
+          [
+            201,
+            126
+          ],
+          [
+            230,
+            120
+          ],
+          [
+            246,
+            104
+          ],
+          [
+            252,
+            78
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 14
+  }
+}

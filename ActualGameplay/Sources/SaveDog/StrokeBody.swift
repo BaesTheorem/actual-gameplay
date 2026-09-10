@@ -1,13 +1,6 @@
 import SpriteKit
 
-enum DrawCategory {
-    static let wall: UInt32 = 1 << 0
-    static let drawn: UInt32 = 1 << 1
-    static let object: UInt32 = 1 << 2
-    static let target: UInt32 = 1 << 3
-    static let killer: UInt32 = 1 << 4
-    static let mover: UInt32 = 1 << 5
-}
+
 
 /// Turns a finished polyline into a rendered stroke with a matching rigid body.
 ///
@@ -44,7 +37,7 @@ enum StrokeBody {
         rawLength < minLength ? dotCost : rawLength
     }
 
-    static func makeNode(points: [CGPoint], dynamic: Bool) -> SKNode {
+    static func makeNode(points: [CGPoint], dynamic: Bool, color: UIColor = StrokeBody.color) -> SKNode {
         let center = Geometry.centroid(points)
         let local = points.map { $0 - center }
         let node = SKShapeNode()
@@ -60,6 +53,7 @@ enum StrokeBody {
         node.lineJoin = .round
         node.strokeColor = dynamic ? color : pinnedColor
         node.fillColor = local.count == 1 ? (dynamic ? color : pinnedColor) : .clear
+        node.lineJoin = .round
         node.position = center
         node.zPosition = 10
         node.name = "stroke"
@@ -91,8 +85,8 @@ enum StrokeBody {
         body.linearDamping = 0.1
         body.angularDamping = 0.1
         body.allowsRotation = true
-        body.categoryBitMask = DrawCategory.drawn
-        body.collisionBitMask = DrawCategory.wall | DrawCategory.drawn | DrawCategory.object | DrawCategory.mover | DrawCategory.killer
+        body.categoryBitMask = StrokeCategory.drawn
+        body.collisionBitMask = StrokeCategory.wall | StrokeCategory.drawn | StrokeCategory.actor | StrokeCategory.killer | StrokeCategory.bee
         body.contactTestBitMask = 0
         return body
     }

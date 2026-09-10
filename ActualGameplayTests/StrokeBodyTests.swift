@@ -22,7 +22,7 @@ final class StrokeBodyTests: XCTestCase {
         XCTAssertEqual(node.position, CGPoint(x: 140, y: 120))
         let body = try! XCTUnwrap(node.physicsBody)
         XCTAssertTrue(body.isDynamic)
-        XCTAssertEqual(body.categoryBitMask, DrawCategory.drawn)
+        XCTAssertEqual(body.categoryBitMask, StrokeCategory.drawn)
         XCTAssertEqual(body.mass, StrokeBody.mass(forLength: 120), accuracy: 1e-6)
     }
 
