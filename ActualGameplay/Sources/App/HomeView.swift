@@ -24,20 +24,20 @@ struct HomeView: View {
                 if mode.hasLevels {
                     LevelSelectView(mode: mode).environmentObject(store)
                 } else {
-                    GameContainerView(mode: mode) { PlaceholderScene(mode: mode) }
+                    RunnerHubView().environmentObject(store)
                 }
             }
             .onDisappear { MusicPlayer.shared.play(.menu) }
         }
         .fullScreenCover(item: $autoplayMode) { mode in
-            AutoplayView(mode: mode, only: LaunchArguments.only)
+            AutoplayView(mode: mode, only: LaunchArguments.only, plan: LaunchArguments.audit == nil ? nil : AuditPlan.load())
         }
         .sheet(isPresented: $showSettings) {
             SettingsView().environmentObject(store)
         }
         .onAppear {
             MusicPlayer.shared.play(.menu)
-            if let mode = LaunchArguments.autoplay {
+            if let mode = LaunchArguments.audit ?? LaunchArguments.autoplay {
                 autoplayMode = mode
             } else if let mode = LaunchArguments.mode {
                 activeMode = mode

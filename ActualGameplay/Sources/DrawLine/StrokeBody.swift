@@ -87,7 +87,7 @@ enum StrokeBody {
         body.isDynamic = dynamic
         body.mass = mass(forLength: Geometry.polylineLength(local))
         body.friction = 0.6
-        body.restitution = 0.1
+        body.restitution = 0.05
         body.linearDamping = 0.1
         body.angularDamping = 0.1
         body.allowsRotation = true

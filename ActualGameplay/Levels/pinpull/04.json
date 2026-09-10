@@ -1,9 +1,76 @@
 {
-  "id": "04", "name": "Drop", "hint": "Just get him down. The lava is not your problem.",
-  "parPins": 1, "winWhen": "heroReachesGoal",
-  "walls": [ {"x":200,"y":100,"w":14,"h":640} ],
-  "pins": [ {"id":"p1","x":38,"y":400,"w":162,"side":"left"}, {"id":"p2","x":214,"y":300,"w":150,"side":"right"} ],
-  "pools": [ {"liquid":"lava","x":224,"y":314,"w":130,"h":60,"count":100} ],
-  "actors": { "hero": {"x":120,"y":430}, "goal": {"x":50,"y":68,"w":140,"h":50} },
-  "solution": ["p1"], "settleSeconds": 4
+  "id": "04",
+  "name": "Decoy",
+  "hint": "Three pins. One of them matters.",
+  "parPins": 1,
+  "winWhen": "treasureReachesHero",
+  "walls": [
+    {
+      "x": 150,
+      "y": 100,
+      "w": 14,
+      "h": 640
+    },
+    {
+      "x": 252,
+      "y": 100,
+      "w": 14,
+      "h": 640
+    }
+  ],
+  "pins": [
+    {
+      "id": "p1",
+      "x": 164,
+      "y": 400,
+      "w": 88,
+      "side": "right"
+    },
+    {
+      "id": "p2",
+      "x": 38,
+      "y": 560,
+      "w": 112,
+      "side": "left"
+    },
+    {
+      "id": "p3",
+      "x": 266,
+      "y": 240,
+      "w": 98,
+      "side": "right"
+    }
+  ],
+  "pools": [
+    {
+      "liquid": "lava",
+      "x": 44,
+      "y": 574,
+      "w": 100,
+      "h": 40,
+      "count": 50
+    },
+    {
+      "liquid": "lava",
+      "x": 272,
+      "y": 254,
+      "w": 86,
+      "h": 40,
+      "count": 50
+    }
+  ],
+  "actors": {
+    "hero": {
+      "x": 208,
+      "y": 84
+    },
+    "treasure": {
+      "x": 208,
+      "y": 425
+    }
+  },
+  "solution": [
+    "p1"
+  ],
+  "settleSeconds": 4
 }

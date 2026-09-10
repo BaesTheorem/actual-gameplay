@@ -26,7 +26,7 @@ enum SceneFactory {
             guard let level = try? catalog.load(PinLevel.self, mode: mode, index: index) else { return nil }
             return PinScene(level: level, index: index)
         case .runner:
-            return nil
+            return RunnerScene(level: index, economy: .base)
         }
     }
 }

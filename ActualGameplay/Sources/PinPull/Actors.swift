@@ -29,6 +29,8 @@ final class HeroNode: SKNode {
         addChild(mouth)
 
         let body = SKPhysicsBody(circleOfRadius: HeroNode.radius)
+        // High enough that arriving liquid does not shove him along a pin; slabs he must slide down
+        // are cut steep enough to beat the mixed friction with the wall's 0.4.
         body.friction = 0.8
         body.restitution = 0.05
         body.linearDamping = 0.2

@@ -28,11 +28,13 @@ final class PinScene: GameSceneBase, ReplayableScene {
     private var hero: HeroNode?
     private var treasure: TreasureNode?
     private var latched = Set<String>()
+    private var winLatchedAt: TimeInterval?
     private var dying = false
     private var calmFrames = 0
     private var elapsed: TimeInterval = 0
     private var lastPullTime: TimeInterval = -10
-    private var replayArmed = false
+    private var replayTemplate: [String]?
+    private var replayArmed: Bool { replayTemplate != nil }
     private var replayQueue: [String] = []
     private var lastHUD = ""
     private var steamBudget = 0
@@ -45,9 +47,12 @@ final class PinScene: GameSceneBase, ReplayableScene {
 
     required init?(coder aDecoder: NSCoder) { fatalError("scenes are built in code") }
 
-    func startReplay() {
-        replayArmed = true
-        replayQueue = level.solution ?? []
+    func startReplay() { replay(pins: level.solution ?? []) }
+
+    /// Pull these pins in order once the scene runs, and again after every reset.
+    func replay(pins: [String]) {
+        replayTemplate = pins
+        replayQueue = pins
     }
 
     func describe(score: Double?) -> String { "pulls \(Int((score ?? 0).rounded()))" }
@@ -59,6 +64,7 @@ final class PinScene: GameSceneBase, ReplayableScene {
         pulled = []
         pins = [:]
         latched = []
+        winLatchedAt = nil
         dying = false
         calmFrames = 0
         lastPullTime = -10
@@ -66,7 +72,7 @@ final class PinScene: GameSceneBase, ReplayableScene {
         hero = nil
         treasure = nil
         liquid.removeAll()
-        replayQueue = replayArmed ? (level.solution ?? []) : []
+        replayQueue = replayTemplate ?? []
         physicsWorld.gravity = CGVector(dx: 0, dy: -6)
         physicsWorld.speed = 1
 
@@ -115,8 +121,8 @@ final class PinScene: GameSceneBase, ReplayableScene {
 
     private func addFrame() {
         let t = PinScene.frameThickness
-        addWall(CGRect(x: 24, y: 54, width: t, height: 700))
-        addWall(CGRect(x: 364, y: 54, width: t, height: 700))
+        addWall(CGRect(x: 24, y: 54, width: t, height: 660))
+        addWall(CGRect(x: 364, y: 54, width: t, height: 660))
         addWall(CGRect(x: 24, y: 54, width: 354, height: t))
     }
 
@@ -214,7 +220,7 @@ final class PinScene: GameSceneBase, ReplayableScene {
         label.preferredMaxLayoutWidth = 360
         label.horizontalAlignmentMode = .center
         label.verticalAlignmentMode = .top
-        label.position = CGPoint(x: 201, y: 800)
+        label.position = CGPoint(x: 201, y: 742)
         addChild(label)
     }
 
@@ -252,15 +258,28 @@ final class PinScene: GameSceneBase, ReplayableScene {
         }
         calmFrames = fastest < 6 ? calmFrames + 1 : 0
 
-        if replayArmed, !replayQueue.isEmpty, !finished, !dying {
+        guard !finished, !dying else { return }
+        // The goal is met, but lava may still be on its way. The win lands when the world has
+        // settled, or after a few seconds if it never quite does. Lava that arrives first still
+        // ends him, which is the whole point. This comes before any replayed pull so a settled
+        // win is not undone by the next tap.
+        if let at = winLatchedAt {
+            if calmFrames >= 30 || elapsed - at > 4 { win() } else { pushHUD() }
+            return
+        }
+
+        if replayArmed, !replayQueue.isEmpty {
             let since = elapsed - lastPullTime
             let ready = pulled.isEmpty ? elapsed >= 0.8 : (since >= 1.0 && (calmFrames >= 30 || since >= 8.0))
             if ready { pull(replayQueue.removeFirst()) }
         }
-
-        guard !finished, !dying else { return }
         if !pins.isEmpty, pins.values.allSatisfy(\.pulled), calmFrames >= 45, elapsed - lastPullTime > 1.5 {
             lose("Nothing left to pull.")
+            return
+        }
+        // A replay has no more moves; once the world stops, its outcome is known.
+        if replayArmed, replayQueue.isEmpty, calmFrames >= 45, elapsed - lastPullTime > 1.5, elapsed > 3 {
+            lose("Settled short of the goal.")
             return
         }
         pushHUD()
@@ -291,8 +310,9 @@ final class PinScene: GameSceneBase, ReplayableScene {
             heroDies()
         } else if treasureLost {
             lose("The treasure went down the drain.")
-        } else if winConditionMet {
-            win()
+        } else if winConditionMet, winLatchedAt == nil {
+            winLatchedAt = elapsed
+            calmFrames = 0
         }
     }
 
@@ -355,7 +375,8 @@ final class PinScene: GameSceneBase, ReplayableScene {
 
     private func pushHUD() {
         let remaining = pins.values.filter { !$0.pulled }.count
-        let readout = "pins \(remaining) left   pulled \(pulled.count)   par \(level.parPins)"
+        var readout = "pins \(remaining) left   pulled \(pulled.count)   par \(level.parPins)"
+        if winLatchedAt != nil, !finished { readout += "   waiting for calm" }
         guard readout != lastHUD else { return }
         lastHUD = readout
         setHUD(HUDState(title: "\(levelIndex + 1). \(level.name)", readout: readout, progress: nil))

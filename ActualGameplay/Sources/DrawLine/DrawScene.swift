@@ -1,6 +1,20 @@
 import SpriteKit
 import UIKit
 
+/// A rigid nudge applied to a replayed stroke: shift it, or scale it about its own centroid.
+struct StrokeTransform {
+    var dx: CGFloat = 0
+    var dy: CGFloat = 0
+    var scale: CGFloat = 1
+
+    static let identity = StrokeTransform()
+
+    func apply(to points: [CGPoint]) -> [CGPoint] {
+        let center = Geometry.centroid(points)
+        return points.map { center + ($0 - center) * scale + CGPoint(x: dx, y: dy) }
+    }
+}
+
 /// Draw-a-line: the player sketches strokes that become rigid bodies, and physics decides the rest.
 ///
 /// By default the world is frozen until the first stroke lands, so a level is a still picture the
@@ -44,8 +58,10 @@ final class DrawScene: GameSceneBase, ReplayableScene {
     private var forbidden: [CGRect] = []
     private var frozen = true
     private var elapsed: TimeInterval = 0
-    private var replaySolution: DrawLevel.Solution?
+    private var calmFrames = 0
+    private var replayTemplate: [(time: TimeInterval, points: [CGPoint])] = []
     private var pendingReplay: [(time: TimeInterval, points: [CGPoint])] = []
+    private var replaying: Bool { !replayTemplate.isEmpty }
     private weak var activeTouch: UITouch?
     private var shownInk = -1
     private var shownFrozen: Bool?
@@ -60,25 +76,32 @@ final class DrawScene: GameSceneBase, ReplayableScene {
     required init?(coder aDecoder: NSCoder) { fatalError("scenes are built in code") }
 
     /// Play the stored solution once the scene runs, and again after every reset.
-    func replay(_ solution: DrawLevel.Solution) {
-        replaySolution = solution
-        scheduleReplay()
+    func replay(_ solution: DrawLevel.Solution, transform: StrokeTransform = .identity) {
+        var time = solution.delay ?? 0
+        var template: [(time: TimeInterval, points: [CGPoint])] = []
+        for stroke in solution.strokes {
+            time += stroke.delay ?? 0
+            template.append((time, transform.apply(to: stroke.cgPoints)))
+        }
+        replayTemplate = template
+        pendingReplay = template
+    }
+
+    /// Play arbitrary strokes, 0.4 s apart. The audit uses this for its naive attempts.
+    func replay(strokes: [[CGPoint]]) {
+        replayTemplate = strokes.enumerated().map { (0.3 + 0.4 * Double($0.offset), $0.element) }
+        pendingReplay = replayTemplate
     }
 
     private func scheduleReplay() {
-        pendingReplay = []
-        guard let solution = replaySolution else { return }
-        var time = solution.delay ?? 0
-        for stroke in solution.strokes {
-            time += stroke.delay ?? 0
-            pendingReplay.append((time, stroke.cgPoints))
-        }
+        pendingReplay = replayTemplate
     }
 
     // MARK: - Build
 
     override func buildLevel() {
         elapsed = 0
+        calmFrames = 0
         frozen = !(level.liveStart ?? false)
         objects = [:]
         zones = [:]
@@ -326,7 +349,9 @@ final class DrawScene: GameSceneBase, ReplayableScene {
         } else {
             return
         }
-        physicsWorld.add(SKPhysicsJointPin.joint(withBodyA: bodyA, bodyB: bodyB, anchor: anchor))
+        let pin = SKPhysicsJointPin.joint(withBodyA: bodyA, bodyB: bodyB, anchor: anchor)
+        if let torque = joint.frictionTorque { pin.frictionTorque = torque }
+        physicsWorld.add(pin)
     }
 
     private func addHint() {
@@ -371,36 +396,92 @@ final class DrawScene: GameSceneBase, ReplayableScene {
     }
 
     /// The one path every stroke takes, drawn by a finger or replayed from a level file.
+    ///
+    /// Parts of the stroke that cross a body or a no-ink zone are cut out rather than refusing the
+    /// whole stroke: a bridge drawn a hair into its supports still becomes a bridge. Bodies that
+    /// spawn overlapping explode, so the pieces also step back a little from whatever they touched.
     @discardableResult
     func commit(raw: [CGPoint]) -> Bool {
         guard !finished, !raw.isEmpty else { return false }
         let points = StrokeBody.prepare(raw)
-        let cost = StrokeBody.inkCost(rawLength: Geometry.polylineLength(raw))
-        guard cost <= capture.inkLeft + 0.5 else {
+        let requested = StrokeBody.inkCost(rawLength: Geometry.polylineLength(raw))
+        guard requested <= capture.inkLeft + 0.5 else {
             reject(points, reason: "out of ink")
             return false
         }
-        let samples = points.count == 1 ? points : Geometry.resample(points, spacing: 6)
-        if samples.contains(where: { p in forbidden.contains { $0.contains(p) } }) {
-            reject(points, reason: "no ink here")
+        let (pieces, removed, hitForbidden) = trim(points)
+        guard !pieces.isEmpty else {
+            reject(points, reason: hitForbidden ? "no ink here" : "blocked")
             return false
         }
-        if samples.contains(where: overlapsBody) {
-            reject(points, reason: "blocked")
-            return false
+        if !removed.isEmpty { flashTrimmed(removed) }
+        var cost: CGFloat = 0
+        for piece in pieces {
+            let node = StrokeBody.makeNode(points: piece, dynamic: !(level.pinnedInk ?? false))
+            addChild(node)
+            cost += StrokeBody.inkCost(rawLength: Geometry.polylineLength(piece))
+            committedStrokes.append(piece)
         }
-        let node = StrokeBody.makeNode(points: points, dynamic: !(level.pinnedInk ?? false))
-        addChild(node)
-        capture.spend(cost)
-        committedStrokes.append(points)
+        capture.spend(min(cost, requested))
         if frozen {
             frozen = false
             physicsWorld.speed = 1
         }
+        calmFrames = 0
         Haptics.shared.tap()
         Audio.play(.tap)
         pushHUD()
         return true
+    }
+
+    /// Split a stroke into the runs that lie clear of bodies and no-ink zones.
+    private func trim(_ points: [CGPoint]) -> (pieces: [[CGPoint]], removed: [CGPoint], hitForbidden: Bool) {
+        func blocked(_ p: CGPoint) -> (Bool, Bool) {
+            let forbid = forbidden.contains { $0.contains(p) }
+            return (forbid || overlapsBody(p), forbid)
+        }
+        if points.count == 1 {
+            let (bad, forbid) = blocked(points[0])
+            return bad ? ([], points, forbid) : ([points], [], false)
+        }
+        let samples = Geometry.resample(points, spacing: 3)
+        var flags: [Bool] = []
+        var hitForbidden = false
+        for sample in samples {
+            let (bad, forbid) = blocked(sample)
+            flags.append(bad)
+            if forbid { hitForbidden = true }
+        }
+        guard flags.contains(true) else { return ([points], [], false) }
+        // Grow every blocked stretch by two samples so the pieces keep a little clearance.
+        var widened = flags
+        for i in flags.indices where flags[i] {
+            for j in max(0, i - 2)...min(flags.count - 1, i + 2) { widened[j] = true }
+        }
+        var pieces: [[CGPoint]] = []
+        var run: [CGPoint] = []
+        for (sample, bad) in zip(samples, widened) {
+            if bad {
+                if Geometry.polylineLength(run) >= StrokeBody.minLength { pieces.append(StrokeBody.prepare(run)) }
+                run = []
+            } else {
+                run.append(sample)
+            }
+        }
+        if Geometry.polylineLength(run) >= StrokeBody.minLength { pieces.append(StrokeBody.prepare(run)) }
+        let removed = zip(samples, widened).filter { $0.1 }.map { $0.0 }
+        return (pieces.filter { !$0.isEmpty }, removed, hitForbidden)
+    }
+
+    private func flashTrimmed(_ points: [CGPoint]) {
+        let path = CGMutablePath()
+        for p in points { path.addEllipse(in: CGRect(x: p.x - 2, y: p.y - 2, width: 4, height: 4)) }
+        let node = SKShapeNode(path: path)
+        node.fillColor = Palette.danger.withAlphaComponent(0.8)
+        node.strokeColor = .clear
+        node.zPosition = 60
+        addChild(node)
+        node.run(.sequence([.wait(forDuration: 0.2), .fadeOut(withDuration: Motion.decorative(0.4)), .removeFromParent()]))
     }
 
     private func overlapsBody(_ point: CGPoint) -> Bool {
@@ -463,7 +544,26 @@ final class DrawScene: GameSceneBase, ReplayableScene {
             lose("\(displayName(id)) fell out of the world.")
             return
         }
+        checkForStall()
         pushHUD()
+    }
+
+    /// Nothing is moving, nothing more will be drawn, and the goal is not met: that is a loss, and
+    /// saying so beats leaving the player staring at a still ball. A running dwell timer is
+    /// progress, so it is never a stall.
+    private func checkForStall() {
+        var fastest: CGFloat = 0
+        for child in children {
+            guard let body = child.physicsBody, body.isDynamic else { continue }
+            fastest = max(fastest, hypot(body.velocity.dx, body.velocity.dy), abs(body.angularVelocity) * 20)
+        }
+        calmFrames = fastest < 6 ? calmFrames + 1 : 0
+        guard calmFrames >= 45, (goals.dwellFraction ?? 0) == 0 else { return }
+        if replaying {
+            if pendingReplay.isEmpty { lose("Settled short of the goal.") }
+        } else if capture.inkLeft < 1, !capture.isDrawing {
+            lose("Out of ink.")
+        }
     }
 
     override func handle(contacts: [ContactEvent]) {

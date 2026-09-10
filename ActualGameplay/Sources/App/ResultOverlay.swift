@@ -35,7 +35,8 @@ struct ResultOverlay: View {
                         Button("Next", action: onNext).buttonStyle(OutlinedButtonStyle(tint: session.mode.accent, filled: true))
                     }
                 }
-                Button("Back to levels", action: onExit).buttonStyle(OutlinedButtonStyle(tint: Theme.onSurfaceMuted))
+                Button(session.mode == .runner ? "Back" : "Back to levels", action: onExit)
+                    .buttonStyle(OutlinedButtonStyle(tint: Theme.onSurfaceMuted))
             }
             .padding(24)
             .frame(maxWidth: 320)

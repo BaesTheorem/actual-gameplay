@@ -46,6 +46,8 @@ struct SettingsView: View {
                     Button("Auto-play Pull the Pin") { autoplayMode = .pinPull }
                         .buttonStyle(OutlinedButtonStyle(tint: Theme.runner))
                 }
+                Button("Autopilot five Crowd Runs") { autoplayMode = .runner }
+                    .buttonStyle(OutlinedButtonStyle(tint: Theme.runner))
                 HairlineDivider()
                 #endif
                 Button("Reset all progress") { confirmReset = true }

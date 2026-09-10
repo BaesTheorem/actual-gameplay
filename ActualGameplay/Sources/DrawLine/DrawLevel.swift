@@ -67,6 +67,8 @@ struct DrawLevel: Decodable {
         var b: String
         var x: CGFloat
         var y: CGFloat
+        /// Resistance at the pivot, so a balanced body stays put until it is really loaded.
+        var frictionTorque: CGFloat?
     }
 
     indirect enum Goal: Decodable {

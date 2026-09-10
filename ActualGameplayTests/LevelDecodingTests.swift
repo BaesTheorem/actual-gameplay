@@ -90,6 +90,12 @@ final class LevelDecodingTests: XCTestCase {
             for rect in (level.walls ?? []).map(\.cgRect) + (level.drains ?? []).map(\.cgRect) {
                 XCTAssertTrue(canvas.contains(rect), "\(id): rect \(rect) outside the canvas")
             }
+            for pin in level.pins {
+                let bar = CGRect(x: pin.x, y: pin.y, width: pin.w, height: 14).insetBy(dx: 0.5, dy: 0.5)
+                for wall in (level.walls ?? []).map(\.cgRect) where bar.intersects(wall) {
+                    XCTFail("\(id): pin \(pin.id) passes through a wall at \(wall)")
+                }
+            }
 
             let needsHero = level.winWhen != "treasureReachesGoal"
             let needsTreasure = level.winWhen != "heroReachesGoal"

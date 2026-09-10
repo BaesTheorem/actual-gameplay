@@ -1,15 +1,106 @@
 {
-  "id": "04", "name": "Lever", "hint": "Weight on one end, ball off the other.",
-  "inkBudget": 260, "stars": [150, 210],
-  "statics": [ {"type":"rect","x":0,"y":34,"w":402,"h":20},
-    {"type":"rect","x":196,"y":54,"w":8,"h":150,"solid":false},
-    {"type":"circle","x":200,"y":209,"r":6,"solid":false},
-    {"type":"rect","x":60,"y":54,"w":16,"h":150} ],
+  "id": "04",
+  "name": "Dominoes",
+  "hint": "Tip the first one. Gently is fine.",
+  "inkBudget": 160,
+  "stars": [
+    90,
+    130
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 34,
+      "w": 402,
+      "h": 20
+    },
+    {
+      "type": "rect",
+      "x": 340,
+      "y": 54,
+      "w": 20,
+      "h": 40
+    }
+  ],
   "dynamics": [
-    {"id":"plank","shape":"box","x":200,"y":209,"w":260,"h":10,"friction":0.6},
-    {"id":"ball","shape":"ball","x":100,"y":228,"r":14} ],
-  "joints": [ {"type":"pin","a":"plank","b":"world","x":200,"y":209} ],
-  "targets": [ {"id":"goal","x":300,"y":54,"w":102,"h":30} ],
-  "goal": {"type":"contact","object":"ball","target":"goal"},
-  "solution": {"strokes":[{"points":[[302,300],[330,300],[302,290],[330,290],[302,280],[330,280]]}], "waitSeconds": 7}
+    {
+      "id": "d1",
+      "shape": "box",
+      "x": 130,
+      "y": 86,
+      "w": 12,
+      "h": 64
+    },
+    {
+      "id": "d2",
+      "shape": "box",
+      "x": 174,
+      "y": 86,
+      "w": 12,
+      "h": 64
+    },
+    {
+      "id": "d3",
+      "shape": "box",
+      "x": 218,
+      "y": 86,
+      "w": 12,
+      "h": 64
+    },
+    {
+      "id": "d4",
+      "shape": "box",
+      "x": 262,
+      "y": 86,
+      "w": 12,
+      "h": 64
+    },
+    {
+      "id": "d5",
+      "shape": "box",
+      "x": 306,
+      "y": 86,
+      "w": 12,
+      "h": 64
+    },
+    {
+      "id": "ball",
+      "shape": "ball",
+      "x": 350,
+      "y": 108,
+      "r": 14
+    }
+  ],
+  "targets": [
+    {
+      "id": "goal",
+      "x": 362,
+      "y": 54,
+      "w": 40,
+      "h": 30
+    }
+  ],
+  "goal": {
+    "type": "contact",
+    "object": "ball",
+    "target": "goal"
+  },
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            70,
+            60
+          ],
+          [
+            118,
+            128
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 8
+  }
 }

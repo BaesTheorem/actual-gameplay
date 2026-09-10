@@ -1,12 +1,13 @@
 {
   "id": "07",
-  "name": "Spill",
-  "hint": "The bucket is balanced. Load one side.",
-  "inkBudget": 240,
+  "name": "Pinned",
+  "hint": "Here your ink stays where you put it.",
+  "inkBudget": 360,
   "stars": [
-    120,
-    170
+    290,
+    320
   ],
+  "pinnedInk": true,
   "statics": [
     {
       "type": "rect",
@@ -17,47 +18,27 @@
     },
     {
       "type": "rect",
-      "x": 197,
-      "y": 54,
-      "w": 8,
-      "h": 120,
-      "solid": false
+      "x": 280,
+      "y": 380,
+      "w": 122,
+      "h": 14
     }
   ],
   "dynamics": [
     {
-      "id": "bucket",
-      "shape": "cup",
-      "x": 201,
-      "y": 211,
-      "w": 100,
-      "h": 74,
-      "t": 8,
-      "friction": 0.7
-    },
-    {
       "id": "ball",
       "shape": "ball",
-      "x": 203,
-      "y": 196,
+      "x": 80,
+      "y": 700,
       "r": 14
-    }
-  ],
-  "joints": [
-    {
-      "type": "pin",
-      "a": "bucket",
-      "b": "world",
-      "x": 201,
-      "y": 178
     }
   ],
   "targets": [
     {
       "id": "goal",
-      "x": 240,
-      "y": 54,
-      "w": 162,
+      "x": 280,
+      "y": 394,
+      "w": 122,
       "h": 30
     }
   ],
@@ -71,40 +52,16 @@
       {
         "points": [
           [
-            224,
-            330
+            40,
+            560
           ],
           [
-            238,
-            330
-          ],
-          [
-            224,
-            320
-          ],
-          [
-            238,
-            320
-          ],
-          [
-            224,
-            310
-          ],
-          [
-            238,
-            310
-          ],
-          [
-            224,
-            300
-          ],
-          [
-            238,
-            300
+            280,
+            432
           ]
         ]
       }
     ],
-    "waitSeconds": 8
+    "waitSeconds": 7
   }
 }

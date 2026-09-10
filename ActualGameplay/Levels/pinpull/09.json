@@ -1,12 +1,79 @@
 {
-  "id": "09", "name": "Decoy", "hint": "Three pins. One of them matters.",
-  "parPins": 1, "winWhen": "treasureReachesHero",
-  "walls": [ {"x":86,"y":100,"w":14,"h":640}, {"x":302,"y":100,"w":14,"h":640} ],
-  "pins": [ {"id":"p1","x":100,"y":400,"w":202,"side":"right"},
-            {"id":"p2","x":38,"y":140,"w":48,"side":"left"},
-            {"id":"p3","x":316,"y":140,"w":48,"side":"right"} ],
-  "pools": [ {"liquid":"lava","x":44,"y":154,"w":36,"h":50,"count":36},
-             {"liquid":"lava","x":322,"y":154,"w":36,"h":50,"count":36} ],
-  "actors": { "hero": {"x":130,"y":84}, "treasure": {"x":130,"y":425} },
-  "solution": ["p1"], "settleSeconds": 4
+  "id": "09",
+  "name": "Divert",
+  "hint": "One pin holds both. Take the lava's floor away first.",
+  "parPins": 2,
+  "winWhen": "treasureReachesHero",
+  "walls": [
+    {
+      "x": 170,
+      "y": 68,
+      "w": 14,
+      "h": 232
+    },
+    {
+      "x": 170,
+      "y": 434,
+      "w": 14,
+      "h": 306
+    }
+  ],
+  "slabs": [
+    {
+      "x1": 364,
+      "y1": 404,
+      "x2": 244,
+      "y2": 328,
+      "t": 14
+    }
+  ],
+  "pins": [
+    {
+      "id": "p1",
+      "x": 38,
+      "y": 420,
+      "w": 326,
+      "side": "right"
+    },
+    {
+      "id": "p2",
+      "x": 184,
+      "y": 300,
+      "w": 60,
+      "side": "right"
+    }
+  ],
+  "pools": [
+    {
+      "liquid": "lava",
+      "x": 230,
+      "y": 434,
+      "w": 120,
+      "h": 50,
+      "count": 80
+    }
+  ],
+  "drains": [
+    {
+      "x": 184,
+      "y": 68,
+      "w": 90,
+      "h": 24
+    }
+  ],
+  "actors": {
+    "hero": {
+      "x": 140,
+      "y": 84
+    },
+    "treasure": {
+      "x": 140,
+      "y": 445
+    }
+  },
+  "solution": [
+    "p2",
+    "p1"
+  ],
+  "settleSeconds": 5
 }

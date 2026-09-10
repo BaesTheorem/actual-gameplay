@@ -1,11 +1,95 @@
 {
-  "id": "12", "name": "The long way", "hint": "Spikes below, and no ink allowed above them.",
-  "inkBudget": 280, "stars": [240, 260],
-  "statics": [ {"type":"rect","x":0,"y":34,"w":402,"h":20}, {"type":"rect","x":0,"y":54,"w":96,"h":32} ],
-  "dynamics": [ {"id":"ball","shape":"ball","x":40,"y":100,"r":14} ],
-  "killers": [ {"x":110,"y":54,"w":180,"h":16} ],
-  "forbidden": [ {"x":110,"y":110,"w":180,"h":650} ],
-  "targets": [ {"id":"goal","x":300,"y":54,"w":102,"h":30} ],
-  "goal": {"type":"contact","object":"ball","target":"goal"},
-  "solution": {"strokes":[{"points":[[102,80],[300,80]]},{"delay":0.6,"points":[[4,170],[34,170]]}], "waitSeconds": 8}
+  "id": "12",
+  "name": "The long way",
+  "hint": "Spikes below, and no ink allowed above them.",
+  "inkBudget": 280,
+  "stars": [
+    240,
+    260
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 34,
+      "w": 402,
+      "h": 20
+    },
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 54,
+      "w": 96,
+      "h": 32
+    }
+  ],
+  "dynamics": [
+    {
+      "id": "ball",
+      "shape": "ball",
+      "x": 40,
+      "y": 100,
+      "r": 14
+    }
+  ],
+  "killers": [
+    {
+      "x": 110,
+      "y": 54,
+      "w": 180,
+      "h": 16
+    }
+  ],
+  "forbidden": [
+    {
+      "x": 110,
+      "y": 110,
+      "w": 180,
+      "h": 650
+    }
+  ],
+  "targets": [
+    {
+      "id": "goal",
+      "x": 300,
+      "y": 54,
+      "w": 102,
+      "h": 30
+    }
+  ],
+  "goal": {
+    "type": "contact",
+    "object": "ball",
+    "target": "goal"
+  },
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            102,
+            80
+          ],
+          [
+            300,
+            80
+          ]
+        ]
+      },
+      {
+        "delay": 0.6,
+        "points": [
+          [
+            4,
+            170
+          ],
+          [
+            34,
+            170
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 8
+  }
 }

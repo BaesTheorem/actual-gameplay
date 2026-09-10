@@ -20,6 +20,8 @@ import subprocess
 import sys
 import time
 
+sys.stdout.reconfigure(line_buffering=True)  # progress shows up in background logs
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 BUNDLE = "com.baestheorem.actualgameplay"
 SIM_NAME = os.environ.get("SIM_NAME", "iPhone 17 Pro")
@@ -53,6 +55,28 @@ def build(udid: str) -> None:
         raise SystemExit("simulator build failed")
 
 
+def wait_for_boot(udid: str) -> None:
+    """Block until the device has finished booting, then warm it up with one launch.
+
+    A cold simulator answers `simctl launch` while SpringBoard is still settling, and
+    the first scene presented into that gets a starved run loop: timers fire tens of
+    seconds late and the display link barely ticks. One measured run was lost to it.
+    """
+    run(["xcrun", "simctl", "bootstatus", udid, "-b"])
+    run(["xcrun", "simctl", "launch", udid, BUNDLE, "--silent"])
+    time.sleep(3)
+    run(["xcrun", "simctl", "terminate", udid, BUNDLE])
+
+
+def install(udid: str) -> pathlib.Path:
+    """Install the last simulator build and return the app's data container."""
+    app = ROOT / "build/dd/Build/Products/Debug-iphonesimulator/ActualGameplay.app"
+    result = run(["xcrun", "simctl", "install", udid, str(app)])
+    if result.returncode:
+        raise SystemExit(result.stderr)
+    return pathlib.Path(run(["xcrun", "simctl", "get_app_container", udid, BUNDLE, "data"]).stdout.strip())
+
+
 def main() -> None:
     args = sys.argv[1:]
     positional = [a for i, a in enumerate(args) if not a.startswith("--") and (i == 0 or args[i - 1] != "--only")]
@@ -63,11 +87,8 @@ def main() -> None:
     run(["xcrun", "simctl", "boot", udid])
     if "--no-build" not in args:
         build(udid)
-    app = ROOT / "build/dd/Build/Products/Debug-iphonesimulator/ActualGameplay.app"
-    result = run(["xcrun", "simctl", "install", udid, str(app)])
-    if result.returncode:
-        raise SystemExit(result.stderr)
-    container = pathlib.Path(run(["xcrun", "simctl", "get_app_container", udid, BUNDLE, "data"]).stdout.strip())
+    container = install(udid)
+    wait_for_boot(udid)
     results_dir = container / "Library/Application Support/ActualGameplay/replay"
     results_file = results_dir / f"{mode}.json"
     if results_dir.exists():

@@ -1,9 +1,57 @@
 {
-  "id": "03", "name": "Water first", "hint": "Lava next to the treasure. Douse it before you drop it.",
-  "parPins": 2, "winWhen": "treasureReachesHero",
-  "pins": [ {"id":"p1","x":38,"y":300,"w":326,"side":"right"}, {"id":"p2","x":38,"y":520,"w":326,"side":"left"} ],
-  "pools": [ {"liquid":"lava","x":200,"y":314,"w":80,"h":40,"count":50},
-             {"liquid":"water","x":160,"y":534,"w":180,"h":70,"count":150} ],
-  "actors": { "hero": {"x":310,"y":84}, "treasure": {"x":310,"y":325} },
-  "solution": ["p2","p1"], "settleSeconds": 5
+  "id": "03",
+  "name": "Drop",
+  "hint": "Just get him down. Leave the lava alone.",
+  "parPins": 1,
+  "winWhen": "heroReachesGoal",
+  "walls": [
+    {
+      "x": 200,
+      "y": 100,
+      "w": 14,
+      "h": 640
+    }
+  ],
+  "pins": [
+    {
+      "id": "p1",
+      "x": 38,
+      "y": 400,
+      "w": 162,
+      "side": "left"
+    },
+    {
+      "id": "p2",
+      "x": 214,
+      "y": 300,
+      "w": 150,
+      "side": "right"
+    }
+  ],
+  "pools": [
+    {
+      "liquid": "lava",
+      "x": 224,
+      "y": 314,
+      "w": 130,
+      "h": 60,
+      "count": 100
+    }
+  ],
+  "actors": {
+    "hero": {
+      "x": 120,
+      "y": 430
+    },
+    "goal": {
+      "x": 50,
+      "y": 68,
+      "w": 140,
+      "h": 50
+    }
+  },
+  "solution": [
+    "p1"
+  ],
+  "settleSeconds": 4
 }

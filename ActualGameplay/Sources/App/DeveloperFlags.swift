@@ -18,6 +18,7 @@ final class DeveloperFlags: ObservableObject {
 ///     --replay               with --level, play the stored solution
 ///     --autoplay drawLine    replay every level of the mode and write a results file
 ///     --only 04,07           limit --autoplay to those level ids
+///     --audit pinPull        run scripts/audit.py's trial plan instead of the stored solutions
 ///     --silent               never start the music
 enum LaunchArguments {
     static var mode: GameMode? { value(after: "--mode").flatMap(GameMode.init(rawValue:)) }
@@ -29,6 +30,8 @@ enum LaunchArguments {
         ProcessInfo.processInfo.arguments.contains("--silent")
             || ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
     }
+    /// Run the trial plan the audit script wrote into the app's container.
+    static var audit: GameMode? { value(after: "--audit").flatMap(GameMode.init(rawValue:)) }
     /// With --autoplay, only these level ids (comma separated), e.g. `--only 04,07`.
     static var only: Set<String>? { value(after: "--only").map { Set($0.split(separator: ",").map(String.init)) } }
 

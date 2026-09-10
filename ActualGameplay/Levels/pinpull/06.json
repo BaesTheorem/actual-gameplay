@@ -1,13 +1,79 @@
 {
-  "id": "06", "name": "Wrong pool", "hint": "Only one pool is over the lava.",
-  "parPins": 2, "winWhen": "treasureReachesHero",
-  "walls": [ {"x":194,"y":474,"w":14,"h":200} ],
-  "pins": [ {"id":"p1","x":38,"y":300,"w":326,"side":"right"},
-            {"id":"p2","x":38,"y":460,"w":163,"side":"left"},
-            {"id":"p3","x":201,"y":460,"w":163,"side":"right"} ],
-  "pools": [ {"liquid":"lava","x":212,"y":314,"w":100,"h":40,"count":60},
-             {"liquid":"water","x":50,"y":474,"w":100,"h":40,"count":40},
-             {"liquid":"water","x":212,"y":474,"w":140,"h":70,"count":150} ],
-  "actors": { "hero": {"x":340,"y":84}, "treasure": {"x":340,"y":325} },
-  "solution": ["p3","p1"], "settleSeconds": 5
+  "id": "06",
+  "name": "Wrong pool",
+  "hint": "Only one pool is over the lava.",
+  "parPins": 2,
+  "winWhen": "treasureReachesHero",
+  "walls": [
+    {
+      "x": 194,
+      "y": 474,
+      "w": 14,
+      "h": 200
+    }
+  ],
+  "pins": [
+    {
+      "id": "p1",
+      "x": 38,
+      "y": 300,
+      "w": 326,
+      "side": "right"
+    },
+    {
+      "id": "p2",
+      "x": 38,
+      "y": 460,
+      "w": 163,
+      "side": "left"
+    },
+    {
+      "id": "p3",
+      "x": 201,
+      "y": 460,
+      "w": 163,
+      "side": "right"
+    }
+  ],
+  "pools": [
+    {
+      "liquid": "lava",
+      "x": 212,
+      "y": 314,
+      "w": 100,
+      "h": 40,
+      "count": 60
+    },
+    {
+      "liquid": "water",
+      "x": 50,
+      "y": 474,
+      "w": 100,
+      "h": 40,
+      "count": 40
+    },
+    {
+      "liquid": "water",
+      "x": 212,
+      "y": 474,
+      "w": 140,
+      "h": 70,
+      "count": 150
+    }
+  ],
+  "actors": {
+    "hero": {
+      "x": 340,
+      "y": 84
+    },
+    "treasure": {
+      "x": 340,
+      "y": 325
+    }
+  },
+  "solution": [
+    "p3",
+    "p1"
+  ],
+  "settleSeconds": 5
 }

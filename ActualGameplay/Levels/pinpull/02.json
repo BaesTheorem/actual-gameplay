@@ -1,8 +1,47 @@
 {
-  "id": "02", "name": "Order matters", "hint": "Lava up top. Which pin first?",
-  "parPins": 1, "winWhen": "treasureReachesHero",
-  "pins": [ {"id":"p1","x":38,"y":460,"w":326,"side":"right"}, {"id":"p2","x":38,"y":260,"w":326,"side":"left"} ],
-  "pools": [ {"liquid":"lava","x":80,"y":474,"w":240,"h":60,"count":110} ],
-  "actors": { "hero": {"x":201,"y":84}, "treasure": {"x":201,"y":285} },
-  "solution": ["p2"], "settleSeconds": 4
+  "id": "02",
+  "name": "Order matters",
+  "hint": "Lava up top. Which pin matters?",
+  "parPins": 1,
+  "winWhen": "treasureReachesHero",
+  "pins": [
+    {
+      "id": "p1",
+      "x": 38,
+      "y": 460,
+      "w": 326,
+      "side": "right"
+    },
+    {
+      "id": "p2",
+      "x": 38,
+      "y": 260,
+      "w": 326,
+      "side": "left"
+    }
+  ],
+  "pools": [
+    {
+      "liquid": "lava",
+      "x": 80,
+      "y": 474,
+      "w": 240,
+      "h": 60,
+      "count": 110
+    }
+  ],
+  "actors": {
+    "hero": {
+      "x": 201,
+      "y": 84
+    },
+    "treasure": {
+      "x": 201,
+      "y": 285
+    }
+  },
+  "solution": [
+    "p2"
+  ],
+  "settleSeconds": 4
 }
