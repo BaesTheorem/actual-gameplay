@@ -1,7 +1,7 @@
 {
   "id": "08",
   "name": "Under the roof",
-  "hint": "The roof is done. An L stands where a line falls.",
+  "hint": "The roof is done. An L stands where a line falls. Point the foot at him.",
   "inkBudget": 300,
   "stars": [
     240,
@@ -49,16 +49,16 @@
       {
         "points": [
           [
-            110,
-            79
-          ],
-          [
-            150,
-            79
-          ],
-          [
             150,
             145
+          ],
+          [
+            150,
+            79
+          ],
+          [
+            180,
+            79
           ]
         ]
       },
@@ -66,16 +66,16 @@
         "delay": 0.3,
         "points": [
           [
-            292,
-            79
-          ],
-          [
-            252,
-            79
-          ],
-          [
             252,
             145
+          ],
+          [
+            252,
+            79
+          ],
+          [
+            222,
+            79
           ]
         ]
       }

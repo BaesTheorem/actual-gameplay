@@ -104,11 +104,9 @@ final class LiquidSystem {
                 compact = true
                 continue
             }
-            let v = body.velocity
-            let speed = hypot(v.dx, v.dy)
+            let speed = Physics.speed(body)
             if speed > LiquidSystem.maxSpeed {
-                let scale = LiquidSystem.maxSpeed / speed
-                body.velocity = CGVector(dx: v.dx * scale, dy: v.dy * scale)
+                Physics.clamp(body, to: LiquidSystem.maxSpeed)
                 fastest = max(fastest, LiquidSystem.maxSpeed)
             } else if speed > fastest {
                 fastest = speed

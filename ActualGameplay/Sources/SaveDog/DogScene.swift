@@ -25,16 +25,18 @@ final class DogScene: StrokeScene, ReplayableScene {
 
     private var dogs: [DogNode] = []
     private var swarm: BeeSwarm!
+    private var field = FlowField(bounds: GameSceneBase.playfield)
+    private var fieldCountdown: TimeInterval = 0
     private var launchAt: TimeInterval?
     private var launchedAt: TimeInterval?
     private var lastHUD = ""
-    private var freezeCountdown = 0
+    private var routeOpen = false
 
     init(level: DogLevel, index: Int) {
         self.level = level
         self.levelIndex = index
         super.init(size: GameSceneBase.canvas)
-        backgroundColor = UIColor(hex: 0xCDEBF7)
+        backgroundColor = UIColor(hex: 0xC3E3FF)
     }
 
     required init?(coder aDecoder: NSCoder) { fatalError("scenes are built in code") }
@@ -119,12 +121,12 @@ final class DogScene: StrokeScene, ReplayableScene {
         if let started = launchedAt {
             let now = elapsed - started
             let targets = dogs.map(\.position)
-            swarm.update(dt: dt, now: now, targets: targets)
-            freezeCountdown -= 1
-            if freezeCountdown <= 0 {
-                freezeSettledStrokes()
-                freezeCountdown = 30
+            fieldCountdown -= dt
+            if fieldCountdown <= 0 {
+                rebuildField()
+                fieldCountdown = 0.4
             }
+            swarm.update(dt: dt, now: now, targets: targets, field: field)
             if now >= level.surviveSeconds {
                 win()
                 return
@@ -137,10 +139,18 @@ final class DogScene: StrokeScene, ReplayableScene {
         pushHUD()
     }
 
+    /// The bees' map: everything solid, inflated by a bee, flooded from the dogs.
+    private func rebuildField() {
+        field.rebuild(solids: solids(),
+                      targets: dogs.map { (center: $0.position, radius: DogNode.radius) },
+                      clearance: BeeNode.radius)
+        routeOpen = swarm.bees.contains { field.nearbyDirection(at: $0.position) != nil }
+    }
+
     private func release() {
         launchedAt = elapsed
-        freezeSettledStrokes()
-        freezeCountdown = 30
+        rebuildField()
+        fieldCountdown = 0.4
         for dog in dogs { dog.panic() }
         for child in children where child.name == "hive" {
             child.run(.fadeAlpha(to: 0.35, duration: 0.3))
@@ -184,9 +194,10 @@ final class DogScene: StrokeScene, ReplayableScene {
         var readout = "ink \(ink)"
         if let started = launchedAt {
             let left = max(0, level.surviveSeconds - (elapsed - started))
-            readout += String(format: "   hold %.1fs   bees %d/%d", left, swarm.spawned, swarm.total)
+            readout += String(format: "   %.1fs   %d bees", left, swarm.alive)
+            if swarm.shoving { readout += "   shove!" } else if routeOpen { readout += "   way in!" }
         } else if let at = launchAt {
-            readout += String(format: "   bees in %.1fs", max(0, at - elapsed))
+            readout += String(format: "   bees in %.1f", max(0, at - elapsed))
         } else {
             readout += "   draw a shield"
         }

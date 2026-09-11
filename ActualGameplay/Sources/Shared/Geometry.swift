@@ -13,6 +13,31 @@ extension CGPoint {
     func distance(to p: CGPoint) -> CGFloat { hypot(p.x - x, p.y - y) }
 }
 
+import SpriteKit
+
+/// Every speed comparison goes through here. Measured, not read from the docs: `velocity` comes
+/// back in points per second (a clamp at 700 visibly caps falling liquid; a settled pile reads
+/// under 6), even though the documentation says meters. Forces and impulses follow the same
+/// scale, so an acceleration written in points per second squared times the body's mass is the
+/// force that produces it. Gravity is the odd one out: its 9.8 lands as about 1470 pt/s².
+enum Physics {
+    static let pointsPerMeter: CGFloat = 1
+
+    /// Linear speed in points per second.
+    static func speed(_ body: SKPhysicsBody) -> CGFloat {
+        hypot(body.velocity.dx, body.velocity.dy) * pointsPerMeter
+    }
+
+    /// Clamp a body's speed to `maxPoints` points per second.
+    static func clamp(_ body: SKPhysicsBody, to maxPoints: CGFloat) {
+        let v = body.velocity
+        let speed = hypot(v.dx, v.dy) * pointsPerMeter
+        guard speed > maxPoints else { return }
+        let k = maxPoints / speed
+        body.velocity = CGVector(dx: v.dx * k, dy: v.dy * k)
+    }
+}
+
 enum Geometry {
     static func polylineLength(_ points: [CGPoint]) -> CGFloat {
         guard points.count > 1 else { return 0 }

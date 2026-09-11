@@ -241,8 +241,9 @@ final class PinScene: GameSceneBase, ReplayableScene {
         steamBudget = 6
         var fastest = liquid.step()
         for node in [hero as SKNode?, treasure as SKNode?].compactMap({ $0 }) {
-            if let v = node.physicsBody?.velocity { fastest = max(fastest, hypot(v.dx, v.dy)) }
+            if let body = node.physicsBody { fastest = max(fastest, Physics.speed(body)) }
         }
+        // 6 pt/s: a settled pile reads below it, a treasure creeping down a slab reads above it.
         calmFrames = fastest < 6 ? calmFrames + 1 : 0
 
         guard !finished, !dying else { return }

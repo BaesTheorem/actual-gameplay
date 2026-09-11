@@ -93,11 +93,11 @@ class GameSceneBase: SKScene, SKPhysicsContactDelegate {
         label.preferredMaxLayoutWidth = 350
         label.horizontalAlignmentMode = .center
         label.verticalAlignmentMode = .top
-        label.position = CGPoint(x: 201, y: 742)
+        label.position = CGPoint(x: 201, y: 724)
         label.zPosition = 31
         let frame = label.calculateAccumulatedFrame().insetBy(dx: -10, dy: -6)
         let plate = SKShapeNode(rect: frame)
-        plate.fillColor = backdrop.withAlphaComponent(0.88)
+        plate.fillColor = backdrop.withAlphaComponent(0.96)
         plate.strokeColor = .clear
         plate.zPosition = 30
         addChild(plate)

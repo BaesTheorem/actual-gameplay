@@ -13,6 +13,7 @@ struct HUDOverlay: View {
                     Text(session.hud.title).font(Theme.label(15)).foregroundStyle(Theme.onSurface)
                     if !session.hud.readout.isEmpty {
                         Text(session.hud.readout).font(Theme.mono(12)).foregroundStyle(session.mode.accent)
+                            .lineLimit(1).minimumScaleFactor(0.7)
                     }
                 }
                 .padding(.horizontal, 10)

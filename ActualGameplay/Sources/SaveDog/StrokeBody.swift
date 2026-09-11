@@ -57,6 +57,7 @@ enum StrokeBody {
         node.position = center
         node.zPosition = 10
         node.name = "stroke"
+        node.userData = ["polyline": local.map { NSValue(cgPoint: $0) }]
         node.physicsBody = makeBody(local: local, dynamic: dynamic)
         return node
     }
@@ -80,7 +81,7 @@ enum StrokeBody {
         let body = parts.count == 1 ? parts[0] : SKPhysicsBody(bodies: parts)
         body.isDynamic = dynamic
         body.mass = mass(forLength: Geometry.polylineLength(local))
-        body.friction = 0.6
+        body.friction = 0.9
         body.restitution = 0.05
         body.linearDamping = 0.1
         body.angularDamping = 0.1

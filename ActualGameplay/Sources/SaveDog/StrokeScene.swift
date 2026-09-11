@@ -114,6 +114,7 @@ class StrokeScene: GameSceneBase {
             let rect = CGRect(x: item.x ?? 0, y: item.y ?? 0, width: item.w ?? 10, height: item.h ?? 10)
             let node = Terrain.node(rect: rect, skin: item.skin)
             node.zPosition = 2
+            node.userData = ["rect": NSValue(cgRect: rect)]
             if solid {
                 let body = SKPhysicsBody(rectangleOf: rect.size, center: CGPoint(x: rect.midX, y: rect.midY))
                 node.physicsBody = solidBody(body)
@@ -124,6 +125,7 @@ class StrokeScene: GameSceneBase {
             let node = SKSpriteNode(texture: Sprite.rock.texture, size: CGSize(width: radius * 2.1, height: radius * 2.1))
             node.position = CGPoint(x: item.x ?? 0, y: item.y ?? 0)
             node.zPosition = 2
+            node.userData = ["radius": radius]
             if solid { node.physicsBody = solidBody(SKPhysicsBody(circleOfRadius: radius)) }
             addChild(node)
         case "chain":
@@ -137,6 +139,7 @@ class StrokeScene: GameSceneBase {
             node.lineCap = .round
             node.lineJoin = .round
             node.zPosition = 2
+            node.userData = ["points": points.map { NSValue(cgPoint: $0) }, "halfWidth": CGFloat(3)]
             if solid { node.physicsBody = solidBody(SKPhysicsBody(edgeChainFrom: path)) }
             addChild(node)
         default:
@@ -147,6 +150,7 @@ class StrokeScene: GameSceneBase {
     func addKiller(_ rect: CGRect) {
         let node = Terrain.spikes(rect: rect)
         node.zPosition = 2
+        node.userData = ["rect": NSValue(cgRect: rect)]
         let body = SKPhysicsBody(rectangleOf: rect.size, center: CGPoint(x: rect.midX, y: rect.midY))
         body.isDynamic = false
         body.friction = 0.8
@@ -355,7 +359,7 @@ class StrokeScene: GameSceneBase {
         var fastest: CGFloat = 0
         for child in children {
             guard let body = child.physicsBody, body.isDynamic else { continue }
-            fastest = max(fastest, hypot(body.velocity.dx, body.velocity.dy), abs(body.angularVelocity) * 20)
+            fastest = max(fastest, Physics.speed(body), abs(body.angularVelocity) * 20)
         }
         calmFrames = fastest < 6 ? calmFrames + 1 : 0
         if calmFrames == 45, replaying ? pendingReplay.isEmpty : (capture.inkLeft < 1 && !capture.isDrawing) {
@@ -363,11 +367,41 @@ class StrokeScene: GameSceneBase {
         }
     }
 
+    /// Every solid a bee has to get around, in scene coordinates, wherever it has ended up.
+    func solids() -> [Solid] {
+        var out: [Solid] = []
+        for child in children {
+            guard let data = child.userData, child.physicsBody != nil else { continue }
+            if let values = data["polyline"] as? [NSValue] {
+                let angle = child.zRotation
+                let points = values.map { value -> CGPoint in
+                    let p = value.cgPointValue
+                    return CGPoint(x: child.position.x + p.x * cos(angle) - p.y * sin(angle),
+                                   y: child.position.y + p.x * sin(angle) + p.y * cos(angle))
+                }
+                if points.count == 1 {
+                    out.append(.circle(points[0], radius: StrokeBody.width / 2))
+                } else {
+                    for i in 1..<points.count { out.append(.segment(points[i - 1], points[i], radius: StrokeBody.width / 2)) }
+                }
+            } else if let rect = (data["rect"] as? NSValue)?.cgRectValue {
+                out.append(.rect(rect))
+            } else if let radius = data["radius"] as? CGFloat {
+                out.append(.circle(child.position, radius: radius))
+            } else if let values = data["points"] as? [NSValue] {
+                let points = values.map(\.cgPointValue)
+                let half = data["halfWidth"] as? CGFloat ?? 3
+                for i in 1..<points.count { out.append(.segment(points[i - 1], points[i], radius: half)) }
+            }
+        }
+        return out
+    }
+
     /// Freeze strokes that have come to rest, so a swarm cannot shove a settled shield.
     func freezeSettledStrokes() {
         for child in children where child.name == "stroke" {
             guard let body = child.physicsBody, body.isDynamic else { continue }
-            if hypot(body.velocity.dx, body.velocity.dy) < 6, abs(body.angularVelocity) < 0.3 {
+            if Physics.speed(body) < 6, abs(body.angularVelocity) < 0.3 {
                 body.isDynamic = false
             }
         }
