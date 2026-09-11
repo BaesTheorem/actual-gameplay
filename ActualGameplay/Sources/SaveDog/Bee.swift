@@ -26,7 +26,7 @@ final class BeeNode: SKSpriteNode {
         body.allowsRotation = false
         body.usesPreciseCollisionDetection = true
         body.categoryBitMask = StrokeCategory.bee
-        body.collisionBitMask = StrokeCategory.wall | StrokeCategory.drawn | StrokeCategory.actor
+        body.collisionBitMask = StrokeCategory.wall | StrokeCategory.drawn | StrokeCategory.actor | StrokeCategory.killer | StrokeCategory.prop
         body.contactTestBitMask = StrokeCategory.actor
         physicsBody = body
     }
@@ -140,7 +140,7 @@ final class DogNode: SKSpriteNode {
         body.linearDamping = 0.3
         body.allowsRotation = false
         body.categoryBitMask = StrokeCategory.actor
-        body.collisionBitMask = StrokeCategory.wall | StrokeCategory.drawn | StrokeCategory.killer | StrokeCategory.actor
+        body.collisionBitMask = StrokeCategory.wall | StrokeCategory.drawn | StrokeCategory.killer | StrokeCategory.actor | StrokeCategory.prop
         body.contactTestBitMask = StrokeCategory.bee | StrokeCategory.killer
         physicsBody = body
     }

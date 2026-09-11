@@ -8,8 +8,12 @@ iPhone, SwiftUI shell, SpriteKit scenes.
 
 **Save the Dog.** A dog, a limited pot of ink, and hives full of bees. Draw a shield; it
 falls like anything you draw; a moment later the bees stream in and hunt him for ten
-seconds. Bees bounce off your line, so a closed shape that lands where you meant it is the
-whole game. Twelve levels, three stars for a low-ink clear.
+seconds. They path-find: a bee with a way in routes around walls and through any gap it
+fits through, and a bee with no way in leans on the shield, crawls along it probing, and
+joins a shove every few seconds, so footing and mass matter. Twelve levels, each a
+different problem: a lid over a pit, one open side of a cave, a hole in a roof, bees rising
+through the floor, a boulder to route into a gap, saw blades that cut ink, two dogs with
+ink for one shield. Three stars for a low-ink clear.
 
 **Pull the Pin.** Chambers of water and lava held up by pins. Tap a pin to slide it out.
 Water and lava cancel each other, lava ends the hero, drains swallow whatever reaches them.
@@ -68,7 +72,11 @@ physics overlays in Settings.
 Drop a JSON file into `ActualGameplay/Levels/<savedog|pinpull>/NN.json`. The folder is
 copied into the bundle as a folder reference, so no project change is needed. Coordinates
 are a fixed 402 x 874 point canvas, origin bottom-left, and the scene letterboxes on other
-screens so a stored solution behaves the same everywhere. Store the solving strokes (Save the Dog) or the pull order (Pull the Pin) as `solution`,
+screens so a stored solution behaves the same everywhere. A Save the Dog level can carry
+`statics` (rect, circle, chain, with a terrain `skin`), `killers` (spike strips), `saws`
+(they cut strokes), `props` (a ball or box the physics can move), `decor` (sprites with no
+body), `forbidden` (no-ink zones), one or more `dogs`, and `hives` with a count, an
+interval, and a delay. Store the solving strokes (Save the Dog) or the pull order (Pull the Pin) as `solution`,
 then run the replay and the audit. The retired ball-physics levels the draw mode started
 with are kept under `attic/` for reference.
 

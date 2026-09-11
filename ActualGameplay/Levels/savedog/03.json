@@ -1,11 +1,11 @@
 {
   "id": "03",
-  "name": "Tight budget",
-  "hint": "Barely enough ink. Draw close.",
-  "inkBudget": 260,
+  "name": "Side door",
+  "hint": "Three walls are done. Close the fourth. An L stands where a line falls.",
+  "inkBudget": 160,
   "stars": [
-    245,
-    255
+    120,
+    140
   ],
   "statics": [
     {
@@ -15,20 +15,50 @@
       "w": 402,
       "h": 40,
       "skin": "grass"
+    },
+    {
+      "type": "rect",
+      "x": 100,
+      "y": 160,
+      "w": 132,
+      "h": 20,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 100,
+      "y": 74,
+      "w": 14,
+      "h": 86,
+      "skin": "stone"
+    }
+  ],
+  "decor": [
+    {
+      "sprite": "torch_on_a",
+      "x": 126,
+      "y": 130,
+      "w": 16,
+      "h": 26
     }
   ],
   "dogs": [
     {
       "id": "dog",
-      "x": 201,
+      "x": 170,
       "y": 92
     }
   ],
   "hives": [
     {
-      "x": 201,
+      "x": 372,
+      "y": 300,
+      "count": 10
+    },
+    {
+      "x": 372,
       "y": 700,
-      "count": 14
+      "count": 6
     }
   ],
   "solution": {
@@ -36,40 +66,16 @@
       {
         "points": [
           [
-            155,
-            78
+            232,
+            156
           ],
           [
-            159,
-            112
+            232,
+            79
           ],
           [
-            168,
-            137
-          ],
-          [
-            183,
-            152
-          ],
-          [
-            201,
-            158
-          ],
-          [
-            219,
-            152
-          ],
-          [
-            234,
-            137
-          ],
-          [
-            243,
-            112
-          ],
-          [
-            247,
-            78
+            196,
+            79
           ]
         ]
       }

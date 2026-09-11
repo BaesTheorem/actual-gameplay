@@ -7,6 +7,7 @@ enum StrokeCategory {
     static let actor: UInt32 = 1 << 2
     static let killer: UInt32 = 1 << 3
     static let bee: UInt32 = 1 << 4
+    static let prop: UInt32 = 1 << 5
 }
 
 /// Everything a draw-a-stroke level shares: ink capture, the commit path (trimmed around
@@ -159,6 +160,65 @@ class StrokeScene: GameSceneBase {
         addChild(node)
     }
 
+    /// A blade that spins in place. Strokes that touch it are cut; the dog does not survive it.
+    func addSaw(_ saw: DogLevel.Saw) {
+        let node = SKSpriteNode(texture: Sprite.sawA.texture, size: CGSize(width: saw.r * 2.3, height: saw.r * 2.3))
+        node.position = CGPoint(x: saw.x, y: saw.y)
+        node.zPosition = 7
+        node.name = "saw"
+        node.userData = ["radius": saw.r]
+        if !Motion.reduced {
+            node.run(.repeatForever(.animate(with: [Sprite.sawA.texture, Sprite.sawB.texture], timePerFrame: 0.06)))
+        }
+        let body = SKPhysicsBody(circleOfRadius: saw.r)
+        body.isDynamic = false
+        body.friction = 0.2
+        body.categoryBitMask = StrokeCategory.killer
+        body.contactTestBitMask = StrokeCategory.drawn | StrokeCategory.actor
+        node.physicsBody = body
+        addChild(node)
+    }
+
+    func addProp(_ prop: DogLevel.Prop) {
+        let node: SKSpriteNode
+        let body: SKPhysicsBody
+        if prop.shape == "ball" {
+            let radius = prop.r ?? 16
+            node = SKSpriteNode(texture: Sprite.rock.texture, size: CGSize(width: radius * 2.15, height: radius * 2.15))
+            node.userData = ["radius": radius]
+            body = SKPhysicsBody(circleOfRadius: radius)
+            body.friction = 0.4
+            body.restitution = 0
+        } else {
+            let size = CGSize(width: prop.w ?? 32, height: prop.h ?? 32)
+            node = SKSpriteNode(texture: Sprite.planks.texture, size: size)
+            node.userData = ["box": NSValue(cgSize: size)]
+            body = SKPhysicsBody(rectangleOf: size)
+            body.friction = 0.6
+            body.restitution = 0
+        }
+        node.position = CGPoint(x: prop.x, y: prop.y)
+        node.zPosition = 6
+        node.name = prop.id
+        body.density = prop.density ?? 2
+        body.linearDamping = 0.1
+        body.angularDamping = 0.2
+        body.usesPreciseCollisionDetection = true
+        body.categoryBitMask = StrokeCategory.prop
+        body.collisionBitMask = StrokeCategory.wall | StrokeCategory.drawn | StrokeCategory.actor | StrokeCategory.prop | StrokeCategory.killer
+        body.contactTestBitMask = StrokeCategory.killer
+        node.physicsBody = body
+        addChild(node)
+    }
+
+    func addDecor(_ decor: DogLevel.Decor) {
+        guard let sprite = Sprite(rawValue: decor.sprite) else { return }
+        let node = SKSpriteNode(texture: sprite.texture, size: CGSize(width: decor.w, height: decor.h))
+        node.position = CGPoint(x: decor.x, y: decor.y)
+        node.zPosition = 1
+        addChild(node)
+    }
+
     func addForbidden(_ rect: CGRect) {
         forbidden.append(rect)
         let dashed = CGPath(rect: rect, transform: nil).copy(dashingWithPhase: 0, lengths: [4, 4])
@@ -296,7 +356,7 @@ class StrokeScene: GameSceneBase {
 
     private func overlapsBody(_ point: CGPoint) -> Bool {
         var hit = false
-        let solid = StrokeCategory.wall | StrokeCategory.actor | StrokeCategory.drawn | StrokeCategory.killer
+        let solid = StrokeCategory.wall | StrokeCategory.actor | StrokeCategory.drawn | StrokeCategory.killer | StrokeCategory.prop
         physicsWorld.enumerateBodies(at: point) { body, stop in
             if body.categoryBitMask & solid != 0 {
                 hit = true
@@ -388,6 +448,14 @@ class StrokeScene: GameSceneBase {
                 out.append(.rect(rect))
             } else if let radius = data["radius"] as? CGFloat {
                 out.append(.circle(child.position, radius: radius))
+            } else if let size = (data["box"] as? NSValue)?.cgSizeValue {
+                let angle = child.zRotation
+                let hw = size.width / 2, hh = size.height / 2
+                let corners = [CGPoint(x: -hw, y: -hh), CGPoint(x: hw, y: -hh), CGPoint(x: hw, y: hh), CGPoint(x: -hw, y: hh)].map { p in
+                    CGPoint(x: child.position.x + p.x * cos(angle) - p.y * sin(angle),
+                            y: child.position.y + p.x * sin(angle) + p.y * cos(angle))
+                }
+                for i in 0..<4 { out.append(.segment(corners[i], corners[(i + 1) % 4], radius: 1)) }
             } else if let values = data["points"] as? [NSValue] {
                 let points = values.map(\.cgPointValue)
                 let half = data["halfWidth"] as? CGFloat ?? 3

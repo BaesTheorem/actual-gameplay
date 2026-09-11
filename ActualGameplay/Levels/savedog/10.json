@@ -1,13 +1,12 @@
 {
   "id": "10",
-  "name": "Swarm",
-  "hint": "Three hives, twelve seconds. Build it well.",
-  "inkBudget": 500,
+  "name": "Two caves",
+  "hint": "Each cave has one open side. Two L's.",
+  "inkBudget": 280,
   "stars": [
-    320,
-    420
+    230,
+    260
   ],
-  "duration": 12,
   "statics": [
     {
       "type": "rect",
@@ -16,31 +15,78 @@
       "w": 402,
       "h": 40,
       "skin": "grass"
+    },
+    {
+      "type": "rect",
+      "x": 20,
+      "y": 160,
+      "w": 100,
+      "h": 20,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 20,
+      "y": 74,
+      "w": 14,
+      "h": 86,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 282,
+      "y": 160,
+      "w": 100,
+      "h": 20,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 368,
+      "y": 74,
+      "w": 14,
+      "h": 86,
+      "skin": "stone"
+    }
+  ],
+  "decor": [
+    {
+      "sprite": "torch_on_a",
+      "x": 44,
+      "y": 130,
+      "w": 16,
+      "h": 26
+    },
+    {
+      "sprite": "torch_on_b",
+      "x": 358,
+      "y": 130,
+      "w": 16,
+      "h": 26
     }
   ],
   "dogs": [
     {
       "id": "dog",
-      "x": 201,
+      "x": 60,
+      "y": 92
+    },
+    {
+      "id": "pup",
+      "x": 342,
       "y": 92
     }
   ],
   "hives": [
     {
-      "x": 30,
+      "x": 201,
       "y": 700,
-      "count": 10
+      "count": 8
     },
     {
-      "x": 372,
-      "y": 700,
-      "count": 10
-    },
-    {
-      "x": 372,
+      "x": 201,
       "y": 300,
-      "count": 10,
-      "delay": 3
+      "count": 8
     }
   ],
   "solution": {
@@ -48,44 +94,37 @@
       {
         "points": [
           [
-            149,
-            78
+            120,
+            156
           ],
           [
-            153,
-            118
+            120,
+            79
           ],
           [
-            164,
-            148
+            88,
+            79
+          ]
+        ]
+      },
+      {
+        "delay": 0.3,
+        "points": [
+          [
+            282,
+            156
           ],
           [
-            181,
-            166
+            282,
+            79
           ],
           [
-            201,
-            173
-          ],
-          [
-            221,
-            166
-          ],
-          [
-            238,
-            148
-          ],
-          [
-            249,
-            118
-          ],
-          [
-            253,
-            78
+            314,
+            79
           ]
         ]
       }
     ],
-    "waitSeconds": 17
+    "waitSeconds": 14
   }
 }

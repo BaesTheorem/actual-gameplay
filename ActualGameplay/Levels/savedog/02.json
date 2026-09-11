@@ -1,11 +1,11 @@
 {
   "id": "02",
-  "name": "From the sides",
-  "hint": "They do not only come from above.",
-  "inkBudget": 500,
+  "name": "Lid",
+  "hint": "He is already in a pit. Put a lid on it.",
+  "inkBudget": 180,
   "stars": [
-    300,
-    400
+    140,
+    160
   ],
   "statics": [
     {
@@ -15,6 +15,31 @@
       "w": 402,
       "h": 40,
       "skin": "grass"
+    },
+    {
+      "type": "rect",
+      "x": 130,
+      "y": 74,
+      "w": 20,
+      "h": 106,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 252,
+      "y": 74,
+      "w": 20,
+      "h": 106,
+      "skin": "stone"
+    }
+  ],
+  "decor": [
+    {
+      "sprite": "rock",
+      "x": 60,
+      "y": 88,
+      "w": 32,
+      "h": 28
     }
   ],
   "dogs": [
@@ -28,12 +53,12 @@
     {
       "x": 30,
       "y": 400,
-      "count": 8
+      "count": 7
     },
     {
       "x": 372,
       "y": 400,
-      "count": 8
+      "count": 7
     }
   ],
   "solution": {
@@ -41,40 +66,12 @@
       {
         "points": [
           [
-            149,
-            78
+            136,
+            186
           ],
           [
-            153,
-            118
-          ],
-          [
-            164,
-            148
-          ],
-          [
-            181,
-            166
-          ],
-          [
-            201,
-            173
-          ],
-          [
-            221,
-            166
-          ],
-          [
-            238,
-            148
-          ],
-          [
-            249,
-            118
-          ],
-          [
-            253,
-            78
+            266,
+            186
           ]
         ]
       }

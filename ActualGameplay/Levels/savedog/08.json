@@ -1,11 +1,11 @@
 {
   "id": "08",
-  "name": "Under the roof",
-  "hint": "The roof is done. An L stands where a line falls. Point the foot at him.",
-  "inkBudget": 300,
+  "name": "Two dogs",
+  "hint": "One shield can cover both. Two shields cost more.",
+  "inkBudget": 520,
   "stars": [
-    240,
-    280
+    320,
+    440
   ],
   "statics": [
     {
@@ -15,33 +15,41 @@
       "w": 402,
       "h": 40,
       "skin": "grass"
+    }
+  ],
+  "decor": [
+    {
+      "sprite": "bush",
+      "x": 40,
+      "y": 92,
+      "w": 40,
+      "h": 34
     },
     {
-      "type": "rect",
-      "x": 150,
-      "y": 150,
-      "w": 102,
-      "h": 20,
-      "skin": "stone"
+      "sprite": "rock",
+      "x": 360,
+      "y": 88,
+      "w": 32,
+      "h": 28
     }
   ],
   "dogs": [
     {
       "id": "dog",
-      "x": 201,
+      "x": 150,
+      "y": 92
+    },
+    {
+      "id": "pup",
+      "x": 252,
       "y": 92
     }
   ],
   "hives": [
     {
-      "x": 30,
+      "x": 201,
       "y": 700,
-      "count": 10
-    },
-    {
-      "x": 372,
-      "y": 700,
-      "count": 10
+      "count": 16
     }
   ],
   "solution": {
@@ -49,33 +57,40 @@
       {
         "points": [
           [
-            150,
-            145
+            109,
+            78
           ],
           [
-            150,
-            79
+            116,
+            122
           ],
           [
-            180,
-            79
-          ]
-        ]
-      },
-      {
-        "delay": 0.3,
-        "points": [
-          [
-            252,
-            145
+            136,
+            155
           ],
           [
-            252,
-            79
+            166,
+            176
           ],
           [
-            222,
-            79
+            201,
+            183
+          ],
+          [
+            236,
+            176
+          ],
+          [
+            266,
+            155
+          ],
+          [
+            286,
+            122
+          ],
+          [
+            293,
+            78
           ]
         ]
       }

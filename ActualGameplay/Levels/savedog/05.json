@@ -1,29 +1,36 @@
 {
   "id": "05",
-  "name": "Sticky ink",
-  "hint": "Here your ink stays where you put it. Close the sides.",
-  "inkBudget": 200,
+  "name": "Holes below",
+  "hint": "Nothing comes from the sky today.",
+  "inkBudget": 150,
   "stars": [
-    180,
-    195
+    115,
+    135
   ],
-  "pinnedInk": true,
   "statics": [
     {
       "type": "rect",
       "x": 0,
       "y": 34,
-      "w": 402,
+      "w": 120,
       "h": 40,
       "skin": "grass"
     },
     {
       "type": "rect",
-      "x": 130,
-      "y": 170,
-      "w": 142,
-      "h": 20,
-      "skin": "stone"
+      "x": 156,
+      "y": 34,
+      "w": 90,
+      "h": 40,
+      "skin": "grass"
+    },
+    {
+      "type": "rect",
+      "x": 282,
+      "y": 34,
+      "w": 120,
+      "h": 40,
+      "skin": "grass"
     }
   ],
   "dogs": [
@@ -35,14 +42,16 @@
   ],
   "hives": [
     {
-      "x": 30,
-      "y": 120,
-      "count": 8
+      "x": 138,
+      "y": 50,
+      "count": 7,
+      "interval": 0.2
     },
     {
-      "x": 372,
-      "y": 120,
-      "count": 8
+      "x": 264,
+      "y": 50,
+      "count": 7,
+      "interval": 0.2
     }
   ],
   "solution": {
@@ -50,12 +59,12 @@
       {
         "points": [
           [
-            150,
-            79
+            110,
+            80
           ],
           [
-            150,
-            165
+            166,
+            80
           ]
         ]
       },
@@ -63,12 +72,12 @@
         "delay": 0.3,
         "points": [
           [
-            252,
-            79
+            236,
+            80
           ],
           [
-            252,
-            165
+            292,
+            80
           ]
         ]
       }

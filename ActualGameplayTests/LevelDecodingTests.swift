@@ -36,6 +36,17 @@ final class LevelDecodingTests: XCTestCase {
             for rect in (level.killers ?? []).map(\.cgRect) + (level.forbidden ?? []).map(\.cgRect) {
                 XCTAssertTrue(canvas.contains(rect), "\(id): region \(rect) outside the canvas")
             }
+            for saw in level.saws ?? [] {
+                XCTAssertTrue(canvas.contains(CGPoint(x: saw.x, y: saw.y)), "\(id): saw outside the canvas")
+                XCTAssertGreaterThan(saw.r, 0)
+            }
+            for prop in level.props ?? [] {
+                XCTAssertTrue(prop.shape == "ball" || prop.shape == "box", "\(id): prop shape \(prop.shape)")
+                XCTAssertTrue(canvas.contains(CGPoint(x: prop.x, y: prop.y)), "\(id): prop \(prop.id) outside the canvas")
+            }
+            for decor in level.decor ?? [] {
+                XCTAssertNotNil(Sprite(rawValue: decor.sprite), "\(id): unknown decor sprite \(decor.sprite)")
+            }
             let solution = try XCTUnwrap(level.solution, "\(id): every level stores a solution")
             XCTAssertFalse(solution.strokes.isEmpty, "\(id): solution has strokes")
             var cost: CGFloat = 0

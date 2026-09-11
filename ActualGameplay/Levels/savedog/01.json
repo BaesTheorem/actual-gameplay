@@ -17,6 +17,22 @@
       "skin": "grass"
     }
   ],
+  "decor": [
+    {
+      "sprite": "bush",
+      "x": 80,
+      "y": 92,
+      "w": 44,
+      "h": 38
+    },
+    {
+      "sprite": "mushroom_red",
+      "x": 330,
+      "y": 87,
+      "w": 26,
+      "h": 26
+    }
+  ],
   "dogs": [
     {
       "id": "dog",

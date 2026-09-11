@@ -53,8 +53,11 @@ final class DogScene: StrokeScene, ReplayableScene {
 
         addBackdrop()
         addBounds(floor: false)
+        for decor in level.decor ?? [] { addDecor(decor) }
         for item in level.statics ?? [] { addStatic(item) }
         for rect in level.killers ?? [] { addKiller(rect.cgRect) }
+        for saw in level.saws ?? [] { addSaw(saw) }
+        for prop in level.props ?? [] { addProp(prop) }
         for spot in level.dogs {
             let dog = DogNode(id: spot.id)
             dog.position = CGPoint(x: spot.x, y: spot.y)
@@ -162,15 +165,39 @@ final class DogScene: StrokeScene, ReplayableScene {
     override func handle(contacts: [ContactEvent]) {
         guard !finished else { return }
         for event in contacts {
+            if let (stroke, killer) = event.pair(StrokeCategory.drawn, StrokeCategory.killer), killer.name == "saw" {
+                cut(stroke, at: event.contact.contactPoint)
+                continue
+            }
             if let (dog, _) = event.pair(StrokeCategory.actor, StrokeCategory.bee), let node = dog as? DogNode {
                 lose("The bees got \(node.dogID).")
                 return
             }
-            if let (dog, _) = event.pair(StrokeCategory.actor, StrokeCategory.killer), let node = dog as? DogNode {
-                lose("\(node.dogID.capitalized) landed on the spikes.")
+            if let (dog, killer) = event.pair(StrokeCategory.actor, StrokeCategory.killer), let node = dog as? DogNode {
+                lose(killer.name == "saw" ? "\(node.dogID.capitalized) met the saw." : "\(node.dogID.capitalized) landed on the spikes.")
                 return
             }
         }
+    }
+
+    /// A saw took a stroke. It goes in a puff of sawdust and the map is rebuilt at once.
+    private func cut(_ stroke: SKNode, at point: CGPoint) {
+        guard stroke.parent != nil else { return }
+        stroke.physicsBody = nil
+        stroke.run(.sequence([.group([.fadeOut(withDuration: Motion.decorative(0.2)), .scale(to: 0.9, duration: 0.2)]), .removeFromParent()]))
+        for _ in 0..<6 {
+            let chip = SKShapeNode(rectOf: CGSize(width: 4, height: 2))
+            chip.fillColor = strokeColor
+            chip.strokeColor = .clear
+            chip.position = point
+            chip.zPosition = 20
+            addChild(chip)
+            let dx = CGFloat.random(in: -40...40)
+            let dy = CGFloat.random(in: 10...60)
+            chip.run(.sequence([.group([.moveBy(x: dx, y: dy, duration: 0.35), .fadeOut(withDuration: 0.35)]), .removeFromParent()]))
+        }
+        Haptics.shared.thud()
+        fieldCountdown = 0
     }
 
     private func win() {

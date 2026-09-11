@@ -1,11 +1,11 @@
 {
   "id": "04",
-  "name": "On a ledge",
-  "hint": "The shield has to fit the ledge.",
-  "inkBudget": 300,
+  "name": "Plug the hole",
+  "hint": "One hole. Ninety ink. Do the math.",
+  "inkBudget": 130,
   "stars": [
-    170,
-    230
+    100,
+    115
   ],
   "statics": [
     {
@@ -18,25 +18,65 @@
     },
     {
       "type": "rect",
-      "x": 166,
-      "y": 280,
-      "w": 70,
-      "h": 20,
+      "x": 120,
+      "y": 74,
+      "w": 14,
+      "h": 146,
       "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 268,
+      "y": 74,
+      "w": 14,
+      "h": 146,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 120,
+      "y": 206,
+      "w": 60,
+      "h": 14,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 222,
+      "y": 206,
+      "w": 60,
+      "h": 14,
+      "skin": "stone"
+    }
+  ],
+  "decor": [
+    {
+      "sprite": "torch_on_a",
+      "x": 146,
+      "y": 150,
+      "w": 16,
+      "h": 26
+    },
+    {
+      "sprite": "torch_on_b",
+      "x": 256,
+      "y": 150,
+      "w": 16,
+      "h": 26
     }
   ],
   "dogs": [
     {
       "id": "dog",
       "x": 201,
-      "y": 318
+      "y": 92
     }
   ],
   "hives": [
     {
       "x": 201,
       "y": 700,
-      "count": 12
+      "count": 14
     }
   ],
   "solution": {
@@ -44,40 +84,12 @@
       {
         "points": [
           [
-            170,
-            304
+            156,
+            228
           ],
           [
-            172,
-            329
-          ],
-          [
-            179,
-            348
-          ],
-          [
-            189,
-            360
-          ],
-          [
-            201,
-            364
-          ],
-          [
-            213,
-            360
-          ],
-          [
-            223,
-            348
-          ],
-          [
-            230,
-            329
-          ],
-          [
-            232,
-            304
+            246,
+            228
           ]
         ]
       }

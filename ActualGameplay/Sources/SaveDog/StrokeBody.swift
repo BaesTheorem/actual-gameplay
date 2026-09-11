@@ -87,8 +87,8 @@ enum StrokeBody {
         body.angularDamping = 0.1
         body.allowsRotation = true
         body.categoryBitMask = StrokeCategory.drawn
-        body.collisionBitMask = StrokeCategory.wall | StrokeCategory.drawn | StrokeCategory.actor | StrokeCategory.killer | StrokeCategory.bee
-        body.contactTestBitMask = 0
+        body.collisionBitMask = StrokeCategory.wall | StrokeCategory.drawn | StrokeCategory.actor | StrokeCategory.killer | StrokeCategory.bee | StrokeCategory.prop
+        body.contactTestBitMask = StrokeCategory.killer
         return body
     }
 }
