@@ -1,9 +1,47 @@
 {
   "id": "05",
-  "name": "Water first",
-  "hint": "Lava next to the treasure. Douse it before you drop it.",
+  "name": "The wrong pool",
+  "hint": "Two tanks of water. Only one of them is over the fire.",
   "parPins": 2,
   "winWhen": "treasureReachesHero",
+  "walls": [
+    {
+      "x": 230,
+      "y": 314,
+      "w": 14,
+      "h": 166
+    },
+    {
+      "x": 230,
+      "y": 494,
+      "w": 14,
+      "h": 106
+    },
+    {
+      "x": 230,
+      "y": 614,
+      "w": 14,
+      "h": 90
+    },
+    {
+      "x": 296,
+      "y": 314,
+      "w": 14,
+      "h": 166
+    },
+    {
+      "x": 296,
+      "y": 494,
+      "w": 14,
+      "h": 106
+    },
+    {
+      "x": 296,
+      "y": 614,
+      "w": 14,
+      "h": 90
+    }
+  ],
   "pins": [
     {
       "id": "p1",
@@ -14,37 +52,82 @@
     },
     {
       "id": "p2",
+      "x": 244,
+      "y": 480,
+      "w": 120,
+      "side": "right"
+    },
+    {
+      "id": "p3",
       "x": 38,
-      "y": 520,
-      "w": 326,
+      "y": 480,
+      "w": 192,
+      "side": "left"
+    },
+    {
+      "id": "p4",
+      "x": 244,
+      "y": 600,
+      "w": 120,
+      "side": "right"
+    },
+    {
+      "id": "p5",
+      "x": 38,
+      "y": 600,
+      "w": 192,
       "side": "left"
     }
   ],
   "pools": [
     {
       "liquid": "lava",
-      "x": 200,
+      "x": 314,
       "y": 314,
-      "w": 80,
+      "w": 44,
       "h": 40,
-      "count": 50
+      "count": 30
     },
     {
       "liquid": "water",
-      "x": 160,
-      "y": 534,
+      "x": 314,
+      "y": 494,
+      "w": 44,
+      "h": 60,
+      "count": 40
+    },
+    {
+      "liquid": "water",
+      "x": 44,
+      "y": 494,
       "w": 180,
-      "h": 70,
-      "count": 150
+      "h": 40,
+      "count": 55
+    },
+    {
+      "liquid": "lava",
+      "x": 314,
+      "y": 614,
+      "w": 44,
+      "h": 60,
+      "count": 40
+    },
+    {
+      "liquid": "lava",
+      "x": 44,
+      "y": 614,
+      "w": 180,
+      "h": 36,
+      "count": 50
     }
   ],
   "actors": {
     "hero": {
-      "x": 310,
+      "x": 270,
       "y": 84
     },
     "treasure": {
-      "x": 310,
+      "x": 270,
       "y": 325
     }
   },
@@ -52,5 +135,5 @@
     "p2",
     "p1"
   ],
-  "settleSeconds": 5
+  "settleSeconds": 6
 }

@@ -87,8 +87,12 @@ final class LevelDecodingTests: XCTestCase {
             for pool in level.pools ?? [] {
                 XCTAssertTrue(pool.liquid == "water" || pool.liquid == "lava", "\(id): pool liquid \(pool.liquid)")
                 XCTAssertTrue(canvas.contains(pool.cgRect), "\(id): pool outside the canvas")
+                if pool.liquid == "lava", let treasure = level.actors.treasure {
+                    let box = CGRect(x: treasure.x - 14, y: treasure.y - 12, width: 28, height: 24)
+                    XCTAssertFalse(pool.cgRect.intersects(box), "\(id): the treasure starts inside lava, which melts it")
+                }
             }
-            for rect in (level.walls ?? []).map(\.cgRect) + (level.drains ?? []).map(\.cgRect) {
+            for rect in (level.walls ?? []).map(\.cgRect) + (level.drains ?? []).map(\.cgRect) + (level.grates ?? []).map(\.cgRect) {
                 XCTAssertTrue(canvas.contains(rect), "\(id): rect \(rect) outside the canvas")
             }
             for pin in level.pins {

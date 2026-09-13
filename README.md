@@ -16,8 +16,11 @@ through the floor, a boulder to route into a gap, saw blades that cut ink, two d
 ink for one shield. Three stars for a low-ink clear.
 
 **Pull the Pin.** Chambers of water and lava held up by pins. Tap a pin to slide it out.
-Water and lava cancel each other, lava ends the hero, drains swallow whatever reaches them.
-Twelve levels, three stars for clearing at par.
+Water and lava cancel each other, lava ends the hero and melts the gem, drains swallow
+whatever reaches them, and grates take the liquid while anything solid drops through.
+Twelve levels of three to six pins, and each has exactly one pull order that wins: every
+other order burns the hero, melts the gem, or throws away the water you needed. The wrong
+pin is never merely a wasted tap.
 
 **Crowd Run.** Drag to steer a crowd down a road. Green gates grow it, red ones shrink it,
 walls and blades and spikes thin it, and whatever is left fights a crowd or a boss at the
@@ -52,13 +55,17 @@ Pull the Pin), and two scripts drive the app on the simulator through them:
 The replay is the regression suite: after touching physics or a level file, it must be 12/12.
 The audit asks the questions a replay cannot. For Pull the Pin it tries every single pin,
 every ordered pair, and everything in order and reversed, and flags a level where a naive
-sequence wins. For Save the Dog it replays the solution shifted and scaled eight ways and tries five
+sequence wins. `scripts/audit.py pinPull --exhaustive` goes further and proves the harder
+claim: it plays every ordered pull sequence up to par, pruning any that already won or
+already died, and reports each level as UNIQUE or lists the other orders that win. For Save the Dog it replays the solution shifted and scaled eight ways and tries five
 naive strokes (a bar over the dog, walls beside him, a roof), and flags levels that are
 fragile (the wobbled solution loses) or trivial (a naive stroke wins). For Crowd Run it compares greedy steering against never
 steering, always-left, and random. Both write per-trial snapshots under `build/`.
 
-Both scripts wait for the simulator to finish booting and warm it up with a throwaway
-launch first. A cold simulator answers `simctl launch` while it is still settling, and the
+Both scripts show the simulator window and wait for it to finish booting, then warm it up
+with a throwaway launch. A simulator with no visible window has its display link throttled
+partway through a long run: the first few scenes play at speed and a later one stalls for
+minutes. A cold simulator answers `simctl launch` while it is still settling, and the
 first scene presented into that gets a starved run loop: timers land tens of seconds late and
 the display link barely ticks, which once cost a measured run.
 
@@ -72,7 +79,12 @@ physics overlays in Settings.
 Drop a JSON file into `ActualGameplay/Levels/<savedog|pinpull>/NN.json`. The folder is
 copied into the bundle as a folder reference, so no project change is needed. Coordinates
 are a fixed 402 x 874 point canvas, origin bottom-left, and the scene letterboxes on other
-screens so a stored solution behaves the same everywhere. A Save the Dog level can carry
+screens so a stored solution behaves the same everywhere. A Pull the Pin level can carry `walls` and `slabs` (thick static geometry), `pins`,
+`pools` of water or lava, `drains` (they end a gem that touches them), `grates` (liquid
+only), `decor`, and the actors it needs for its `winWhen`. Two rules matter when placing
+liquid: a pool spreads until something stops it, so give every pool a wall at each end, and
+keep lava out of the gem's compartment, since they are meant to meet on the floor after the
+pin goes, not on the shelf beforehand. A Save the Dog level can carry
 `statics` (rect, circle, chain, with a terrain `skin`), `killers` (spike strips), `saws`
 (they cut strokes), `props` (a ball or box the physics can move), `decor` (sprites with no
 body), `forbidden` (no-ink zones), one or more `dogs`, and `hives` with a count, an

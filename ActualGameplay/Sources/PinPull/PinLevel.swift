@@ -65,6 +65,10 @@ struct PinLevel: Decodable {
     var pins: [Pin]
     var pools: [Pool]?
     var drains: [Rect]?
+    /// Liquid that touches a grate is gone; the hero and the treasure pass through untouched.
+    var grates: [Rect]?
+    /// Scenery with no physics (torches, signs).
+    var decor: [DogLevel.Decor]?
     var actors: Actors
     /// Pin ids in pull order.
     var solution: [String]?

@@ -58,7 +58,7 @@ final class TreasureNode: SKSpriteNode {
         body.usesPreciseCollisionDetection = true
         body.categoryBitMask = PinCategory.treasure
         body.collisionBitMask = PinCategory.wall | PinCategory.pin | PinCategory.water | PinCategory.lava | PinCategory.hero | PinCategory.treasure
-        body.contactTestBitMask = PinCategory.goal | PinCategory.hero | PinCategory.drain
+        body.contactTestBitMask = PinCategory.goal | PinCategory.hero | PinCategory.drain | PinCategory.lava
         physicsBody = body
     }
 

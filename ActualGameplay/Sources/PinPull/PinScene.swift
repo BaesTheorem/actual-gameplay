@@ -78,20 +78,23 @@ final class PinScene: GameSceneBase, ReplayableScene {
 
         addBounds()
         if level.frame ?? true { addFrame() }
+        for decor in level.decor ?? [] {
+            guard let sprite = Sprite(rawValue: decor.sprite) else { continue }
+            let node = SKSpriteNode(texture: sprite.texture, size: CGSize(width: decor.w, height: decor.h))
+            node.position = CGPoint(x: decor.x, y: decor.y)
+            node.zPosition = 1
+            addChild(node)
+        }
         for wall in level.walls ?? [] { addWall(wall.cgRect) }
         for slab in level.slabs ?? [] { addSlab(slab) }
         for drain in level.drains ?? [] { addDrain(drain.cgRect) }
+        for grate in level.grates ?? [] { addGrate(grate.cgRect) }
         if let goal = level.actors.goal { addGoal(goal.cgRect) }
         for pin in level.pins { addPin(pin) }
         liquid.layer.removeFromParent()
         addChild(liquid.layer)
-        if let view {
-            for pool in level.pools ?? [] {
-                let kind = LiquidKind(rawValue: pool.liquid) ?? .water
-                let texture = NodeFactory.shared.circle(radius: LiquidSystem.radius * LiquidSystem.visualScale,
-                                                        color: kind.color, view: view)
-                liquid.spawn(in: pool.cgRect, count: pool.count, kind: kind, texture: texture)
-            }
+        for pool in level.pools ?? [] {
+            liquid.spawn(in: pool.cgRect, count: pool.count, kind: LiquidKind(rawValue: pool.liquid) ?? .water)
         }
         if let spot = level.actors.hero {
             let node = HeroNode()
@@ -179,6 +182,34 @@ final class PinScene: GameSceneBase, ReplayableScene {
         body.categoryBitMask = PinCategory.drain
         body.collisionBitMask = 0
         body.contactTestBitMask = PinCategory.liquid | PinCategory.treasure
+        node.physicsBody = body
+    }
+
+    /// A row of bars: liquid falls in and is gone, anything solid drops straight through.
+    private func addGrate(_ rect: CGRect) {
+        let node = SKShapeNode(rect: rect)
+        node.fillColor = Palette.drain.withAlphaComponent(0.6)
+        node.strokeColor = Palette.muted
+        node.lineWidth = 1
+        node.zPosition = 3
+        addChild(node)
+        let bars = CGMutablePath()
+        var x = rect.minX + 5
+        while x < rect.maxX - 2 {
+            bars.move(to: CGPoint(x: x, y: rect.minY))
+            bars.addLine(to: CGPoint(x: x, y: rect.maxY))
+            x += 8
+        }
+        let lines = SKShapeNode(path: bars)
+        lines.strokeColor = UIColor(hex: 0xB9BEC9)
+        lines.lineWidth = 2
+        lines.zPosition = 3
+        addChild(lines)
+        let body = SKPhysicsBody(rectangleOf: rect.size, center: CGPoint(x: rect.midX, y: rect.midY))
+        body.isDynamic = false
+        body.categoryBitMask = PinCategory.grate
+        body.collisionBitMask = 0
+        body.contactTestBitMask = PinCategory.liquid
         node.physicsBody = body
     }
 
@@ -277,12 +308,15 @@ final class PinScene: GameSceneBase, ReplayableScene {
         guard !finished, !dying else { return }
         var heroBurned = false
         var treasureLost = false
+        var treasureMelted = false
         for event in contacts {
             if event.matches(PinCategory.lava, PinCategory.hero) {
                 heroBurned = true
+            } else if event.matches(PinCategory.lava, PinCategory.treasure) {
+                treasureMelted = true
             } else if let (water, lava) = event.pair(PinCategory.water, PinCategory.lava) {
                 annihilate(water: water, lava: lava)
-            } else if let (particle, _) = event.pair(PinCategory.liquid, PinCategory.drain) {
+            } else if let (particle, _) = event.pair(PinCategory.liquid, PinCategory.drain | PinCategory.grate) {
                 liquid.remove(particle)
             } else if event.matches(PinCategory.treasure, PinCategory.drain) {
                 treasureLost = true
@@ -296,6 +330,8 @@ final class PinScene: GameSceneBase, ReplayableScene {
         }
         if heroBurned {
             heroDies()
+        } else if treasureMelted {
+            treasureMelts()
         } else if treasureLost {
             lose("The treasure went down the drain.")
         } else if winConditionMet, winLatchedAt == nil {
@@ -336,6 +372,19 @@ final class PinScene: GameSceneBase, ReplayableScene {
         case "both": return latched.contains("treasureHero") && latched.contains("heroGoal")
         default: return latched.contains("treasureHero")
         }
+    }
+
+    /// Gold does not survive lava. The level ends, after the treasure has visibly gone.
+    private func treasureMelts() {
+        guard let treasure, !dying else { return }
+        dying = true
+        Haptics.shared.slam()
+        Audio.play(.sizzle)
+        treasure.run(.sequence([
+            .group([.colorize(with: UIColor(hex: 0xFF6A3D), colorBlendFactor: 0.8, duration: 0.2),
+                    .scale(to: 0.3, duration: Motion.decorative(0.5)), .fadeOut(withDuration: Motion.decorative(0.5))]),
+            .run { [weak self] in self?.lose("The treasure melted.") },
+        ]))
     }
 
     private func heroDies() {

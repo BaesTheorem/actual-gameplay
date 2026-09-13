@@ -5,3 +5,5 @@ build/
 Config/Signing.xcconfig
 Config/device.env
 .DS_Store
+__pycache__/
+*.pyc

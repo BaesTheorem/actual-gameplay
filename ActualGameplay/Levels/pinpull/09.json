@@ -1,79 +1,121 @@
 {
   "id": "09",
-  "name": "Divert",
-  "hint": "One pin holds both. Take the lava's floor away first.",
+  "name": "Two taps",
+  "hint": "One tank, two ways out. Only one of them is over the fire.",
   "parPins": 2,
   "winWhen": "treasureReachesHero",
   "walls": [
     {
-      "x": 170,
-      "y": 68,
+      "x": 194,
+      "y": 380,
       "w": 14,
-      "h": 232
+      "h": 106
     },
     {
-      "x": 170,
-      "y": 434,
+      "x": 194,
+      "y": 486,
+      "w": 66,
+      "h": 14
+    },
+    {
+      "x": 246,
+      "y": 314,
       "w": 14,
-      "h": 306
+      "h": 172
     }
   ],
-  "slabs": [
+  "grates": [
     {
-      "x1": 364,
-      "y1": 404,
-      "x2": 244,
-      "y2": 328,
-      "t": 14
+      "x": 38,
+      "y": 300,
+      "w": 156,
+      "h": 16
     }
   ],
   "pins": [
     {
       "id": "p1",
       "x": 38,
-      "y": 420,
-      "w": 326,
-      "side": "right"
+      "y": 486,
+      "w": 156,
+      "side": "left"
     },
     {
       "id": "p2",
-      "x": 184,
-      "y": 300,
-      "w": 60,
+      "x": 260,
+      "y": 486,
+      "w": 104,
       "side": "right"
+    },
+    {
+      "id": "p3",
+      "x": 194,
+      "y": 300,
+      "w": 170,
+      "side": "right"
+    },
+    {
+      "id": "p4",
+      "x": 38,
+      "y": 620,
+      "w": 326,
+      "side": "left"
+    },
+    {
+      "id": "p5",
+      "x": 38,
+      "y": 380,
+      "w": 156,
+      "side": "left"
     }
   ],
   "pools": [
     {
-      "liquid": "lava",
-      "x": 230,
-      "y": 434,
-      "w": 120,
+      "liquid": "water",
+      "x": 60,
+      "y": 500,
+      "w": 280,
       "h": 50,
-      "count": 80
-    }
-  ],
-  "drains": [
+      "count": 115
+    },
     {
-      "x": 184,
-      "y": 68,
-      "w": 90,
-      "h": 24
+      "liquid": "lava",
+      "x": 264,
+      "y": 314,
+      "w": 86,
+      "h": 40,
+      "count": 50
+    },
+    {
+      "liquid": "lava",
+      "x": 60,
+      "y": 634,
+      "w": 280,
+      "h": 40,
+      "count": 90
+    },
+    {
+      "liquid": "lava",
+      "x": 44,
+      "y": 394,
+      "w": 144,
+      "h": 36,
+      "count": 40
     }
   ],
   "actors": {
     "hero": {
-      "x": 140,
+      "x": 220,
       "y": 84
     },
     "treasure": {
-      "x": 140,
-      "y": 445
+      "x": 220,
+      "y": 325
     }
   },
   "solution": [
     "p2",
-    "p1"
+    "p3"
   ],
-  "settleSeconds": 5
+  "settleSeconds": 6
 }

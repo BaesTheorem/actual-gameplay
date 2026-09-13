@@ -1,76 +1,105 @@
 {
   "id": "04",
-  "name": "Decoy",
-  "hint": "Three pins. One of them matters.",
-  "parPins": 1,
-  "winWhen": "treasureReachesHero",
-  "walls": [
+  "name": "The slide",
+  "hint": "He slides the whole way down. Clean the bottom first.",
+  "parPins": 2,
+  "winWhen": "heroReachesGoal",
+  "slabs": [
     {
-      "x": 150,
-      "y": 100,
-      "w": 14,
-      "h": 640
-    },
+      "x1": 38,
+      "y1": 340,
+      "x2": 250,
+      "y2": 182,
+      "t": 14
+    }
+  ],
+  "grates": [
     {
-      "x": 252,
-      "y": 100,
-      "w": 14,
-      "h": 640
+      "x": 256,
+      "y": 68,
+      "w": 108,
+      "h": 16
     }
   ],
   "pins": [
     {
       "id": "p1",
-      "x": 164,
-      "y": 400,
-      "w": 88,
+      "x": 256,
+      "y": 84,
+      "w": 108,
       "side": "right"
     },
     {
       "id": "p2",
       "x": 38,
       "y": 560,
-      "w": 112,
+      "w": 140,
       "side": "left"
     },
     {
       "id": "p3",
-      "x": 266,
-      "y": 240,
-      "w": 98,
+      "x": 124,
+      "y": 460,
+      "w": 240,
       "side": "right"
+    },
+    {
+      "id": "p4",
+      "x": 38,
+      "y": 650,
+      "w": 140,
+      "side": "left"
     }
   ],
   "pools": [
     {
       "liquid": "lava",
-      "x": 44,
-      "y": 574,
-      "w": 100,
-      "h": 40,
-      "count": 50
+      "x": 262,
+      "y": 98,
+      "w": 96,
+      "h": 36,
+      "count": 45
     },
     {
       "liquid": "lava",
-      "x": 272,
-      "y": 254,
-      "w": 86,
-      "h": 40,
-      "count": 50
+      "x": 150,
+      "y": 474,
+      "w": 90,
+      "h": 36,
+      "count": 40
+    },
+    {
+      "liquid": "lava",
+      "x": 44,
+      "y": 664,
+      "w": 128,
+      "h": 30,
+      "count": 35
     }
   ],
   "actors": {
     "hero": {
-      "x": 208,
-      "y": 84
+      "x": 80,
+      "y": 590
     },
-    "treasure": {
-      "x": 208,
-      "y": 425
+    "goal": {
+      "x": 256,
+      "y": 68,
+      "w": 108,
+      "h": 64
     }
   },
   "solution": [
-    "p1"
+    "p1",
+    "p2"
   ],
-  "settleSeconds": 4
+  "settleSeconds": 6,
+  "walls": [
+    {
+      "x": 242,
+      "y": 68,
+      "w": 14,
+      "h": 72
+    }
+  ]
 }

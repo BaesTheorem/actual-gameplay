@@ -62,6 +62,10 @@ def wait_for_boot(udid: str) -> None:
     the first scene presented into that gets a starved run loop: timers fire tens of
     seconds late and the display link barely ticks. One measured run was lost to it.
     """
+    # A simulator with no visible window gets its display link throttled part way through a long
+    # run: the first few scenes play at speed and a later one stalls for minutes. Showing the
+    # window keeps the app foreground and the run honest.
+    run(["open", "-a", "Simulator", "--args", "-CurrentDeviceUDID", udid])
     run(["xcrun", "simctl", "bootstatus", udid, "-b"])
     run(["xcrun", "simctl", "launch", udid, BUNDLE, "--silent"])
     time.sleep(3)
@@ -101,7 +105,7 @@ def main() -> None:
     if result.returncode:
         raise SystemExit(result.stderr)
 
-    deadline = time.time() + 300
+    deadline = time.time() + 1800
     while time.time() < deadline and not results_file.exists():
         time.sleep(1)
     run(["xcrun", "simctl", "terminate", udid, BUNDLE])

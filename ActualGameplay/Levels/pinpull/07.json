@@ -1,79 +1,134 @@
 {
   "id": "07",
-  "name": "Downhill",
-  "hint": "Water flows downhill. Use that.",
-  "parPins": 2,
+  "name": "One tank, two fires",
+  "hint": "The water has to come through the upper floor to reach the lower one.",
+  "parPins": 3,
   "winWhen": "treasureReachesHero",
   "walls": [
     {
-      "x": 186,
-      "y": 68,
+      "x": 260,
+      "y": 314,
       "w": 14,
-      "h": 332
+      "h": 34
     },
     {
-      "x": 186,
-      "y": 470,
+      "x": 260,
+      "y": 474,
       "w": 14,
-      "h": 270
-    }
-  ],
-  "slabs": [
+      "h": 146
+    },
     {
-      "x1": 38,
-      "y1": 480,
-      "x2": 200,
-      "y2": 400,
-      "t": 14
+      "x": 260,
+      "y": 634,
+      "w": 14,
+      "h": 70
+    },
+    {
+      "x": 178,
+      "y": 574,
+      "w": 14,
+      "h": 46
+    },
+    {
+      "x": 178,
+      "y": 414,
+      "w": 14,
+      "h": 46
     }
   ],
   "pins": [
     {
       "id": "p1",
-      "x": 200,
-      "y": 260,
-      "w": 164,
-      "side": "right"
+      "x": 38,
+      "y": 620,
+      "w": 326,
+      "side": "left"
     },
     {
       "id": "p2",
       "x": 38,
+      "y": 460,
+      "w": 326,
+      "side": "right"
+    },
+    {
+      "id": "p3",
+      "x": 38,
+      "y": 300,
+      "w": 326,
+      "side": "right"
+    },
+    {
+      "id": "p4",
+      "x": 38,
       "y": 560,
-      "w": 148,
+      "w": 140,
+      "side": "left"
+    },
+    {
+      "id": "p5",
+      "x": 38,
+      "y": 400,
+      "w": 140,
       "side": "left"
     }
   ],
   "pools": [
     {
-      "liquid": "lava",
-      "x": 212,
-      "y": 274,
+      "liquid": "water",
+      "x": 278,
+      "y": 634,
       "w": 80,
-      "h": 40,
-      "count": 50
+      "h": 60,
+      "count": 110
     },
     {
-      "liquid": "water",
-      "x": 50,
+      "liquid": "lava",
+      "x": 280,
+      "y": 474,
+      "w": 76,
+      "h": 36,
+      "count": 45
+    },
+    {
+      "liquid": "lava",
+      "x": 280,
+      "y": 314,
+      "w": 76,
+      "h": 36,
+      "count": 45
+    },
+    {
+      "liquid": "lava",
+      "x": 44,
       "y": 574,
-      "w": 120,
-      "h": 80,
-      "count": 140
+      "w": 128,
+      "h": 36,
+      "count": 45
+    },
+    {
+      "liquid": "lava",
+      "x": 44,
+      "y": 414,
+      "w": 128,
+      "h": 36,
+      "count": 45
     }
   ],
   "actors": {
     "hero": {
-      "x": 340,
+      "x": 150,
       "y": 84
     },
     "treasure": {
-      "x": 340,
-      "y": 285
+      "x": 150,
+      "y": 325
     }
   },
   "solution": [
+    "p1",
     "p2",
-    "p1"
+    "p3"
   ],
-  "settleSeconds": 5
+  "settleSeconds": 7
 }

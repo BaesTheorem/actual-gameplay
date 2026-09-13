@@ -1,79 +1,140 @@
 {
   "id": "06",
-  "name": "Wrong pool",
-  "hint": "Only one pool is over the lava.",
+  "name": "Mind the hole",
+  "hint": "He is standing on the only floor there is.",
   "parPins": 2,
   "winWhen": "treasureReachesHero",
+  "frame": false,
   "walls": [
     {
-      "x": 194,
+      "x": 24,
+      "y": 54,
+      "w": 14,
+      "h": 660
+    },
+    {
+      "x": 364,
+      "y": 54,
+      "w": 14,
+      "h": 660
+    },
+    {
+      "x": 38,
+      "y": 54,
+      "w": 112,
+      "h": 14
+    },
+    {
+      "x": 214,
+      "y": 314,
+      "w": 14,
+      "h": 146
+    },
+    {
+      "x": 214,
       "y": 474,
       "w": 14,
-      "h": 200
+      "h": 126
+    },
+    {
+      "x": 214,
+      "y": 614,
+      "w": 14,
+      "h": 90
     }
   ],
   "pins": [
     {
       "id": "p1",
+      "x": 150,
+      "y": 54,
+      "w": 214,
+      "side": "right"
+    },
+    {
+      "id": "p2",
       "x": 38,
       "y": 300,
       "w": 326,
       "side": "right"
     },
     {
-      "id": "p2",
-      "x": 38,
+      "id": "p3",
+      "x": 228,
       "y": 460,
-      "w": 163,
-      "side": "left"
+      "w": 136,
+      "side": "right"
     },
     {
-      "id": "p3",
-      "x": 201,
-      "y": 460,
-      "w": 163,
+      "id": "p4",
+      "x": 228,
+      "y": 600,
+      "w": 136,
       "side": "right"
+    },
+    {
+      "id": "p5",
+      "x": 38,
+      "y": 600,
+      "w": 176,
+      "side": "left"
     }
   ],
   "pools": [
     {
       "liquid": "lava",
-      "x": 212,
+      "x": 240,
       "y": 314,
-      "w": 100,
-      "h": 40,
-      "count": 60
+      "w": 110,
+      "h": 36,
+      "count": 45
     },
     {
       "liquid": "water",
-      "x": 50,
+      "x": 240,
       "y": 474,
-      "w": 100,
+      "w": 110,
+      "h": 45,
+      "count": 55
+    },
+    {
+      "liquid": "lava",
+      "x": 240,
+      "y": 614,
+      "w": 110,
       "h": 40,
+      "count": 50
+    },
+    {
+      "liquid": "lava",
+      "x": 60,
+      "y": 614,
+      "w": 140,
+      "h": 36,
       "count": 40
     },
     {
-      "liquid": "water",
-      "x": 212,
-      "y": 474,
-      "w": 140,
-      "h": 70,
-      "count": 150
+      "liquid": "lava",
+      "x": 154,
+      "y": 36,
+      "w": 206,
+      "h": 16,
+      "count": 50
     }
   ],
   "actors": {
     "hero": {
-      "x": 340,
+      "x": 180,
       "y": 84
     },
     "treasure": {
-      "x": 340,
+      "x": 180,
       "y": 325
     }
   },
   "solution": [
     "p3",
-    "p1"
+    "p2"
   ],
-  "settleSeconds": 5
+  "settleSeconds": 6
 }

@@ -1,57 +1,96 @@
 {
   "id": "03",
-  "name": "Drop",
-  "hint": "Just get him down. Leave the lava alone.",
-  "parPins": 1,
+  "name": "Clear the landing",
+  "hint": "The exit is full. Give the lava somewhere to go.",
+  "parPins": 2,
   "winWhen": "heroReachesGoal",
   "walls": [
     {
-      "x": 200,
-      "y": 100,
+      "x": 110,
+      "y": 68,
       "w": 14,
-      "h": 640
+      "h": 572
+    }
+  ],
+  "grates": [
+    {
+      "x": 124,
+      "y": 68,
+      "w": 132,
+      "h": 16
     }
   ],
   "pins": [
     {
       "id": "p1",
-      "x": 38,
-      "y": 400,
-      "w": 162,
-      "side": "left"
+      "x": 124,
+      "y": 90,
+      "w": 240,
+      "side": "right"
     },
     {
       "id": "p2",
-      "x": 214,
-      "y": 300,
-      "w": 150,
+      "x": 124,
+      "y": 400,
+      "w": 240,
+      "side": "right"
+    },
+    {
+      "id": "p3",
+      "x": 38,
+      "y": 500,
+      "w": 72,
+      "side": "left"
+    },
+    {
+      "id": "p4",
+      "x": 124,
+      "y": 560,
+      "w": 240,
       "side": "right"
     }
   ],
   "pools": [
     {
       "liquid": "lava",
-      "x": 224,
-      "y": 314,
-      "w": 130,
-      "h": 60,
-      "count": 100
+      "x": 130,
+      "y": 104,
+      "w": 120,
+      "h": 38,
+      "count": 55
+    },
+    {
+      "liquid": "lava",
+      "x": 44,
+      "y": 514,
+      "w": 62,
+      "h": 36,
+      "count": 40
+    },
+    {
+      "liquid": "lava",
+      "x": 160,
+      "y": 574,
+      "w": 100,
+      "h": 40,
+      "count": 50
     }
   ],
   "actors": {
     "hero": {
-      "x": 120,
+      "x": 190,
       "y": 430
     },
     "goal": {
-      "x": 50,
+      "x": 124,
       "y": 68,
-      "w": 140,
-      "h": 50
+      "w": 132,
+      "h": 56
     }
   },
   "solution": [
-    "p1"
+    "p1",
+    "p2"
   ],
-  "settleSeconds": 4
+  "settleSeconds": 6
 }

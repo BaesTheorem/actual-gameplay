@@ -11,6 +11,7 @@ trials per level and reports the ones that look trivial (a naive move wins), fra
     scripts/audit.py runner             greedy, straight, always-left, and random steering
     scripts/audit.py <mode> --no-build  reuse the last simulator build
     scripts/audit.py <mode> --only 05,07
+    scripts/audit.py pinPull --exhaustive   every pull sequence up to par, pruned at deaths; UNIQUE or the other winners
 
 Writes build/audit/<mode>.json (raw) and prints the verdicts. The plan is generated
 here and read by the app from its own container, so adding a trial kind is a Python
@@ -173,29 +174,21 @@ def verdicts(mode: str, entries: list[dict], levels: list[dict] | None = None) -
     return lines
 
 
-# ----------------------------------------------------------------------------- main
+
+_SIM_READY = {"udid": None}
 
 
-def main() -> None:
-    args = sys.argv[1:]
-    positional = [a for i, a in enumerate(args) if not a.startswith("--") and (i == 0 or args[i - 1] != "--only")]
-    mode = positional[0] if positional else "pinPull"
-    only = set(args[args.index("--only") + 1].split(",")) if "--only" in args else None
-    if mode == "pinPull":
-        trials = pin_trials(load_levels("pinpull"), only)
-    elif mode == "saveDog":
-        trials = draw_trials(load_levels("savedog"), only)
-    elif mode == "runner":
-        trials = runner_trials(only)
-    else:
-        raise SystemExit(f"unknown mode {mode}")
-
-    udid = replay.sim_udid()
-    replay.run(["xcrun", "simctl", "boot", udid])
-    if "--no-build" not in args:
-        replay.build(udid)
-    container = replay.install(udid)
-    replay.wait_for_boot(udid)
+def run_plan(mode: str, trials: list[dict], build: bool = True) -> list[dict]:
+    """Install (and optionally build) the app, hand it a plan, and wait for its results."""
+    udid = _SIM_READY["udid"] or replay.sim_udid()
+    if _SIM_READY["udid"] is None:
+        replay.run(["xcrun", "simctl", "boot", udid])
+        if build:
+            replay.build(udid)
+        _SIM_READY["container"] = replay.install(udid)
+        replay.wait_for_boot(udid)
+        _SIM_READY["udid"] = udid
+    container = _SIM_READY["container"]
     support = container / "Library/Application Support/ActualGameplay"
     support.mkdir(parents=True, exist_ok=True)
     (support / "audit-plan.json").write_text(json.dumps({"mode": mode, "trials": trials}))
@@ -207,7 +200,6 @@ def main() -> None:
     result = replay.run(["xcrun", "simctl", "launch", udid, replay.BUNDLE, "--audit", mode, "--silent"])
     if result.returncode:
         raise SystemExit(result.stderr)
-
     print(f"{len(trials)} trials queued for {mode}")
     deadline = time.time() + 60 * 60
     while time.time() < deadline and not results_file.exists():
@@ -215,13 +207,110 @@ def main() -> None:
     replay.run(["xcrun", "simctl", "terminate", udid, replay.BUNDLE])
     if not results_file.exists():
         raise SystemExit("no results file: the audit did not finish in time")
-
-    entries = json.loads(results_file.read_text())
     out_dir = ROOT / "build/audit"
     out_dir.mkdir(parents=True, exist_ok=True)
-    shutil.copy(results_file, out_dir / f"{mode}.json")
     for png in results_dir.glob(f"{mode}-*.png"):
         shutil.copy(png, out_dir / png.name)
+    return json.loads(results_file.read_text())
+
+
+STALL = "Settled short of the goal."
+
+
+def exhaustive_pins(levels: list[dict], only: set[str] | None) -> tuple[list[dict], list[str]]:
+    """Search pull sequences up to par, extending only sequences that neither won nor died.
+
+    A sequence that stalled (everything settled, nothing won) can still be extended; one that
+    ended in a death, a melt, or a drain cannot, and one that won needs no more pulls. Each
+    round is one launch of the app. Returns every entry seen plus the verdict lines.
+    """
+    chosen = [l for l in levels if not only or l["id"] in only]
+    frontier: dict[str, list[list[str]]] = {l["id"]: [[]] for l in chosen}
+    seen: list[dict] = []
+    winners: dict[str, list[list[str]]] = {l["id"]: [] for l in chosen}
+    max_par = max(l.get("parPins", 1) for l in chosen)
+    for k in range(1, max_par + 1):
+        trials = []
+        for level in chosen:
+            if k > level.get("parPins", 1):
+                continue
+            ids = [p["id"] for p in level["pins"]]
+            for prefix in frontier[level["id"]]:
+                for pin in ids:
+                    if pin in prefix:
+                        continue
+                    seq = prefix + [pin]
+                    trials.append({"id": f"{level['id']}/seq:{','.join(seq)}", "level": levels.index(level), "pins": seq})
+        if not trials:
+            break
+        print(f"round {k}: {len(trials)} sequences")
+        entries = run_plan("pinPull", trials, build=False)
+        seen.extend(entries)
+        by_level: dict[str, list[list[str]]] = {l["id"]: [] for l in chosen}
+        for e in entries:
+            lid, name = e["id"].split("/", 1)
+            seq = name.split(":", 1)[1].split(",")
+            if e["outcome"] == "won":
+                winners[lid].append(seq)
+            elif e["outcome"] in ("lost", "timeout") and e.get("detail") == STALL:
+                by_level[lid].append(seq)
+            elif e["outcome"] == "timeout":
+                by_level[lid].append(seq)   # never settled; treat as still open
+        frontier = by_level
+    lines = []
+    for level in chosen:
+        lid = level["id"]
+        sol = level.get("solution") or []
+        wins = winners[lid]
+        if not wins:
+            verdict = "UNWINNABLE within par"
+        elif len(wins) == 1 and wins[0] == sol:
+            verdict = "UNIQUE"
+        elif sol in wins:
+            others = ["+".join(w) for w in wins if w != sol]
+            verdict = f"NOT UNIQUE: also {', '.join(others)}"
+        else:
+            verdict = f"BROKEN: solution does not win; winners {['+'.join(w) for w in wins]}"
+        lines.append(f"{lid}  {level['name']:<16} par {level.get('parPins', 1)}  {verdict}")
+    return seen, lines
+
+
+# ----------------------------------------------------------------------------- main
+
+
+def main() -> None:
+    args = sys.argv[1:]
+    positional = [a for i, a in enumerate(args) if not a.startswith("--") and (i == 0 or args[i - 1] != "--only")]
+    mode = positional[0] if positional else "pinPull"
+    only = set(args[args.index("--only") + 1].split(",")) if "--only" in args else None
+    if mode == "pinPull" and "--exhaustive" in args:
+        levels = load_levels("pinpull")
+        _SIM_READY["udid"] = None
+        if "--no-build" not in args:
+            udid = replay.sim_udid()
+            replay.run(["xcrun", "simctl", "boot", udid])
+            replay.build(udid)
+        entries, lines = exhaustive_pins(levels, only)
+        (ROOT / "build/audit").mkdir(parents=True, exist_ok=True)
+        (ROOT / "build/audit/pinPull-exhaustive.json").write_text(json.dumps(entries, indent=2))
+        print()
+        for line in lines:
+            print(line)
+        flagged = sum(1 for line in lines if not line.rstrip().endswith("  UNIQUE"))
+        print(f"\n{flagged} level(s) flagged; raw results in build/audit/pinPull-exhaustive.json")
+        return
+    if mode == "pinPull":
+        trials = pin_trials(load_levels("pinpull"), only)
+    elif mode == "saveDog":
+        trials = draw_trials(load_levels("savedog"), only)
+    elif mode == "runner":
+        trials = runner_trials(only)
+    else:
+        raise SystemExit(f"unknown mode {mode}")
+
+    entries = run_plan(mode, trials, build="--no-build" not in args)
+    out_dir = ROOT / "build/audit"
+    (out_dir / f"{mode}.json").write_text(json.dumps(entries, indent=2))
     levels = load_levels("pinpull") if mode == "pinPull" else None
     lines = verdicts(mode, entries, levels)
     print()
