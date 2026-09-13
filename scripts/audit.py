@@ -201,7 +201,7 @@ def run_plan(mode: str, trials: list[dict], build: bool = True) -> list[dict]:
     if result.returncode:
         raise SystemExit(result.stderr)
     print(f"{len(trials)} trials queued for {mode}")
-    deadline = time.time() + 60 * 60
+    deadline = time.time() + 4 * 60 * 60
     while time.time() < deadline and not results_file.exists():
         time.sleep(2)
     replay.run(["xcrun", "simctl", "terminate", udid, replay.BUNDLE])

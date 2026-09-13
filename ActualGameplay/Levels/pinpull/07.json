@@ -1,15 +1,15 @@
 {
   "id": "07",
-  "name": "One tank, two fires",
-  "hint": "The water has to come through the upper floor to reach the lower one.",
-  "parPins": 3,
+  "name": "Everything else is fire",
+  "hint": "One tank of water and four pins holding lava. Only one order saves the gem.",
+  "parPins": 2,
   "winWhen": "treasureReachesHero",
   "walls": [
     {
       "x": 260,
       "y": 314,
       "w": 14,
-      "h": 34
+      "h": 146
     },
     {
       "x": 260,
@@ -22,6 +22,12 @@
       "y": 634,
       "w": 14,
       "h": 70
+    },
+    {
+      "x": 178,
+      "y": 474,
+      "w": 14,
+      "h": 46
     },
     {
       "x": 178,
@@ -48,8 +54,8 @@
       "id": "p2",
       "x": 38,
       "y": 460,
-      "w": 326,
-      "side": "right"
+      "w": 222,
+      "side": "left"
     },
     {
       "id": "p3",
@@ -85,16 +91,16 @@
     {
       "liquid": "lava",
       "x": 280,
-      "y": 474,
+      "y": 314,
       "w": 76,
       "h": 36,
       "count": 45
     },
     {
       "liquid": "lava",
-      "x": 280,
-      "y": 314,
-      "w": 76,
+      "x": 44,
+      "y": 474,
+      "w": 128,
       "h": 36,
       "count": 45
     },
@@ -127,8 +133,7 @@
   },
   "solution": [
     "p1",
-    "p2",
     "p3"
   ],
-  "settleSeconds": 7
+  "settleSeconds": 6
 }

@@ -1,8 +1,8 @@
 {
   "id": "08",
   "name": "Into the box",
-  "hint": "Three floors of fire and one tank. Start at the top.",
-  "parPins": 3,
+  "hint": "The gem has to end up in the box, and three pins are holding fire above it.",
+  "parPins": 2,
   "winWhen": "treasureReachesGoal",
   "walls": [
     {
@@ -15,7 +15,7 @@
       "x": 260,
       "y": 314,
       "w": 14,
-      "h": 34
+      "h": 146
     },
     {
       "x": 260,
@@ -33,7 +33,7 @@
       "x": 224,
       "y": 394,
       "w": 14,
-      "h": 56
+      "h": 46
     }
   ],
   "pins": [
@@ -48,7 +48,7 @@
       "id": "p2",
       "x": 124,
       "y": 460,
-      "w": 240,
+      "w": 136,
       "side": "right"
     },
     {
@@ -85,16 +85,16 @@
     {
       "liquid": "lava",
       "x": 280,
-      "y": 474,
+      "y": 314,
       "w": 76,
       "h": 36,
       "count": 45
     },
     {
       "liquid": "lava",
-      "x": 280,
-      "y": 314,
-      "w": 76,
+      "x": 130,
+      "y": 474,
+      "w": 124,
       "h": 36,
       "count": 45
     },
@@ -129,8 +129,7 @@
   },
   "solution": [
     "p1",
-    "p2",
     "p3"
   ],
-  "settleSeconds": 7
+  "settleSeconds": 6
 }

@@ -1,15 +1,15 @@
 {
   "id": "10",
-  "name": "Three floors down",
-  "hint": "He has to land on a clean floor, and so does the water.",
-  "parPins": 3,
+  "name": "Slide to the exit",
+  "hint": "The exit is under the lava. He will slide straight into it.",
+  "parPins": 2,
   "winWhen": "heroReachesGoal",
   "walls": [
     {
       "x": 260,
       "y": 314,
       "w": 14,
-      "h": 34
+      "h": 146
     },
     {
       "x": 260,
@@ -25,21 +25,24 @@
     },
     {
       "x": 178,
-      "y": 574,
+      "y": 474,
       "w": 14,
       "h": 46
     },
     {
       "x": 178,
-      "y": 414,
+      "y": 574,
       "w": 14,
       "h": 46
-    },
+    }
+  ],
+  "slabs": [
     {
-      "x": 260,
-      "y": 194,
-      "w": 14,
-      "h": 56
+      "x1": 100,
+      "y1": 280,
+      "x2": 290,
+      "y2": 120,
+      "t": 14
     }
   ],
   "pins": [
@@ -54,8 +57,8 @@
       "id": "p2",
       "x": 38,
       "y": 460,
-      "w": 326,
-      "side": "right"
+      "w": 222,
+      "side": "left"
     },
     {
       "id": "p3",
@@ -70,20 +73,6 @@
       "y": 560,
       "w": 140,
       "side": "left"
-    },
-    {
-      "id": "p5",
-      "x": 38,
-      "y": 400,
-      "w": 140,
-      "side": "left"
-    },
-    {
-      "id": "p6",
-      "x": 274,
-      "y": 180,
-      "w": 90,
-      "side": "right"
     }
   ],
   "pools": [
@@ -98,16 +87,16 @@
     {
       "liquid": "lava",
       "x": 280,
-      "y": 474,
+      "y": 314,
       "w": 76,
       "h": 36,
       "count": 45
     },
     {
       "liquid": "lava",
-      "x": 280,
-      "y": 314,
-      "w": 76,
+      "x": 44,
+      "y": 474,
+      "w": 128,
       "h": 36,
       "count": 45
     },
@@ -117,41 +106,24 @@
       "y": 574,
       "w": 128,
       "h": 36,
-      "count": 40
-    },
-    {
-      "liquid": "lava",
-      "x": 44,
-      "y": 414,
-      "w": 128,
-      "h": 36,
-      "count": 40
-    },
-    {
-      "liquid": "lava",
-      "x": 280,
-      "y": 194,
-      "w": 76,
-      "h": 36,
-      "count": 35
+      "count": 45
     }
   ],
   "actors": {
     "hero": {
-      "x": 236,
+      "x": 150,
       "y": 330
     },
     "goal": {
-      "x": 176,
+      "x": 280,
       "y": 68,
-      "w": 120,
+      "w": 84,
       "h": 60
     }
   },
   "solution": [
     "p1",
-    "p2",
     "p3"
   ],
-  "settleSeconds": 7
+  "settleSeconds": 6
 }

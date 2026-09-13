@@ -1,7 +1,7 @@
 {
   "id": "02",
   "name": "Lid",
-  "hint": "He is in a pit. Rest a lid on both walls, not on the dog.",
+  "hint": "He is already in a pit. Put a lid on it.",
   "inkBudget": 180,
   "stars": [
     140,
@@ -21,7 +21,7 @@
       "x": 130,
       "y": 74,
       "w": 20,
-      "h": 126,
+      "h": 106,
       "skin": "stone"
     },
     {
@@ -29,7 +29,7 @@
       "x": 252,
       "y": 74,
       "w": 20,
-      "h": 126,
+      "h": 106,
       "skin": "stone"
     }
   ],
@@ -67,11 +67,11 @@
         "points": [
           [
             136,
-            206
+            186
           ],
           [
             266,
-            206
+            186
           ]
         ]
       }

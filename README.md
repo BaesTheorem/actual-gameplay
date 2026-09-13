@@ -20,7 +20,9 @@ Water and lava cancel each other, lava ends the hero and melts the gem, drains s
 whatever reaches them, and grates take the liquid while anything solid drops through.
 Twelve levels of three to six pins, and each has exactly one pull order that wins: every
 other order burns the hero, melts the gem, or throws away the water you needed. The wrong
-pin is never merely a wasted tap.
+pin is never merely a wasted tap. The pull count stays low on purpose. Water and lava cancel
+one for one no matter what order they meet in, so a level that needs two fires put out has
+two answers, not one; the difficulty is in which pin, not how many.
 
 **Crowd Run.** Drag to steer a crowd down a road. Green gates grow it, red ones shrink it,
 walls and blades and spikes thin it, and whatever is left fights a crowd or a boss at the

@@ -2,7 +2,7 @@
   "id": "12",
   "name": "All of it",
   "hint": "Everything you have learned, over a pit of fire.",
-  "parPins": 3,
+  "parPins": 2,
   "winWhen": "treasureReachesHero",
   "frame": false,
   "walls": [
@@ -28,7 +28,7 @@
       "x": 260,
       "y": 314,
       "w": 14,
-      "h": 34
+      "h": 146
     },
     {
       "x": 260,
@@ -46,13 +46,13 @@
       "x": 166,
       "y": 394,
       "w": 14,
-      "h": 56
+      "h": 46
     },
     {
       "x": 166,
       "y": 194,
       "w": 14,
-      "h": 56
+      "h": 46
     }
   ],
   "pins": [
@@ -74,8 +74,8 @@
       "id": "p3",
       "x": 38,
       "y": 460,
-      "w": 326,
-      "side": "right"
+      "w": 222,
+      "side": "left"
     },
     {
       "id": "p4",
@@ -111,18 +111,18 @@
     {
       "liquid": "lava",
       "x": 280,
-      "y": 474,
+      "y": 314,
       "w": 76,
       "h": 36,
       "count": 45
     },
     {
       "liquid": "lava",
-      "x": 280,
-      "y": 314,
-      "w": 76,
+      "x": 44,
+      "y": 474,
+      "w": 200,
       "h": 36,
-      "count": 45
+      "count": 50
     },
     {
       "liquid": "lava",
@@ -146,7 +146,7 @@
       "y": 36,
       "w": 206,
       "h": 16,
-      "count": 50
+      "count": 40
     }
   ],
   "actors": {
@@ -161,8 +161,7 @@
   },
   "solution": [
     "p2",
-    "p3",
     "p4"
   ],
-  "settleSeconds": 7
+  "settleSeconds": 6
 }
