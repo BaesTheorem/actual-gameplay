@@ -36,11 +36,13 @@ final class BeeNode: SKSpriteNode {
 
 /// Spawns bees from the level's hives on schedule and steers the live ones every frame.
 ///
-/// Two behaviours. With a route to the dog (the flow field), a bee follows it, which takes it
-/// around walls and through any gap it fits through. With no route, it presses on whatever is
-/// between it and the dog, crawls sideways along the surface looking for a way in, and joins
-/// the swarm's periodic shove. Steering is a force, not a set velocity, so contacts resolve
-/// properly and a shove is a real push the shield's mass and footing have to answer.
+/// With a route to the dog (the flow field), a bee follows it, which takes it around walls and
+/// through any gap it fits through. With no route, it joins the crew (`BeeCrew`): the stuck bees
+/// pick the weakest loose part of the shield they can reach, spread along it, and heave on it
+/// together. A stuck bee the crew has no place for yet presses on whatever is between it and the
+/// dog, crawls sideways along the surface looking for a way in, and shoves on the old beat.
+/// Steering is a force, not a set velocity, so contacts resolve properly and a heave is a real
+/// push the shield's mass and footing have to answer.
 final class BeeSwarm {
     // Accelerations in points per second squared (times mass gives the impulse per second).
     static let cruise: CGFloat = 720          // open air: 0 to the 260 pt/s clamp in about a third of a second
@@ -48,8 +50,10 @@ final class BeeSwarm {
     static let shove: CGFloat = 900           // the burst
     static let shovePeriod: TimeInterval = 3.0
     static let shoveLength: TimeInterval = 0.6
+    static let topSpeed: CGFloat = 260
 
     let layer = SKNode()
+    let crew = BeeCrew()
     private(set) var bees: [BeeNode] = []
     private(set) var spawned = 0
     private(set) var shoving = false
@@ -72,6 +76,13 @@ final class BeeSwarm {
 
     var alive: Int { bees.count }
 
+    /// With every flow field rebuild: who is stuck outside, and what they could shift.
+    func survey(scene: StrokeScene, dogs: [CGPoint], field: FlowField) {
+        let stuck = bees.filter { field.nearbyDirection(at: $0.position) == nil }
+        let (bodies, anchors) = scene.crewSurvey()
+        crew.plan(bodies: bodies, anchors: anchors, dogs: dogs, stuck: stuck, field: field)
+    }
+
     /// `now` is seconds since the swarm was released.
     func update(dt: TimeInterval, now: TimeInterval, targets: [CGPoint], field: FlowField?) {
         while let next = schedule.first, now >= next.time {
@@ -84,33 +95,45 @@ final class BeeSwarm {
             spawned += 1
         }
         guard !targets.isEmpty else { return }
-        shoving = now > 2 && now.truncatingRemainder(dividingBy: BeeSwarm.shovePeriod) < BeeSwarm.shoveLength
+        crew.tick(now: now, bees: bees)
+        // The old beat is for stuck bees without a place; with a crew out, the heave is the shove.
+        let beat = now > 2 && now.truncatingRemainder(dividingBy: BeeSwarm.shovePeriod) < BeeSwarm.shoveLength
+        shoving = crew.active ? crew.phase == .heave : beat
         for bee in bees {
             guard let body = bee.physicsBody else { continue }
-            let target = targets.min { $0.distance(to: bee.position) < $1.distance(to: bee.position) }!
-            let direct = (target - bee.position).normalized
-            let speed = Physics.speed(body)
-            let age = now - bee.bornAt
-            var desired: CGPoint
-            var strength = BeeSwarm.cruise
-            if let route = field?.nearbyDirection(at: bee.position) {
-                // A way in exists: follow it, with a little pull straight at the dog so the path
-                // does not read as a grid walk.
-                desired = (CGPoint(x: route.dx, y: route.dy) * 0.85 + direct * 0.15).normalized
-                if speed < 25, age > 0.6 { strength = BeeSwarm.press * 1.5 }   // nudged off a corner
+            let route = field?.nearbyDirection(at: bee.position)
+            if route == nil, let a = crew.steer(bee, velocity: body.velocity, field: field) {
+                // As an impulse per frame, the same m·a·dt as below.
+                let push = a * (body.mass * CGFloat(dt))
+                body.isResting = false
+                body.applyImpulse(CGVector(dx: push.x, dy: push.y))
             } else {
-                // No way in. Lean on the structure, probe along it, shove on the beat.
-                let probe = direct.perpendicular * CGFloat(sin(now * 2.2 + Double(bee.phase))) * 0.7
-                desired = (direct + probe).normalized
-                let pressing = speed < 25 && age > 0.6
-                strength = pressing ? (shoving ? BeeSwarm.shove : BeeSwarm.press) : BeeSwarm.cruise
+                let target = targets.min { $0.distance(to: bee.position) < $1.distance(to: bee.position) }!
+                let direct = (target - bee.position).normalized
+                let speed = Physics.speed(body)
+                let age = now - bee.bornAt
+                var desired: CGPoint
+                var strength = BeeSwarm.cruise
+                if let route {
+                    // A way in exists: follow it, with a little pull straight at the dog so the path
+                    // does not read as a grid walk.
+                    desired = (CGPoint(x: route.dx, y: route.dy) * 0.85 + direct * 0.15).normalized
+                    if speed < 25, age > 0.6 { strength = BeeSwarm.press * 1.5 }   // nudged off a corner
+                } else {
+                    // No way in and no place in the crew yet. Lean on the structure, probe along it,
+                    // shove on the beat.
+                    let probe = direct.perpendicular * CGFloat(sin(now * 2.2 + Double(bee.phase))) * 0.7
+                    desired = (direct + probe).normalized
+                    let pressing = speed < 25 && age > 0.6
+                    strength = pressing ? (beat ? BeeSwarm.shove : BeeSwarm.press) : BeeSwarm.cruise
+                }
+                let wobble = desired.perpendicular * CGFloat(sin(now * 7 + Double(bee.phase))) * 0.25
+                // As an impulse per frame: strength is an acceleration in pt/s², so this is m·a·dt.
+                let push = (desired + wobble).normalized * (strength * body.mass * CGFloat(dt))
+                body.isResting = false
+                body.applyImpulse(CGVector(dx: push.x, dy: push.y))
             }
-            let wobble = desired.perpendicular * CGFloat(sin(now * 7 + Double(bee.phase))) * 0.25
-            // As an impulse per frame: strength is an acceleration in pt/s², so this is m·a·dt.
-            let push = (desired + wobble).normalized * (strength * body.mass * CGFloat(dt))
-            body.isResting = false
-            body.applyImpulse(CGVector(dx: push.x, dy: push.y))
-            Physics.clamp(body, to: 260)
+            Physics.clamp(body, to: BeeSwarm.topSpeed)
             if abs(body.velocity.dx) * Physics.pointsPerMeter > 10 { bee.xScale = body.velocity.dx < 0 ? -1 : 1 }
         }
     }

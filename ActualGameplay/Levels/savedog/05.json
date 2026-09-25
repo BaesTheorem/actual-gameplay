@@ -2,10 +2,10 @@
   "id": "05",
   "name": "Holes below",
   "hint": "Nothing comes from the sky today.",
-  "inkBudget": 150,
+  "inkBudget": 180,
   "stars": [
-    115,
-    135
+    156,
+    172
   ],
   "statics": [
     {
@@ -59,11 +59,11 @@
       {
         "points": [
           [
-            110,
+            100,
             80
           ],
           [
-            166,
+            176,
             80
           ]
         ]
@@ -72,11 +72,11 @@
         "delay": 0.3,
         "points": [
           [
-            236,
+            226,
             80
           ],
           [
-            292,
+            302,
             80
           ]
         ]

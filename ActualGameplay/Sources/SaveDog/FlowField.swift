@@ -6,11 +6,33 @@ enum Solid {
     case segment(CGPoint, CGPoint, radius: CGFloat)
     case rect(CGRect)
     case circle(CGPoint, radius: CGFloat)
+
+    /// The point on the shape's surface nearest `p`, and how far `p` is from it (0 inside).
+    func nearest(to p: CGPoint) -> (point: CGPoint, distance: CGFloat) {
+        switch self {
+        case .segment(let a, let b, let radius):
+            let ab = b - a
+            let len2 = ab.x * ab.x + ab.y * ab.y
+            let t = len2 == 0 ? 0 : max(0, min(1, ((p.x - a.x) * ab.x + (p.y - a.y) * ab.y) / len2))
+            let core = a + ab * t
+            let away = p - core
+            return (core + away.normalized * radius, max(0, away.length - radius))
+        case .rect(let rect):
+            let c = CGPoint(x: min(max(p.x, rect.minX), rect.maxX), y: min(max(p.y, rect.minY), rect.maxY))
+            return (c, p.distance(to: c))
+        case .circle(let center, let radius):
+            let away = p - center
+            return (center + away.normalized * radius, max(0, away.length - radius))
+        }
+    }
 }
 
 /// A coarse distance map from the dogs through the open space of the level. Bees follow it
 /// downhill, which routes them around walls and through any gap wide enough for a bee. Cells
 /// with no route at all are where the shield is doing its job.
+///
+/// The same obstacles also carry two maps for the bees that have no route (see `BeeCrew`): which
+/// pocket of open air each of them is in, and the way to their places on the structure.
 final class FlowField {
     let cell: CGFloat
     let origin: CGPoint
@@ -20,6 +42,9 @@ final class FlowField {
     private var distance: [Int32]
     private var directions: [CGVector]
     private var targets: [(CGPoint, CGFloat)] = []
+    private var regions: [Int32]
+    private var crewDistance: [Int32]
+    private var crewDirections: [CGVector]
 
     init(bounds: CGRect, cell: CGFloat = 6) {
         self.cell = cell
@@ -29,6 +54,9 @@ final class FlowField {
         blocked = Array(repeating: false, count: columns * rows)
         distance = Array(repeating: -1, count: columns * rows)
         directions = Array(repeating: .zero, count: columns * rows)
+        regions = Array(repeating: -1, count: columns * rows)
+        crewDistance = Array(repeating: -1, count: columns * rows)
+        crewDirections = Array(repeating: .zero, count: columns * rows)
     }
 
     private func index(_ c: Int, _ r: Int) -> Int { r * columns + c }
@@ -90,6 +118,13 @@ final class FlowField {
                 }
             }
         }
+        flood(&distance, from: queue)
+        pointDownhill(distance, into: &directions)
+    }
+
+    /// Breadth-first step counts through open cells, outward from `queue` (already at 0).
+    private func flood(_ distance: inout [Int32], from queue: [Int]) {
+        var queue = queue
         var head = 0
         while head < queue.count {
             let i = queue[head]
@@ -107,7 +142,10 @@ final class FlowField {
                 queue.append(n)
             }
         }
-        // Each reachable cell points at its lowest neighbour, diagonals included, for smooth paths.
+    }
+
+    /// Each reachable cell points at its lowest neighbour, diagonals included, for smooth paths.
+    private func pointDownhill(_ distance: [Int32], into directions: inout [CGVector]) {
         for r in 0..<rows {
             for c in 0..<columns {
                 let i = index(c, r)
@@ -178,4 +216,86 @@ final class FlowField {
     /// True when at least one target can be reached from anywhere along the top edge, which is
     /// what the developer overlay uses to show whether a shield is closed.
     var anyRoute: Bool { distance.contains { $0 > 0 } }
+
+    // MARK: - Crews
+
+    /// The cell at `point` if it is open, else the first open neighbour: a bee pressed flat on a
+    /// shield sits inside the shield's inflated border.
+    private func openCell(near point: CGPoint) -> Int? {
+        for (dx, dy) in [(0, 0), (cell, 0), (-cell, 0), (0, cell), (0, -cell), (cell, cell), (-cell, cell), (cell, -cell), (-cell, -cell)] {
+            guard let (c, r) = cellOf(CGPoint(x: point.x + dx, y: point.y + dy)) else { continue }
+            let i = index(c, r)
+            if !blocked[i] { return i }
+        }
+        return nil
+    }
+
+    /// Split the open space into the pockets the given bees are in: every cell a bee at
+    /// `seeds[k]` could fly to gets the smallest such k. Level 5's two holes under the floor come
+    /// out as two regions, so each crew only plans around what its own bees can touch.
+    func markRegions(seeds: [CGPoint]) {
+        for i in regions.indices { regions[i] = -1 }
+        for (label, seed) in seeds.enumerated() {
+            guard let start = openCell(near: seed), regions[start] < 0 else { continue }
+            regions[start] = Int32(label)
+            var queue = [start]
+            var head = 0
+            while head < queue.count {
+                let i = queue[head]
+                head += 1
+                let c = i % columns
+                let r = i / columns
+                for (dc, dr) in [(1, 0), (-1, 0), (0, 1), (0, -1)] {
+                    let nc = c + dc
+                    let nr = r + dr
+                    guard nc >= 0, nc < columns, nr >= 0, nr < rows else { continue }
+                    let n = index(nc, nr)
+                    guard !blocked[n], regions[n] < 0 else { continue }
+                    regions[n] = Int32(label)
+                    queue.append(n)
+                }
+            }
+        }
+    }
+
+    /// The region of the cell under `point`, or nil for a blocked or unvisited cell.
+    func region(at point: CGPoint) -> Int? {
+        guard let (c, r) = cellOf(point) else { return nil }
+        let label = regions[index(c, r)]
+        return label >= 0 ? Int(label) : nil
+    }
+
+    /// The region a bee is in, looking one cell around it when it is pressed against something.
+    func region(near point: CGPoint) -> Int? {
+        guard let i = openCell(near: point) else { return nil }
+        return regions[i] >= 0 ? Int(regions[i]) : nil
+    }
+
+    /// Flood from the crew's places on a structure, through the same open space. A bee on its way
+    /// to a place follows this; the dog's map would walk it into the shield instead.
+    func routeCrew(toward points: [CGPoint]) {
+        for i in crewDistance.indices { crewDistance[i] = -1 }
+        var queue: [Int] = []
+        for p in points {
+            guard let (c, r) = cellOf(p) else { continue }
+            let i = index(c, r)
+            if crewDistance[i] != 0 {
+                crewDistance[i] = 0
+                queue.append(i)
+            }
+        }
+        flood(&crewDistance, from: queue)
+        pointDownhill(crewDistance, into: &crewDirections)
+    }
+
+    /// Direction toward the nearest crew place and how many cells away it is, looking one cell
+    /// around for bees in a blocked cell. Nil where no place can be reached.
+    func crewRoute(at point: CGPoint) -> (direction: CGVector, steps: Int)? {
+        for (dx, dy) in [(0, 0), (cell, 0), (-cell, 0), (0, cell), (0, -cell), (cell, cell), (-cell, cell), (cell, -cell), (-cell, -cell)] {
+            guard let (c, r) = cellOf(CGPoint(x: point.x + dx, y: point.y + dy)) else { continue }
+            let i = index(c, r)
+            if crewDistance[i] >= 0 { return (crewDirections[i], Int(crewDistance[i])) }
+        }
+        return nil
+    }
 }
