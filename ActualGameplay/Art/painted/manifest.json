@@ -1,0 +1,812 @@
+{
+ "clawd_idle": {
+  "frames": 16,
+  "fps": 6.666666666666667,
+  "anchor": [
+   0.5,
+   0.1111111111111111
+  ],
+  "paper": false
+ },
+ "clawd_happy": {
+  "frames": 16,
+  "fps": 6.666666666666667,
+  "anchor": [
+   0.5,
+   0.1111111111111111
+  ],
+  "paper": false
+ },
+ "clawd_excited": {
+  "frames": 12,
+  "fps": 10,
+  "anchor": [
+   0.5,
+   0.1111111111111111
+  ],
+  "paper": false
+ },
+ "clawd_nervous": {
+  "frames": 12,
+  "fps": 5,
+  "anchor": [
+   0.5,
+   0.1111111111111111
+  ],
+  "paper": false
+ },
+ "clawd_scared": {
+  "frames": 12,
+  "fps": 10,
+  "anchor": [
+   0.5,
+   0.1111111111111111
+  ],
+  "paper": false
+ },
+ "clawd_sad": {
+  "frames": 8,
+  "fps": 3.3333333333333335,
+  "anchor": [
+   0.5,
+   0.1111111111111111
+  ],
+  "paper": false
+ },
+ "clawd_ko": {
+  "frames": 8,
+  "fps": 3.3333333333333335,
+  "anchor": [
+   0.5,
+   0.1111111111111111
+  ],
+  "paper": false
+ },
+ "clawd_determined": {
+  "frames": 8,
+  "fps": 3.3333333333333335,
+  "anchor": [
+   0.5,
+   0.1111111111111111
+  ],
+  "paper": false
+ },
+ "clawd_run": {
+  "frames": 12,
+  "fps": 24,
+  "anchor": [
+   0.5,
+   0.1111111111111111
+  ],
+  "paper": false
+ },
+ "clawd_hard_idle": {
+  "frames": 16,
+  "fps": 6.666666666666667,
+  "anchor": [
+   0.5,
+   0.1111111111111111
+  ],
+  "paper": false
+ },
+ "clawd_hard_excited": {
+  "frames": 12,
+  "fps": 10,
+  "anchor": [
+   0.5,
+   0.1111111111111111
+  ],
+  "paper": false
+ },
+ "clawd_hard_ko": {
+  "frames": 8,
+  "fps": 3.3333333333333335,
+  "anchor": [
+   0.5,
+   0.1111111111111111
+  ],
+  "paper": false
+ },
+ "clawd_foe_run": {
+  "frames": 12,
+  "fps": 24,
+  "anchor": [
+   0.5,
+   0.1111111111111111
+  ],
+  "paper": false
+ },
+ "clawd_boss_idle": {
+  "frames": 12,
+  "fps": 10,
+  "anchor": [
+   0.5,
+   0.1111111111111111
+  ],
+  "paper": false
+ },
+ "clawd_boss_hit": {
+  "frames": 8,
+  "fps": 3.3333333333333335,
+  "anchor": [
+   0.5,
+   0.1111111111111111
+  ],
+  "paper": false
+ },
+ "bee_a": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "bee_b": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "bee_rest": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "saw_a": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "saw_b": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "spikes": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0
+  ],
+  "paper": false
+ },
+ "gem_yellow": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "gem_blue": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "coin_gold": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "sign_exit": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.15625
+  ],
+  "paper": false
+ },
+ "flag_green_a": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.15625
+  ],
+  "paper": false
+ },
+ "flag_green_b": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.15625
+  ],
+  "paper": false
+ },
+ "torch_on_a": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.15625
+  ],
+  "paper": false
+ },
+ "torch_on_b": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.15625
+  ],
+  "paper": false
+ },
+ "rock": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "bush": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.08333333333333333
+  ],
+  "paper": false
+ },
+ "mushroom_red": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.20833333333333334
+  ],
+  "paper": false
+ },
+ "bomb": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "block_planks": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "block_danger": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "cloud_1": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "cloud_2": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "cloud_3": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "background_color_hills": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0
+  ],
+  "paper": false
+ },
+ "terrain_grass_block_center": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_grass_block_top": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_grass_block_top_left": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_grass_block_top_right": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_grass_block_left": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_grass_block_right": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_grass_horizontal_left": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_grass_horizontal_middle": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_grass_horizontal_right": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_dirt_block_center": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_dirt_block_top": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_dirt_block_top_left": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_dirt_block_top_right": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_dirt_block_left": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_dirt_block_right": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_dirt_horizontal_left": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_dirt_horizontal_middle": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_dirt_horizontal_right": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_stone_block_center": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_stone_block_top": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_stone_block_top_left": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_stone_block_top_right": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_stone_block_left": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_stone_block_right": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_stone_horizontal_left": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_stone_horizontal_middle": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_stone_horizontal_right": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_purple_block_center": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_purple_block_top": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_purple_block_top_left": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_purple_block_top_right": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_purple_block_left": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_purple_block_right": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_purple_horizontal_left": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_purple_horizontal_middle": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "terrain_purple_horizontal_right": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "ui_card": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "ui_card_dark": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "ui_button_clay": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "ui_button_sap": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "ui_button_sky": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "ui_button_rose": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "ui_button_ink": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "ui_button_paper": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "ui_star_on": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "ui_star_off": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "pin_knob": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "ui_hive": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": false
+ },
+ "paper": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": true
+ },
+ "paper_cave": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": true
+ },
+ "icon": {
+  "frames": 1,
+  "fps": 1,
+  "anchor": [
+   0.5,
+   0.5
+  ],
+  "paper": true
+ }
+}

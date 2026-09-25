@@ -13,7 +13,7 @@
   <key>UISupportedInterfaceOrientations</key><array><string>UIInterfaceOrientationPortrait</string></array>
   <key>UIRequiresFullScreen</key><true/>
   <key>UIUserInterfaceStyle</key><string>Dark</string>
-  <key>UIAppFonts</key><array><string>MaterialSymbolsSharp.ttf</string></array>
+  <key>UIAppFonts</key><array><string>MaterialSymbolsSharp.ttf</string><string>PermanentMarker-Regular.ttf</string></array>
   <key>ITSAppUsesNonExemptEncryption</key><false/>
 </dict>
 </plist>

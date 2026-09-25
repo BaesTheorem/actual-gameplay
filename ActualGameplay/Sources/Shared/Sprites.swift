@@ -28,7 +28,9 @@ enum Sprite: String {
     static func texture(named name: String) -> SKTexture {
         if let cached = cache[name] { return cached }
         let texture: SKTexture
-        if let url = Bundle.main.url(forResource: name, withExtension: "png", subdirectory: "Art"),
+        // The painted set (Art/painted, from tools/painted) wins over the Kenney set when both have the name.
+        if let url = Bundle.main.url(forResource: name, withExtension: "png", subdirectory: "Art/painted")
+            ?? Bundle.main.url(forResource: name, withExtension: "png", subdirectory: "Art"),
            let image = UIImage(contentsOfFile: url.path) {
             texture = SKTexture(image: image)
         } else {
@@ -44,7 +46,8 @@ enum Sprite: String {
     }
 
     static func exists(_ name: String) -> Bool {
-        Bundle.main.url(forResource: name, withExtension: "png", subdirectory: "Art") != nil
+        Bundle.main.url(forResource: name, withExtension: "png", subdirectory: "Art/painted") != nil
+            || Bundle.main.url(forResource: name, withExtension: "png", subdirectory: "Art") != nil
     }
 }
 
