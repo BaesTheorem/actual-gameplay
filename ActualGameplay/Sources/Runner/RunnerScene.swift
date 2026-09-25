@@ -5,17 +5,20 @@ import UIKit
 /// Pure kinematics in lane space; nothing here uses the physics engine.
 final class RunnerScene: GameSceneBase, ReplayableScene {
     private enum Palette {
-        static let road = UIColor(hex: 0x2B303A)
-        static let edge = UIColor(hex: 0x4A5160)
-        static let stripe = UIColor(hex: 0xC9CDD6)
-        static let good = UIColor(hex: 0x9CE37D)
-        static let bad = UIColor(hex: 0xFF5C5C)
-        static let runner = UIColor(hex: 0x9CE37D)
-        static let enemy = UIColor(hex: 0xFF5C5C)
-        static let boss = UIColor(hex: 0xFF8A5B)
-        static let label = UIColor(hex: 0xE2E4EA)
-        static let muted = UIColor(hex: 0x6B7280)
+        static let road = UIColor(hex: 0xCDB894)   // a dusty path: light enough that brush flecks near the runners vanish and the violet rivals read
+        static let edge = Pigment.ink
+        /// Sap mixed into the paper, so the verge sits behind the road instead of competing with it.
+        static let ground = UIColor(hex: 0xA9C48F)
+        static let stripe = Pigment.ink.withAlphaComponent(0.45)
+        static let good = Pigment.sap
+        static let bad = UIColor(hex: 0xE2476E)
+        static let bossBar = Pigment.clay
+        static let bossTrack = Pigment.night
+        static let label = Pigment.ink
     }
+
+    /// Crowd runners, in clip-frame points at depth scale 1.
+    private static let runnerHeight: CGFloat = 40
 
     /// One gate pair on the road: two panels that scale with depth.
     private final class GateNode: SKNode {
@@ -37,16 +40,16 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
 
         static func panel(for op: GateOp) -> SKSpriteNode {
             let color = op.isGood ? Palette.good : Palette.bad
-            let node = SKSpriteNode(color: color.withAlphaComponent(0.28), size: CGSize(width: Projection.halfRoad - 8, height: 96))
-            let frame = SKShapeNode(rectOf: node.size)
-            frame.strokeColor = color
-            frame.lineWidth = 2
+            let node = SKSpriteNode(color: color.withAlphaComponent(0.8), size: CGSize(width: Projection.halfRoad - 8, height: 96))
+            let frame = SKShapeNode(rectOf: node.size, cornerRadius: 6)
+            frame.strokeColor = Palette.edge
+            frame.lineWidth = 2.5
             frame.fillColor = .clear
             node.addChild(frame)
-            let label = SKLabelNode(fontNamed: "HelveticaNeue-Bold")
+            let label = SKLabelNode(fontNamed: Painted.font)
             label.text = op.label
             label.fontSize = 36
-            label.fontColor = color
+            label.fontColor = Palette.label
             label.verticalAlignmentMode = .center
             node.addChild(label)
             return node
@@ -136,6 +139,7 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
     private var crowd: Crowd!
     private var enemy: Crowd?
     private var boss: SKNode?
+    private var bossSprite: PaintedSprite?
     private var bossBar: SKSpriteNode?
     private var enemyStrength = 0
     private var gates: [GateNode] = []
@@ -173,6 +177,7 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
         stripes = []
         enemy = nil
         boss = nil
+        bossSprite = nil
         bossBar = nil
         enemyLabel = nil
         physicsWorld.gravity = .zero
@@ -180,21 +185,22 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
         let roadPath = CGMutablePath()
         roadPath.addLines(between: Projection.roadPolygon)
         roadPath.closeSubpath()
+        addPaper("paper")
         let sky = SKSpriteNode(texture: Sprite.hills.texture, size: CGSize(width: 402, height: 260))
         sky.position = CGPoint(x: 201, y: Projection.horizonY + 130 - 60)
         sky.zPosition = -20
         addChild(sky)
-        let ground = SKSpriteNode(color: UIColor(hex: 0x4E8A3A), size: CGSize(width: 402, height: Projection.horizonY))
+        let ground = SKSpriteNode(color: Palette.ground, size: CGSize(width: 402, height: Projection.horizonY))
         ground.position = CGPoint(x: 201, y: Projection.horizonY / 2)
         ground.zPosition = -19
         addChild(ground)
         let road = SKShapeNode(path: roadPath)
         road.fillColor = Palette.road
         road.strokeColor = Palette.edge
-        road.lineWidth = 1
+        road.lineWidth = 2
         road.zPosition = -18
         addChild(road)
-        let horizon = SKShapeNode(rectOf: CGSize(width: 402, height: 1))
+        let horizon = SKShapeNode(rectOf: CGSize(width: 402, height: 1.5))
         horizon.position = CGPoint(x: 201, y: Projection.horizonY)
         horizon.fillColor = Palette.edge
         horizon.strokeColor = .clear
@@ -223,27 +229,32 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
 
         guard let view else { return }
         _ = view
-        let runnerFrames = [Sprite.runnerA.texture, Sprite.runnerB.texture]
-        crowd = Crowd(count: track.startCrowd, anchorZ: Projection.anchorZ, frames: runnerFrames, size: CGSize(width: 22, height: 26))
+        crowd = Crowd(count: track.startCrowd, anchorZ: Projection.anchorZ, clip: "clawd_run", height: RunnerScene.runnerHeight)
         addChild(crowd.layer)
 
         enemyStrength = track.finale.strength
         switch track.finale {
         case .crowd(let n):
-            let foes = Crowd(count: n, anchorZ: track.finaleZ + 4, frames: [Sprite.enemyA.texture, Sprite.enemyB.texture], size: CGSize(width: 22, height: 26))
+            // The rivals are mirrored so the two crowds face each other.
+            let foes = Crowd(count: n, anchorZ: track.finaleZ + 4, clip: "clawd_foe_run", height: RunnerScene.runnerHeight, facing: -1)
             addChild(foes.layer)
             enemy = foes
         case .boss(let hp):
             let node = SKNode()
-            let body = SKSpriteNode(texture: Sprite.boss.texture, size: CGSize(width: 96, height: 96))
-            body.position = CGPoint(x: 0, y: 8)
+            let body = PaintedSprite(clip: "clawd_boss_idle", height: 110)
             node.addChild(body)
-            let track = SKSpriteNode(color: UIColor(hex: 0x262A32), size: CGSize(width: 90, height: 8))
-            track.position = CGPoint(x: 0, y: 56)
+            bossSprite = body
+            let track = SKShapeNode(rectOf: CGSize(width: 90, height: 9), cornerRadius: 4.5)
+            track.fillColor = Palette.bossTrack
+            track.strokeColor = Palette.edge
+            track.lineWidth = 1.5
+            track.position = CGPoint(x: 0, y: 96)
+            track.zPosition = 1
             node.addChild(track)
-            let bar = SKSpriteNode(color: Palette.bad, size: CGSize(width: 90, height: 8))
+            let bar = SKSpriteNode(color: Palette.bossBar, size: CGSize(width: 87, height: 6))
             bar.anchorPoint = CGPoint(x: 0, y: 0.5)
-            bar.position = CGPoint(x: -45, y: 56)
+            bar.position = CGPoint(x: -43.5, y: 96)
+            bar.zPosition = 2
             node.addChild(bar)
             bossBar = bar
             addChild(node)
@@ -251,14 +262,14 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
             _ = hp
         }
 
-        countLabel = SKLabelNode(fontNamed: "HelveticaNeue-Heavy")
-        countLabel.fontSize = 20
+        countLabel = SKLabelNode(fontNamed: Painted.font)
+        countLabel.fontSize = 22
         countLabel.fontColor = Palette.label
         countLabel.zPosition = 200
         addChild(countLabel)
-        let foeLabel = SKLabelNode(fontNamed: "HelveticaNeue-Heavy")
-        foeLabel.fontSize = 18
-        foeLabel.fontColor = Palette.bad
+        let foeLabel = SKLabelNode(fontNamed: Painted.font)
+        foeLabel.fontSize = 20
+        foeLabel.fontColor = Palette.label
         foeLabel.zPosition = 200
         addChild(foeLabel)
         enemyLabel = foeLabel
@@ -340,6 +351,8 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
     private func startFight() {
         fighting = true
         fightClock = 0
+        // The crowd hits the boss from the first tick of the fight to the last.
+        bossSprite?.play("clawd_boss_hit")
         Haptics.shared.slam()
     }
 
@@ -389,6 +402,7 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
     }
 
     private func lose(_ reason: String) {
+        bossSprite?.play("clawd_boss_idle")
         Haptics.shared.failure()
         Audio.play(.lose)
         finish(.lost(reason: reason))
@@ -494,13 +508,15 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
             boss.isHidden = z > Projection.farZ
             boss.zPosition = 100 - z
             if let enemyLabel {
-                enemyLabel.position = CGPoint(x: boss.position.x, y: boss.position.y + 70 * s + 10)
+                enemyLabel.position = CGPoint(x: boss.position.x, y: boss.position.y + 104 * s + 6)
                 enemyLabel.text = "HP \(enemyStrength)"
                 enemyLabel.isHidden = boss.isHidden
             }
         }
         let anchor = Projection.point(x: anchorX, z: Projection.anchorZ)
-        countLabel.position = CGPoint(x: anchor.x, y: anchor.y + 34 + crowd.radius * 90)
+        // A boss fights from just up the road, where the count would sit on its face; it drops below then.
+        let countY = fighting && boss != nil ? anchor.y - 30 : anchor.y + 34 + crowd.radius * 90
+        countLabel.position = CGPoint(x: anchor.x, y: countY)
         countLabel.text = "\u{00D7}\(crowd.count)"
     }
 

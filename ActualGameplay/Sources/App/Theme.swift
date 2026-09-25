@@ -1,25 +1,44 @@
 import SwiftUI
 import UIKit
 
-/// Flat and sharp: square corners, hairline outlines, tonal surfaces, no shadows.
+/// The painted look from the animation kit: paper, ink and soft washes, painted cards and buttons, and
+/// Permanent Marker for anything that shouts. Flat colour only: no gradients, no drop shadows.
 enum Theme {
-    static let surface = Color(hex: 0x111318)
-    static let surfaceContainer = Color(hex: 0x1B1E24)
-    static let surfaceHigh = Color(hex: 0x262A32)
-    static let outline = Color(hex: 0x3F4553)
-    static let outlineStrong = Color(hex: 0x6B7280)
-    static let onSurface = Color(hex: 0xE2E4EA)
-    static let onSurfaceMuted = Color(hex: 0x9AA0AC)
-    static let draw = Color(hex: 0x7BD3FF)
-    static let pin = Color(hex: 0xFF8A5B)
-    static let runner = Color(hex: 0x9CE37D)
-    static let danger = Color(hex: 0xFF5C5C)
-    static let gold = Color(hex: 0xFFD166)
+    static let paper = Color(uiColor: Pigment.paper)
+    static let ink = Color(uiColor: Pigment.ink)
+    static let clay = Color(uiColor: Pigment.clay)
+    static let clayDark = Color(uiColor: Pigment.clayDark)
+    static let clayLight = Color(uiColor: Pigment.clayLight)
+    static let cream = Color(uiColor: Pigment.cream)
+    static let sky = Color(uiColor: Pigment.sky)
+    static let sap = Color(uiColor: Pigment.sap)
+    static let rose = Color(uiColor: Pigment.rose)
+    static let ochre = Color(uiColor: Pigment.ochre)
+    static let teal = Color(uiColor: Pigment.teal)
+    static let violet = Color(uiColor: Pigment.violet)
+    static let indigo = Color(uiColor: Pigment.indigo)
+    static let night = Color(uiColor: Pigment.night)
 
-    static func title(_ size: CGFloat = 28) -> Font { .system(size: size, weight: .heavy) }
-    static func label(_ size: CGFloat = 15) -> Font { .system(size: size, weight: .semibold) }
-    static func body(_ size: CGFloat = 14) -> Font { .system(size: size, weight: .regular) }
-    static func mono(_ size: CGFloat = 15) -> Font { .system(size: size, weight: .bold, design: .monospaced) }
+    // The names the screens were written against, now mapped onto the palette.
+    static let surface = paper
+    static let surfaceContainer = cream
+    static let surfaceHigh = ink.opacity(0.12)
+    static let outline = ink.opacity(0.6)
+    static let outlineStrong = ink
+    static let onSurface = ink
+    static let onSurfaceMuted = ink.opacity(0.65)
+    static let draw = sky
+    static let pin = clay
+    static let runner = sap
+    static let danger = rose
+    static let gold = ochre
+
+    // Fixed sizes, like the system fonts they replace: the HUD and the cards are laid out to them.
+    static func title(_ size: CGFloat = 28) -> Font { .custom(Painted.font, fixedSize: size) }
+    static func label(_ size: CGFloat = 15) -> Font { .custom(Painted.font, fixedSize: size) }
+    static func body(_ size: CGFloat = 14) -> Font { .system(size: size, weight: .regular, design: .rounded) }
+    /// Rounded bold with tabular digits, so counters do not jitter as they tick.
+    static func mono(_ size: CGFloat = 15) -> Font { .system(size: size, weight: .bold, design: .rounded).monospacedDigit() }
 }
 
 extension Color {
@@ -62,20 +81,24 @@ struct MSIcon: View {
     }
 }
 
+/// A painted button: clay when filled, paper when not. `tint` is kept so call sites compile, but the paint
+/// carries the colour now; `art` swaps in another painted piece (the rose one for destructive actions).
 struct OutlinedButtonStyle: ButtonStyle {
     var tint: Color = Theme.onSurface
     var filled: Bool = false
+    var art: String? = nil
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(Theme.label())
-            .foregroundStyle(filled ? Theme.surface : tint)
+            .font(Theme.label(17))
+            .foregroundStyle(filled ? Theme.cream : Theme.ink)
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
             .frame(maxWidth: .infinity)
-            .background(filled ? tint : (configuration.isPressed ? Theme.surfaceHigh : Theme.surfaceContainer))
-            .overlay(Rectangle().stroke(filled ? tint : Theme.outline, lineWidth: 1))
-            .opacity(configuration.isPressed ? 0.85 : 1)
+            .background(PaintedFrame(art ?? (filled ? "ui_button_clay" : "ui_button_paper")))
+            .opacity(configuration.isPressed ? 0.8 : 1)
     }
 }
 
@@ -89,32 +112,14 @@ struct IconButton: View {
             MSIcon(icon, size: 24)
                 .foregroundStyle(tint)
                 .frame(width: 44, height: 44)
-                .background(Theme.surfaceContainer)
-                .overlay(Rectangle().stroke(Theme.outline, lineWidth: 1))
+                .background(PaintedFrame("ui_button_paper"))
         }
         .buttonStyle(.plain)
     }
 }
 
 struct HairlineDivider: View {
-    var body: some View { Rectangle().fill(Theme.outline).frame(height: 1) }
-}
-
-struct StarShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let center = CGPoint(x: rect.midX, y: rect.midY)
-        let outer = min(rect.width, rect.height) / 2
-        let inner = outer * 0.45
-        for i in 0..<10 {
-            let angle = -CGFloat.pi / 2 + CGFloat(i) * .pi / 5
-            let radius = i % 2 == 0 ? outer : inner
-            let point = CGPoint(x: center.x + cos(angle) * radius, y: center.y + sin(angle) * radius)
-            if i == 0 { path.move(to: point) } else { path.addLine(to: point) }
-        }
-        path.closeSubpath()
-        return path
-    }
+    var body: some View { Rectangle().fill(Theme.ink.opacity(0.6)).frame(height: 1) }
 }
 
 struct StarRow: View {
@@ -122,13 +127,40 @@ struct StarRow: View {
     var size: CGFloat = 34
 
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: max(2, size * 0.2)) {
             ForEach(0..<3, id: \.self) { i in
-                StarShape()
-                    .fill(i < count ? Theme.gold : Theme.surfaceHigh)
-                    .overlay(StarShape().stroke(i < count ? Theme.gold : Theme.outline, lineWidth: 1))
+                PaintedImage(i < count ? "ui_star_on" : "ui_star_off")
                     .frame(width: size, height: size)
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(count) of 3 stars")
+    }
+}
+
+extension View {
+    /// Sits the view on a painted card.
+    func paintedCard(_ name: String = "ui_card") -> some View {
+        background(PaintedFrame(name))
+    }
+}
+
+/// A painted Clawd frame standing on a coloured painted swatch, for the mode cards.
+struct ClawdSwatch: View {
+    let clip: String
+    var frame: Int = 0
+    var art: String = "ui_button_sky"
+    var size: CGFloat = 64
+
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            PaintedFrame(art, insets: 14)
+            // The clip frames leave room above Clawd for hats and emotes; the swatch only has to hold him,
+            // so the frame is sized off his width and stood on the swatch floor.
+            PaintedImage(clip, frame: frame)
+                .frame(width: size * 0.95, height: size * 0.95 * 360 / 320)
+                .offset(y: size * 0.03)
+        }
+        .frame(width: size, height: size)
     }
 }

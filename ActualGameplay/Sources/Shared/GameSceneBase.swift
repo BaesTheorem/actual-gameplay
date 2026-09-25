@@ -19,7 +19,7 @@ class GameSceneBase: SKScene, SKPhysicsContactDelegate {
         super.init(size: size)
         scaleMode = .aspectFit
         anchorPoint = .zero
-        backgroundColor = UIColor(hex: 0x111318)
+        backgroundColor = Pigment.paper
         physicsWorld.contactDelegate = self
     }
 
@@ -82,12 +82,26 @@ class GameSceneBase: SKScene, SKPhysicsContactDelegate {
         }
     }
 
-    /// A two-line hint under the HUD, on a backdrop so tall geometry cannot swallow it.
-    func addHintLabel(_ text: String?, color: UIColor, backdrop: UIColor) {
+    /// The sheet the scene is painted on, behind everything. The paper is landscape, so it stands on end and
+    /// scales to cover the canvas.
+    func addPaper(_ name: String) {
+        let native = Painted.size(name)
+        let canvas = GameSceneBase.canvas
+        let scale = max(canvas.width / native.height, canvas.height / native.width)
+        let paper = SKSpriteNode(texture: Painted.texture(name),
+                                 size: CGSize(width: native.width * scale, height: native.height * scale))
+        paper.zRotation = .pi / 2
+        paper.position = CGPoint(x: canvas.width / 2, y: canvas.height / 2)
+        paper.zPosition = -100
+        addChild(paper)
+    }
+
+    /// A two-line hint under the HUD, on a plate so tall geometry cannot swallow it.
+    func addHintLabel(_ text: String?, color: UIColor = Pigment.ink, backdrop: UIColor = Pigment.cream) {
         guard let text, !text.isEmpty else { return }
-        let label = SKLabelNode(fontNamed: "Menlo")
+        let label = SKLabelNode(fontNamed: Painted.font)
         label.text = text
-        label.fontSize = 12
+        label.fontSize = 13
         label.fontColor = color
         label.numberOfLines = 2
         label.preferredMaxLayoutWidth = 350
@@ -96,9 +110,10 @@ class GameSceneBase: SKScene, SKPhysicsContactDelegate {
         label.position = CGPoint(x: 201, y: 724)
         label.zPosition = 31
         let frame = label.calculateAccumulatedFrame().insetBy(dx: -10, dy: -6)
-        let plate = SKShapeNode(rect: frame)
-        plate.fillColor = backdrop.withAlphaComponent(0.96)
-        plate.strokeColor = .clear
+        let plate = SKShapeNode(rect: frame, cornerRadius: 6)
+        plate.fillColor = backdrop
+        plate.strokeColor = Pigment.ink
+        plate.lineWidth = 1
         plate.zPosition = 30
         addChild(plate)
         addChild(label)

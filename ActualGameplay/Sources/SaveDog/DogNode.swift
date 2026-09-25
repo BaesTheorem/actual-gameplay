@@ -1,17 +1,22 @@
 import SpriteKit
 import UIKit
 
-/// The dog. Heavy for his size so a landing shield does not launch him; never rolls.
+/// The dog, played by Clawd. Heavy for his size so a landing shield does not launch him; never rolls.
+/// The node keeps the body; a painted child plays the moods, standing on the bottom of the body circle.
 final class DogNode: SKSpriteNode {
     static let radius: CGFloat = 18
     let dogID: String
+    /// The clip frames leave room above him for emotes, so a 58 pt frame is what makes his body as wide as
+    /// the 36 pt body circle.
+    private let clawd = PaintedSprite(clip: "clawd_nervous", height: 58)
 
     init(id: String) {
         dogID = id
-        let texture = Sprite.exists("dog") ? Sprite.dog.texture : Sprite.dogFront.texture
-        super.init(texture: texture, color: .clear, size: CGSize(width: 42, height: 42))
+        super.init(texture: nil, color: .clear, size: CGSize(width: 42, height: 42))
         zPosition = 8
         name = id
+        clawd.position = CGPoint(x: 0, y: -DogNode.radius)
+        addChild(clawd)
         let body = SKPhysicsBody(circleOfRadius: DogNode.radius)
         body.density = 3
         body.friction = 0.9
@@ -26,12 +31,32 @@ final class DogNode: SKSpriteNode {
 
     required init?(coder aDecoder: NSCoder) { fatalError("built in code") }
 
+    /// The bees are out.
     func panic() {
+        clawd.play("clawd_scared")
         guard !Motion.reduced else { return }
         run(.repeatForever(.sequence([.rotate(toAngle: 0.15, duration: 0.06), .rotate(toAngle: -0.15, duration: 0.06)])))
     }
 
     func relax() {
+        settle()
+        clawd.play("clawd_happy")
+    }
+
+    /// The swarm gave up: the level is won.
+    func saved() {
+        settle()
+        clawd.play("clawd_excited")
+    }
+
+    /// A bee, a saw or the spikes got him.
+    func caught() {
+        removeAllActions()
+        zRotation = 0
+        clawd.play("clawd_ko")
+    }
+
+    private func settle() {
         removeAllActions()
         zRotation = 0
         if !Motion.reduced {

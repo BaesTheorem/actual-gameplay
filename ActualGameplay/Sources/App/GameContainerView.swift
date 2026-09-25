@@ -27,7 +27,8 @@ struct GameContainerView: View {
 
     var body: some View {
         ZStack {
-            Theme.surface.ignoresSafeArea()
+            // Only shows where a screen of another shape letterboxes the scene.
+            PaperBackground(name: session.mode == .pinPull ? "paper_cave" : "paper")
             SpriteView(scene: session.scene, preferredFramesPerSecond: 60, debugOptions: debugOptions)
                 .ignoresSafeArea()
             HUDOverlay(session: session, onBack: { dismiss() })

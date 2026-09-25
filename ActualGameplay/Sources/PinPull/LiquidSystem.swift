@@ -22,8 +22,8 @@ enum LiquidKind: String {
     var category: UInt32 { self == .water ? PinCategory.water : PinCategory.lava }
 
     /// Body color, and the lighter band the surface shader paints along the edge.
-    var core: vector_float3 { self == .water ? LiquidKind.rgb(0x2F8FE8) : LiquidKind.rgb(0xF2552A) }
-    var rim: vector_float3 { self == .water ? LiquidKind.rgb(0xA6DBFF) : LiquidKind.rgb(0xFFC857) }
+    var core: vector_float3 { self == .water ? LiquidKind.rgb(0x3A9C98) : LiquidKind.rgb(0xD97757) }
+    var rim: vector_float3 { self == .water ? LiquidKind.rgb(0x8EC3E6) : LiquidKind.rgb(0xE8AA38) }
 
     private static func rgb(_ hex: UInt32) -> vector_float3 {
         vector_float3(Float((hex >> 16) & 0xFF) / 255, Float((hex >> 8) & 0xFF) / 255, Float(hex & 0xFF) / 255)

@@ -1,14 +1,19 @@
 import SpriteKit
 import UIKit
 
-/// The person at the bottom of the chamber. Lava ends him; treasure or the exit saves him.
+/// The person at the bottom of the chamber, Clawd in a hard hat. Lava ends him; treasure or the exit saves him.
+/// The node keeps the body; a painted child plays the moods, standing on the bottom of the body circle.
 final class HeroNode: SKSpriteNode {
     static let radius: CGFloat = 16
     private(set) var isDead = false
+    /// The clip frames leave room above him for emotes; at 48 pt his hat-to-feet height matches the body circle.
+    private let clawd = PaintedSprite(clip: "clawd_hard_idle", height: 48)
 
     init() {
-        super.init(texture: Sprite.heroIdle.texture, color: .clear, size: CGSize(width: 38, height: 38))
+        super.init(texture: nil, color: .clear, size: CGSize(width: 38, height: 38))
         zPosition = 6
+        clawd.position = CGPoint(x: 0, y: -HeroNode.radius)
+        addChild(clawd)
         let body = SKPhysicsBody(circleOfRadius: HeroNode.radius)
         // High enough that arriving liquid does not shove him along a pin; slabs he must slide down
         // are cut steep enough to beat the mixed friction with the wall's 0.4.
@@ -28,18 +33,18 @@ final class HeroNode: SKSpriteNode {
     func die(completion: @escaping () -> Void) {
         guard !isDead else { return }
         isDead = true
-        texture = Sprite.heroHit.texture
-        color = UIColor(hex: 0xFF5C5C)
-        colorBlendFactor = 0.5
+        clawd.play("clawd_hard_ko")
         let duration = Motion.decorative(0.5)
+        // A beat on the knocked-out pose, so the take reads before he goes.
         run(.sequence([
+            .wait(forDuration: 0.6),
             .group([.scale(to: 0.2, duration: duration), .fadeOut(withDuration: duration)]),
             .run(completion),
         ]))
     }
 
     func celebrate() {
-        texture = Sprite.heroJump.texture
+        clawd.play("clawd_hard_excited")
         guard !Motion.reduced else { return }
         run(.sequence([.scaleY(to: 1.18, duration: 0.1), .scaleY(to: 1, duration: 0.12)]))
     }

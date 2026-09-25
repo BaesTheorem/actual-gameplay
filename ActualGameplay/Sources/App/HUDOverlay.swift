@@ -7,31 +7,33 @@ struct HUDOverlay: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            HStack(spacing: 12) {
+            HStack(spacing: 10) {
                 IconButton(icon: .arrowBack, action: onBack)
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(session.hud.title).font(Theme.label(15)).foregroundStyle(Theme.onSurface)
+                VStack(alignment: .leading, spacing: -2) {
+                    Text(session.hud.title).font(Theme.label(16)).foregroundStyle(Theme.ink)
+                        .lineLimit(1).minimumScaleFactor(0.7)
                     if !session.hud.readout.isEmpty {
-                        Text(session.hud.readout).font(Theme.mono(12)).foregroundStyle(session.mode.accent)
-                            .lineLimit(1).minimumScaleFactor(0.7)
+                        Text(session.hud.readout).font(Theme.label(13)).foregroundStyle(Theme.ink.opacity(0.8))
+                            .lineLimit(1).minimumScaleFactor(0.6)
                     }
                 }
-                .padding(.horizontal, 10)
+                .padding(.horizontal, 14)
                 .padding(.vertical, 6)
-                .background(Theme.surfaceContainer.opacity(0.92))
-                .overlay(Rectangle().stroke(Theme.outline, lineWidth: 1))
+                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                .paintedCard()
                 .allowsHitTesting(false)
-                Spacer(minLength: 0).allowsHitTesting(false)
                 IconButton(icon: .refresh) { session.reset() }
             }
             if let progress = session.hud.progress {
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
-                        Rectangle().fill(Theme.surfaceHigh)
-                        Rectangle().fill(session.mode.accent).frame(width: geo.size.width * max(0, min(1, progress)))
+                        Capsule().fill(Theme.cream)
+                        Capsule().fill(session.mode.accent).frame(width: geo.size.width * max(0, min(1, progress)))
+                        Capsule().stroke(Theme.ink, lineWidth: 1.5)
                     }
                 }
-                .frame(height: 4)
+                .frame(height: 9)
+                .padding(.horizontal, 2)
                 .allowsHitTesting(false)
             }
             Spacer(minLength: 0).allowsHitTesting(false)

@@ -2,6 +2,8 @@
  "clawd_idle": {
   "frames": 16,
   "fps": 6.666666666666667,
+  "w": 400,
+  "h": 360,
   "anchor": [
    0.5,
    0.1111111111111111
@@ -11,6 +13,8 @@
  "clawd_happy": {
   "frames": 16,
   "fps": 6.666666666666667,
+  "w": 400,
+  "h": 360,
   "anchor": [
    0.5,
    0.1111111111111111
@@ -20,6 +24,8 @@
  "clawd_excited": {
   "frames": 12,
   "fps": 10,
+  "w": 400,
+  "h": 360,
   "anchor": [
    0.5,
    0.1111111111111111
@@ -29,6 +35,8 @@
  "clawd_nervous": {
   "frames": 12,
   "fps": 5,
+  "w": 400,
+  "h": 360,
   "anchor": [
    0.5,
    0.1111111111111111
@@ -38,6 +46,8 @@
  "clawd_scared": {
   "frames": 12,
   "fps": 10,
+  "w": 400,
+  "h": 360,
   "anchor": [
    0.5,
    0.1111111111111111
@@ -47,6 +57,8 @@
  "clawd_sad": {
   "frames": 8,
   "fps": 3.3333333333333335,
+  "w": 400,
+  "h": 360,
   "anchor": [
    0.5,
    0.1111111111111111
@@ -56,6 +68,8 @@
  "clawd_ko": {
   "frames": 8,
   "fps": 3.3333333333333335,
+  "w": 400,
+  "h": 360,
   "anchor": [
    0.5,
    0.1111111111111111
@@ -65,6 +79,8 @@
  "clawd_determined": {
   "frames": 8,
   "fps": 3.3333333333333335,
+  "w": 400,
+  "h": 360,
   "anchor": [
    0.5,
    0.1111111111111111
@@ -74,6 +90,8 @@
  "clawd_run": {
   "frames": 12,
   "fps": 24,
+  "w": 400,
+  "h": 360,
   "anchor": [
    0.5,
    0.1111111111111111
@@ -83,6 +101,8 @@
  "clawd_hard_idle": {
   "frames": 16,
   "fps": 6.666666666666667,
+  "w": 400,
+  "h": 360,
   "anchor": [
    0.5,
    0.1111111111111111
@@ -92,6 +112,8 @@
  "clawd_hard_excited": {
   "frames": 12,
   "fps": 10,
+  "w": 400,
+  "h": 360,
   "anchor": [
    0.5,
    0.1111111111111111
@@ -101,6 +123,8 @@
  "clawd_hard_ko": {
   "frames": 8,
   "fps": 3.3333333333333335,
+  "w": 400,
+  "h": 360,
   "anchor": [
    0.5,
    0.1111111111111111
@@ -110,6 +134,8 @@
  "clawd_foe_run": {
   "frames": 12,
   "fps": 24,
+  "w": 400,
+  "h": 360,
   "anchor": [
    0.5,
    0.1111111111111111
@@ -119,6 +145,8 @@
  "clawd_boss_idle": {
   "frames": 12,
   "fps": 10,
+  "w": 600,
+  "h": 540,
   "anchor": [
    0.5,
    0.1111111111111111
@@ -128,6 +156,8 @@
  "clawd_boss_hit": {
   "frames": 8,
   "fps": 3.3333333333333335,
+  "w": 600,
+  "h": 540,
   "anchor": [
    0.5,
    0.1111111111111111
@@ -137,6 +167,8 @@
  "bee_a": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -146,6 +178,8 @@
  "bee_b": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -155,6 +189,8 @@
  "bee_rest": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -164,6 +200,8 @@
  "saw_a": {
   "frames": 1,
   "fps": 1,
+  "w": 160,
+  "h": 160,
   "anchor": [
    0.5,
    0.5
@@ -173,6 +211,8 @@
  "saw_b": {
   "frames": 1,
   "fps": 1,
+  "w": 160,
+  "h": 160,
   "anchor": [
    0.5,
    0.5
@@ -182,6 +222,8 @@
  "spikes": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0
@@ -191,6 +233,8 @@
  "gem_yellow": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -200,6 +244,8 @@
  "gem_blue": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -209,6 +255,8 @@
  "coin_gold": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -218,6 +266,8 @@
  "sign_exit": {
   "frames": 1,
   "fps": 1,
+  "w": 128,
+  "h": 128,
   "anchor": [
    0.5,
    0.15625
@@ -227,6 +277,8 @@
  "flag_green_a": {
   "frames": 1,
   "fps": 1,
+  "w": 128,
+  "h": 128,
   "anchor": [
    0.5,
    0.15625
@@ -236,6 +288,8 @@
  "flag_green_b": {
   "frames": 1,
   "fps": 1,
+  "w": 128,
+  "h": 128,
   "anchor": [
    0.5,
    0.15625
@@ -245,6 +299,8 @@
  "torch_on_a": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 128,
   "anchor": [
    0.5,
    0.15625
@@ -254,6 +310,8 @@
  "torch_on_b": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 128,
   "anchor": [
    0.5,
    0.15625
@@ -263,6 +321,8 @@
  "rock": {
   "frames": 1,
   "fps": 1,
+  "w": 128,
+  "h": 128,
   "anchor": [
    0.5,
    0.5
@@ -272,6 +332,8 @@
  "bush": {
   "frames": 1,
   "fps": 1,
+  "w": 128,
+  "h": 96,
   "anchor": [
    0.5,
    0.08333333333333333
@@ -281,6 +343,8 @@
  "mushroom_red": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.20833333333333334
@@ -290,6 +354,8 @@
  "bomb": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -299,6 +365,8 @@
  "block_planks": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -308,6 +376,8 @@
  "block_danger": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -317,6 +387,8 @@
  "cloud_1": {
   "frames": 1,
   "fps": 1,
+  "w": 320,
+  "h": 160,
   "anchor": [
    0.5,
    0.5
@@ -326,6 +398,8 @@
  "cloud_2": {
   "frames": 1,
   "fps": 1,
+  "w": 320,
+  "h": 160,
   "anchor": [
    0.5,
    0.5
@@ -335,6 +409,8 @@
  "cloud_3": {
   "frames": 1,
   "fps": 1,
+  "w": 320,
+  "h": 160,
   "anchor": [
    0.5,
    0.5
@@ -344,6 +420,8 @@
  "background_color_hills": {
   "frames": 1,
   "fps": 1,
+  "w": 1206,
+  "h": 780,
   "anchor": [
    0.5,
    0
@@ -353,6 +431,8 @@
  "terrain_grass_block_center": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -362,6 +442,8 @@
  "terrain_grass_block_top": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -371,6 +453,8 @@
  "terrain_grass_block_top_left": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -380,6 +464,8 @@
  "terrain_grass_block_top_right": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -389,6 +475,8 @@
  "terrain_grass_block_left": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -398,6 +486,8 @@
  "terrain_grass_block_right": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -407,6 +497,8 @@
  "terrain_grass_horizontal_left": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -416,6 +508,8 @@
  "terrain_grass_horizontal_middle": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -425,6 +519,8 @@
  "terrain_grass_horizontal_right": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -434,6 +530,8 @@
  "terrain_dirt_block_center": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -443,6 +541,8 @@
  "terrain_dirt_block_top": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -452,6 +552,8 @@
  "terrain_dirt_block_top_left": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -461,6 +563,8 @@
  "terrain_dirt_block_top_right": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -470,6 +574,8 @@
  "terrain_dirt_block_left": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -479,6 +585,8 @@
  "terrain_dirt_block_right": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -488,6 +596,8 @@
  "terrain_dirt_horizontal_left": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -497,6 +607,8 @@
  "terrain_dirt_horizontal_middle": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -506,6 +618,8 @@
  "terrain_dirt_horizontal_right": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -515,6 +629,8 @@
  "terrain_stone_block_center": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -524,6 +640,8 @@
  "terrain_stone_block_top": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -533,6 +651,8 @@
  "terrain_stone_block_top_left": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -542,6 +662,8 @@
  "terrain_stone_block_top_right": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -551,6 +673,8 @@
  "terrain_stone_block_left": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -560,6 +684,8 @@
  "terrain_stone_block_right": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -569,6 +695,8 @@
  "terrain_stone_horizontal_left": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -578,6 +706,8 @@
  "terrain_stone_horizontal_middle": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -587,6 +717,8 @@
  "terrain_stone_horizontal_right": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -596,6 +728,8 @@
  "terrain_purple_block_center": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -605,6 +739,8 @@
  "terrain_purple_block_top": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -614,6 +750,8 @@
  "terrain_purple_block_top_left": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -623,6 +761,8 @@
  "terrain_purple_block_top_right": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -632,6 +772,8 @@
  "terrain_purple_block_left": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -641,6 +783,8 @@
  "terrain_purple_block_right": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -650,6 +794,8 @@
  "terrain_purple_horizontal_left": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -659,6 +805,8 @@
  "terrain_purple_horizontal_middle": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -668,6 +816,8 @@
  "terrain_purple_horizontal_right": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -677,6 +827,8 @@
  "ui_card": {
   "frames": 1,
   "fps": 1,
+  "w": 192,
+  "h": 192,
   "anchor": [
    0.5,
    0.5
@@ -686,6 +838,8 @@
  "ui_card_dark": {
   "frames": 1,
   "fps": 1,
+  "w": 192,
+  "h": 192,
   "anchor": [
    0.5,
    0.5
@@ -695,6 +849,8 @@
  "ui_button_clay": {
   "frames": 1,
   "fps": 1,
+  "w": 192,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -704,6 +860,8 @@
  "ui_button_sap": {
   "frames": 1,
   "fps": 1,
+  "w": 192,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -713,6 +871,8 @@
  "ui_button_sky": {
   "frames": 1,
   "fps": 1,
+  "w": 192,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -722,6 +882,8 @@
  "ui_button_rose": {
   "frames": 1,
   "fps": 1,
+  "w": 192,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -731,6 +893,8 @@
  "ui_button_ink": {
   "frames": 1,
   "fps": 1,
+  "w": 192,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -740,6 +904,8 @@
  "ui_button_paper": {
   "frames": 1,
   "fps": 1,
+  "w": 192,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -749,6 +915,8 @@
  "ui_star_on": {
   "frames": 1,
   "fps": 1,
+  "w": 128,
+  "h": 128,
   "anchor": [
    0.5,
    0.5
@@ -758,6 +926,8 @@
  "ui_star_off": {
   "frames": 1,
   "fps": 1,
+  "w": 128,
+  "h": 128,
   "anchor": [
    0.5,
    0.5
@@ -767,6 +937,8 @@
  "pin_knob": {
   "frames": 1,
   "fps": 1,
+  "w": 96,
+  "h": 96,
   "anchor": [
    0.5,
    0.5
@@ -776,6 +948,8 @@
  "ui_hive": {
   "frames": 1,
   "fps": 1,
+  "w": 128,
+  "h": 128,
   "anchor": [
    0.5,
    0.5
@@ -785,6 +959,8 @@
  "paper": {
   "frames": 1,
   "fps": 1,
+  "w": 1920,
+  "h": 1080,
   "anchor": [
    0.5,
    0.5
@@ -794,6 +970,8 @@
  "paper_cave": {
   "frames": 1,
   "fps": 1,
+  "w": 1920,
+  "h": 1080,
   "anchor": [
    0.5,
    0.5
@@ -803,6 +981,8 @@
  "icon": {
   "frames": 1,
   "fps": 1,
+  "w": 1080,
+  "h": 1080,
   "anchor": [
    0.5,
    0.5

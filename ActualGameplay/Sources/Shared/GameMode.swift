@@ -42,12 +42,21 @@ enum GameMode: String, CaseIterable, Identifiable, Codable {
 
     var uiAccent: UIColor { UIColor(accent) }
 
-    /// The sprite on the home card.
-    var preview: Sprite {
+    /// The painted Clawd on the home card: a clip and the frame of it to show (frame 0 is often mid-blink).
+    var preview: (clip: String, frame: Int) {
         switch self {
-        case .saveDog: return .dog
-        case .pinPull: return .heroIdle
-        case .runner: return .runnerA
+        case .saveDog: return ("clawd_nervous", 3)
+        case .pinPull: return ("clawd_hard_idle", 4)
+        case .runner: return ("clawd_run", 3)
+        }
+    }
+
+    /// The painted swatch Clawd stands on in that card.
+    var swatch: String {
+        switch self {
+        case .saveDog: return "ui_button_sky"
+        case .pinPull: return "ui_button_ink"
+        case .runner: return "ui_button_sap"
         }
     }
 

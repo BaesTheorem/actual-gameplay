@@ -15,34 +15,42 @@ struct RunnerHubView: View {
 
     var body: some View {
         ZStack {
-            Theme.surface.ignoresSafeArea()
+            PaperBackground()
             VStack(alignment: .leading, spacing: 16) {
                 HStack(spacing: 12) {
                     IconButton(icon: .arrowBack) { dismiss() }
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("CROWD RUN").font(Theme.title(24))
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text("CROWD RUN").font(Theme.title(26))
                         Text("run \(runner.level + 1)   best \(runner.bestLevel)")
-                            .font(Theme.mono(12)).foregroundStyle(Theme.runner)
+                            .font(Theme.mono(13)).foregroundStyle(Theme.onSurfaceMuted)
                     }
                     Spacer()
-                    HStack(spacing: 6) {
-                        SpriteImage(sprite: .coin, size: 22)
-                        Text("\(runner.coins)").font(Theme.mono(16)).foregroundStyle(Theme.gold)
-                    }
+                    CoinCount(coins: runner.coins)
                 }
-                Button("RUN \(runner.level + 1)") { run = RunSelection() }
-                    .buttonStyle(OutlinedButtonStyle(tint: Theme.runner, filled: true))
-                Text("Drag to steer. Green gates grow the crowd, red ones shrink it. Whatever is left fights at the end.")
-                    .font(Theme.body(13)).foregroundStyle(Theme.onSurfaceMuted)
-                HairlineDivider()
-                Text("UPGRADES").font(Theme.mono(12)).foregroundStyle(Theme.onSurfaceMuted)
+                VStack(spacing: 12) {
+                    // The frame's top third is headroom for emotes this clip does not use.
+                    PaintedClip("clawd_determined")
+                        .frame(height: 150)
+                        .padding(.top, -40)
+                        .padding(.bottom, -16)
+                    Text("Drag to steer. Green gates grow the crowd, red ones shrink it. Whatever is left fights at the end.")
+                        .font(Theme.body(14)).foregroundStyle(Theme.onSurfaceMuted)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Button("RUN \(runner.level + 1)") { run = RunSelection() }
+                        .buttonStyle(OutlinedButtonStyle(filled: true))
+                }
+                .padding(16)
+                .paintedCard()
+                Text("UPGRADES").font(Theme.label(15)).foregroundStyle(Theme.onSurfaceMuted)
+                    .padding(.top, 4)
                 ForEach(RunnerEconomy.Upgrade.allCases) { upgrade in
                     UpgradeRow(upgrade: upgrade, level: economy.level(of: upgrade), coins: runner.coins) { buy(upgrade) }
                 }
                 Spacer(minLength: 0)
             }
             .padding(20)
-            .foregroundStyle(Theme.onSurface)
+            .foregroundStyle(Theme.ink)
         }
         .fullScreenCover(item: $run) { selection in
             GameContainerView(mode: .runner, onNext: { run = RunSelection() }, onResult: record) {
@@ -87,28 +95,44 @@ struct UpgradeRow: View {
 
     private var maxed: Bool { level >= upgrade.maxLevel }
     private var cost: Int { upgrade.cost(atLevel: level) }
+    private var affordable: Bool { !maxed && coins >= cost }
 
     var body: some View {
         HStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(upgrade.title).font(Theme.label(15))
+            VStack(alignment: .leading, spacing: 0) {
+                Text(upgrade.title).font(Theme.label(17))
                 Text("Lv \(level)/\(upgrade.maxLevel)   \(upgrade.effectText(atLevel: level))")
-                    .font(Theme.mono(11)).foregroundStyle(Theme.onSurfaceMuted)
+                    .font(Theme.mono(12)).foregroundStyle(Theme.onSurfaceMuted)
             }
             Spacer()
             Button(action: action) {
-                Text(maxed ? "MAX" : "\(cost)")
-                    .font(Theme.mono(13))
-                    .foregroundStyle(maxed ? Theme.onSurfaceMuted : (coins >= cost ? Theme.surface : Theme.onSurfaceMuted))
-                    .frame(width: 72, height: 36)
-                    .background(!maxed && coins >= cost ? Theme.gold : Theme.surfaceContainer)
-                    .overlay(Rectangle().stroke(Theme.outline, lineWidth: 1))
+                HStack(spacing: 4) {
+                    if !maxed { PaintedImage("coin_gold").frame(width: 18, height: 18) }
+                    Text(maxed ? "MAX" : "\(cost)").font(Theme.label(16))
+                }
+                .foregroundStyle(affordable ? Theme.cream : Theme.ink.opacity(0.45))
+                .frame(width: 84, height: 40)
+                .background(PaintedFrame(affordable ? "ui_button_clay" : "ui_button_paper"))
             }
             .buttonStyle(.plain)
-            .disabled(maxed || coins < cost)
+            .disabled(!affordable)
         }
-        .padding(10)
-        .background(Theme.surfaceContainer)
-        .overlay(Rectangle().stroke(Theme.outline, lineWidth: 1))
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .paintedCard()
+    }
+}
+
+/// The coin purse: the painted coin and the count beside it.
+struct CoinCount: View {
+    let coins: Int
+
+    var body: some View {
+        HStack(spacing: 6) {
+            PaintedImage("coin_gold").frame(width: 26, height: 26)
+            Text("\(coins)").font(Theme.label(20)).foregroundStyle(Theme.ink)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(coins) coins")
     }
 }

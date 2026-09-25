@@ -5,12 +5,12 @@
 //                    anchor: [ax, ay] (SpriteKit anchor point, y up), paper: true to keep the paper and grain,
 //                    draw(t) }
 //
-// Characters share one frame size (320 x 360 px at u = 20, ground 40 px above the bottom edge), so every
+// Characters share one frame size (400 x 360 px at u = 20, ground 40 px above the bottom edge), so every
 // animation of a character lines up on the same anchor. The boss is bigger and gets its own box.
 (() => {
   const CX = 960, GY = 900;                    // where characters stand on the canvas
-  const CHAR = { box: [CX - 160, GY - 320, 320, 360], anchor: [0.5, 40 / 360] };
-  const BOSS = { box: [CX - 240, GY - 480, 480, 540], anchor: [0.5, 60 / 540] };
+  const CHAR = { box: [CX - 200, GY - 320, 400, 360], anchor: [0.5, 40 / 360] };
+  const BOSS = { box: [CX - 300, GY - 480, 600, 540], anchor: [0.5, 60 / 540] };
   const BAR = 4 * BEAT;                        // one bar at the sprite tempo; every beat-locked idle repeats on it
   window.ASSETS = {};
   const add = (name, spec) => { window.ASSETS[name] = spec; };
@@ -167,9 +167,9 @@
     for (let i = 0; i < 44; i++) { const a = i / 44 * TAU, up = Math.sin(a) < 0, r = up ? 1 + 0.3 * Math.pow(Math.abs(Math.sin(a * (2.5 + seed * 0.5) + seed)), 0.7) : 1; pts.push([Math.cos(a) * w * 0.46 * (up ? r * 0.95 : 1), Math.sin(a) * (up ? 40 : 18) * r]); }
     paint(pts, { wash: PAL.cream, washOp: 245, fill: PAL.sky, fillOp: 35, bleed: 0.12, ink: mixCol(PAL.ink, PAL.paper, 0.35), sw: 0.9, curv: 0.5 });
   };
-  still('cloud_1', CENTRE(256, 128), cloud(1, 230));
-  still('cloud_2', CENTRE(256, 128), cloud(2, 200));
-  still('cloud_3', CENTRE(256, 128), cloud(3, 250));
+  still('cloud_1', CENTRE(320, 160), cloud(1, 230));
+  still('cloud_2', CENTRE(320, 160), cloud(2, 200));
+  still('cloud_3', CENTRE(320, 160), cloud(3, 250));
   // rolling hills for the bottom of a portrait scene: 1206 x 780 px (402 x 260 pt at 3x), anchored bottom-centre
   still('background_color_hills', { box: [CX - 603, 1080 - 780, 1206, 780], anchor: [0.5, 0] }, t => {
     boilSeed('hills');

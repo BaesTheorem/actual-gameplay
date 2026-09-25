@@ -8,7 +8,7 @@ struct HomeView: View {
 
     var body: some View {
         ZStack {
-            Theme.surface.ignoresSafeArea()
+            PaperBackground()
             VStack(alignment: .leading, spacing: 16) {
                 header
                 ForEach(GameMode.allCases) { mode in
@@ -48,16 +48,16 @@ struct HomeView: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: -4) {
-                    Text("ACTUAL").font(Theme.title(36))
-                    Text("GAMEPLAY").font(Theme.title(36))
+                VStack(alignment: .leading, spacing: -14) {
+                    Text("ACTUAL").font(Theme.title(40))
+                    Text("GAMEPLAY").font(Theme.title(40))
                 }
-                .foregroundStyle(Theme.onSurface)
+                .foregroundStyle(Theme.ink)
                 Spacer()
                 IconButton(icon: .settings) { showSettings = true }
             }
             Text("The games from the ads. Without the ads.")
-                .font(Theme.body(14))
+                .font(Theme.body(15))
                 .foregroundStyle(Theme.onSurfaceMuted)
             HairlineDivider().padding(.top, 10)
         }
@@ -66,7 +66,7 @@ struct HomeView: View {
     private var footer: some View {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
         return Text("v\(version)")
-            .font(Theme.mono(11))
+            .font(Theme.mono(12))
             .foregroundStyle(Theme.onSurfaceMuted)
     }
 
@@ -93,20 +93,17 @@ struct ModeCard: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 14) {
-                SpriteImage(sprite: mode.preview, size: 44)
-                    .frame(width: 60, height: 60)
-                    .background(mode.accent)
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(mode.title).font(Theme.label(18)).foregroundStyle(Theme.onSurface)
+                ClawdSwatch(clip: mode.preview.clip, frame: mode.preview.frame, art: mode.swatch, size: 68)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(mode.title).font(Theme.label(21)).foregroundStyle(Theme.ink)
                     Text(mode.blurb).font(Theme.body(13)).foregroundStyle(Theme.onSurfaceMuted).lineLimit(2)
-                    Text(summary).font(Theme.mono(12)).foregroundStyle(mode.accent)
+                    Text(summary).font(Theme.mono(12)).foregroundStyle(Theme.ink)
                 }
                 Spacer(minLength: 0)
-                MSIcon(.chevronRight, size: 24).foregroundStyle(Theme.onSurfaceMuted)
+                MSIcon(.chevronRight, size: 24).foregroundStyle(Theme.ink)
             }
-            .padding(12)
-            .background(Theme.surfaceContainer)
-            .overlay(Rectangle().stroke(Theme.outline, lineWidth: 1))
+            .padding(14)
+            .paintedCard()
         }
         .buttonStyle(.plain)
     }

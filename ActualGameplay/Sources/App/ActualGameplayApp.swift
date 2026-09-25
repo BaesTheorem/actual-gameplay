@@ -9,7 +9,7 @@ struct ActualGameplayApp: App {
         WindowGroup {
             HomeView()
                 .environmentObject(store)
-                .preferredColorScheme(.dark)
+                .preferredColorScheme(.light)
                 .onAppear {
                     Haptics.shared.enabled = store.progress.settings.haptics
                     Haptics.shared.prepare()

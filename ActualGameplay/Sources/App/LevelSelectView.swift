@@ -11,40 +11,42 @@ struct LevelSelectView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var selected: LevelSelection?
 
-    private let columns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 4)
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 12), count: 4)
     private var catalog: LevelCatalog { LevelCatalog.shared }
     private var count: Int { catalog.count(for: mode) }
     private var clearedCount: Int { store.progress.results(for: mode).values.filter(\.cleared).count }
 
     var body: some View {
         ZStack {
-            Theme.surface.ignoresSafeArea()
+            PaperBackground(name: mode == .pinPull ? "paper_cave" : "paper")
             VStack(alignment: .leading, spacing: 16) {
                 HStack(spacing: 12) {
                     IconButton(icon: .arrowBack) { dismiss() }
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(mode.title.uppercased()).font(Theme.title(24))
-                        Text("\(clearedCount)/\(count) cleared").font(Theme.mono(12)).foregroundStyle(mode.accent)
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text(mode.title.uppercased()).font(Theme.title(26))
+                        Text("\(clearedCount)/\(count) cleared").font(Theme.mono(13)).foregroundStyle(Theme.onSurfaceMuted)
                     }
                     Spacer()
+                    ClawdSwatch(clip: mode.preview.clip, frame: mode.preview.frame, art: mode.swatch, size: 52)
                 }
                 if count == 0 {
                     Text("No levels yet.").font(Theme.body()).foregroundStyle(Theme.onSurfaceMuted)
                 }
                 ScrollView {
-                    LazyVGrid(columns: columns, spacing: 10) {
+                    LazyVGrid(columns: columns, spacing: 12) {
                         ForEach(0..<count, id: \.self) { index in
                             let result = store.progress.results(for: mode)[catalog.id(for: mode, index: index)]
-                            LevelTile(number: index + 1, result: result, accent: mode.accent) {
+                            LevelTile(number: index + 1, result: result, locked: isLocked(index)) {
                                 selected = LevelSelection(index: index)
                             }
                         }
                     }
+                    .padding(.vertical, 2)
                 }
                 Spacer(minLength: 0)
             }
             .padding(20)
-            .foregroundStyle(Theme.onSurface)
+            .foregroundStyle(Theme.ink)
         }
         .fullScreenCover(item: $selected) { selection in
             GameContainerView(mode: mode,
@@ -61,6 +63,10 @@ struct LevelSelectView: View {
             }
         }
     }
+
+    /// Levels open in order: the first, anything already cleared, and the one after a clear.
+    /// Every level is open. The tile knows how to draw a lock, so gating is one line away if it is ever wanted.
+    private func isLocked(_ index: Int) -> Bool { false }
 
     private func nextAction(after index: Int) -> (() -> Void)? {
         guard index + 1 < count else { return nil }
@@ -85,22 +91,37 @@ struct LevelSelectView: View {
 struct LevelTile: View {
     let number: Int
     let result: LevelResult?
-    let accent: Color
+    var locked: Bool = false
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 6) {
-                Text("\(number)")
-                    .font(Theme.title(24))
-                    .foregroundStyle(result?.cleared == true ? accent : Theme.onSurface)
-                StarRow(count: result?.bestStars ?? 0, size: 10)
+            VStack(spacing: 2) {
+                if locked {
+                    MSIcon(.lock, size: 26)
+                        .frame(height: 36)
+                    Text("\(number)").font(Theme.label(14))
+                } else {
+                    Text("\(number)").font(Theme.title(28))
+                        .frame(height: 36)
+                    StarRow(count: result?.bestStars ?? 0, size: 15)
+                }
             }
+            .foregroundStyle(Theme.ink.opacity(locked ? 0.4 : 1))
             .frame(maxWidth: .infinity)
-            .frame(height: 76)
-            .background(Theme.surfaceContainer)
-            .overlay(Rectangle().stroke(result?.cleared == true ? accent : Theme.outline, lineWidth: 1))
+            .frame(height: 86)
+            .paintedCard()
         }
-        .buttonStyle(.plain)
+        .buttonStyle(TileButtonStyle())
+        .disabled(locked)
+        .accessibilityLabel(locked ? "Level \(number), locked" : "Level \(number), \(result?.bestStars ?? 0) stars")
+    }
+}
+
+/// Presses dim the tile; a disabled tile is left as drawn, since the lock already says so and the plain style
+/// would fade the painted card along with it.
+private struct TileButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label.opacity(configuration.isPressed ? 0.75 : 1)
     }
 }

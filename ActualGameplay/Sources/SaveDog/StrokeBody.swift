@@ -15,8 +15,9 @@ enum StrokeBody {
     static let minLength: CGFloat = 6
     static let epsilon: CGFloat = 1.5
     static let dotCost: CGFloat = 8
-    static let color = UIColor(hex: 0xE2E4EA)
-    static let pinnedColor = UIColor(hex: 0x7BD3FF)
+    /// The player's ink. Pinned ink is indigo, so a stroke that will not fall reads as a different ink.
+    static let color = Pigment.ink
+    static let pinnedColor = Pigment.indigo
 
     /// Natural mass at density 1 for a stroke of this length. Compounds double-count overlaps, so
     /// the mass is set explicitly instead of trusting what SpriteKit computes.

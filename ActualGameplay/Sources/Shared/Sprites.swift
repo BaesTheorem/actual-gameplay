@@ -129,23 +129,3 @@ enum Terrain {
         return node
     }
 }
-
-import SwiftUI
-
-/// A bundled sprite as a SwiftUI image, for the shell (mode cards, the coin purse).
-struct SpriteImage: View {
-    let sprite: Sprite
-    var size: CGFloat = 32
-
-    var body: some View {
-        Group {
-            if let url = Bundle.main.url(forResource: sprite.rawValue, withExtension: "png", subdirectory: "Art"),
-               let image = UIImage(contentsOfFile: url.path) {
-                Image(uiImage: image).resizable().scaledToFit()
-            } else {
-                Rectangle().fill(Color.pink)
-            }
-        }
-        .frame(width: size, height: size)
-    }
-}

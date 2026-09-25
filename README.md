@@ -9,8 +9,11 @@ iPhone, SwiftUI shell, SpriteKit scenes.
 **Save the Dog.** A dog, a limited pot of ink, and hives full of bees. Draw a shield; it
 falls like anything you draw; a moment later the bees stream in and hunt him for ten
 seconds. They path-find: a bee with a way in routes around walls and through any gap it
-fits through, and a bee with no way in leans on the shield, crawls along it probing, and
-joins a shove every few seconds, so footing and mass matter. Twelve levels, each a
+fits through. Bees with no way in work as a crew: they pick the least secure loose part of
+the shield they can reach, line up along it, wind up, and heave on it together, alternating
+the middle and the far end, straight and tilted up, and move on to the next weakest part
+when one will not budge. Footing and mass decide what survives, so a bar balanced on a
+point or a lid resting on him goes, and a shape that stands on its own feet holds. Twelve levels, each a
 different problem: a lid over a pit, one open side of a cave, a hole in a roof, bees rising
 through the floor, a boulder to route into a gap, saw blades that cut ink, two dogs with
 ink for one shield. Three stars for a low-ink clear.
@@ -96,11 +99,28 @@ with are kept under `attic/` for reference.
 
 ## Art
 
-Sprites, tiles, and backgrounds are from [Kenney](https://kenney.nl) (New Platformer Pack,
-Animal Pack Remastered, Background Elements), all CC0. They live in `ActualGameplay/Art/`
-next to a `CREDITS.txt`, renamed to what they are used as. Strokes, liquids, and the road
-are still drawn in code on purpose: they are the parts the player makes or that behave like
-fluids, and a texture would only get in the way.
+The art is painted: flat watercolour washes and ink outlines on paper, drawn with the
+[Claude Animation Base](https://github.com/JohnHeibel/ClaudeAnimationBase) kit (p5.js and
+p5.brush, MIT) through the fork at `~/Documents/claude-animation`. Clawd, the Claude Code
+mascot, plays the lead in all three games: the dog in Save the Dog, a miner in a hard hat in
+Pull the Pin, and every runner in Crowd Run, against a violet rival crowd and a boss with its
+lid blown open.
+
+The set lives in `ActualGameplay/Art/painted/`: PNGs at 3x, animated clips as
+`name_00.png ... name_NN.png`, and a `manifest.json` with each asset's frame count, playback
+rate and ground anchor. `Sources/Shared/Painted.swift` reads it: `PaintedSprite` plays clips in
+the scenes, and `PaintedImage`, `PaintedClip` and `PaintedFrame` draw them in SwiftUI, cards and
+buttons as 9-slices. The drawings themselves are code, in `tools/painted/gameart.js`, and
+`tools/painted/render.mjs` renders them against the kit; change the drawing and re-render
+rather than editing a PNG (`tools/painted/README.md` has the commands). A painted prop that
+kept its old name wins over the Kenney file of the same name (CC0, still in `Art/`), so the
+levels needed no changes.
+
+Strokes, liquids, pins and the road are still drawn in code, on purpose: they are the parts the
+player makes or that behave like fluids, and a texture would only get in the way. Their colours
+come from the kit's palette. Titles, HUD numbers and button labels are set in Permanent Marker
+(Font Diner, Apache 2.0), body text in the rounded system font, and icons in Material Symbols
+Sharp. Credits for all of it are in `Art/CREDITS.txt`.
 
 ## Music
 

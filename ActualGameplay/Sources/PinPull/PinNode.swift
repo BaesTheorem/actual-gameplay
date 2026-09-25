@@ -29,29 +29,24 @@ final class PinNode: SKNode {
         position = center
         zPosition = 4
 
-        let bar = SKShapeNode(rectOf: CGSize(width: w, height: PinNode.thickness))
-        bar.fillColor = UIColor(hex: 0xE2E4EA)
-        bar.strokeColor = .clear
-        addChild(bar)
-
+        // Stem first, so the bar's inked end sits over the joint.
         let stem = SKShapeNode(rectOf: CGSize(width: PinNode.knobOffset, height: 6))
-        stem.fillColor = UIColor(hex: 0xE2E4EA)
-        stem.strokeColor = .clear
+        stem.fillColor = Pigment.cream
+        stem.strokeColor = Pigment.ink
+        stem.lineWidth = 2
         stem.position = CGPoint(x: direction * (w / 2 + PinNode.knobOffset / 2), y: 0)
         addChild(stem)
 
-        let knob = SKShapeNode(circleOfRadius: 11)
-        knob.fillColor = UIColor(hex: 0xE2E4EA)
-        knob.strokeColor = UIColor(hex: 0x111318)
-        knob.lineWidth = 2
+        let bar = SKShapeNode(rectOf: CGSize(width: w, height: PinNode.thickness), cornerRadius: 3)
+        bar.fillColor = Pigment.cream
+        bar.strokeColor = Pigment.ink
+        bar.lineWidth = 2
+        addChild(bar)
+
+        // 30 pt: the painted disc is 24 pt across, the size of the old knob, so it still clears the screen edge.
+        let knob = SKSpriteNode(texture: Painted.texture("pin_knob"), size: CGSize(width: 30, height: 30))
         knob.position = CGPoint(x: direction * (w / 2 + PinNode.knobOffset), y: 0)
         addChild(knob)
-
-        let dot = SKShapeNode(circleOfRadius: 4)
-        dot.fillColor = UIColor(hex: 0xFF8A5B)
-        dot.strokeColor = .clear
-        dot.position = knob.position
-        addChild(dot)
 
         let body = SKPhysicsBody(rectangleOf: CGSize(width: w, height: PinNode.thickness))
         body.isDynamic = false

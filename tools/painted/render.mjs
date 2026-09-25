@@ -56,7 +56,7 @@ const manifest = only && existsSync(manifestFile) ? JSON.parse(readFileSync(mani
 let n = 0; const t0 = Date.now();
 for (const name of assets) {
   if (only && !only.some(o => name === o || name.startsWith(o))) continue;
-  const spec = await page.evaluate(name => { const a = window.ASSETS[name]; return { frames: a.frames || 1, fps: a.fps || 10, w: a.w, h: a.h, anchor: a.anchor || [0.5, 0.5], paper: !!a.paper }; }, name);
+  const spec = await page.evaluate(name => { const a = window.ASSETS[name]; return { frames: a.frames || 1, fps: a.fps || 10, w: a.box[2], h: a.box[3], anchor: a.anchor || [0.5, 0.5], paper: !!a.paper }; }, name);
   for (let i = 0; i < spec.frames; i++) {
     const url = await page.evaluate((name, i) => window.renderAsset(name, i), name, i);
     save(`${OUT}/${name}${spec.frames > 1 ? '_' + String(i).padStart(2, '0') : ''}.png`, url); n++;

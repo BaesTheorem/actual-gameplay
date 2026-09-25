@@ -18,10 +18,12 @@ class StrokeScene: GameSceneBase {
     static let drawArea = CGRect(x: 0, y: 34, width: 402, height: 720)
 
     enum Palette {
-        static let solid = UIColor(hex: 0x262A32)
-        static let outline = UIColor(hex: 0x3F4553)
-        static let danger = UIColor(hex: 0xFF5C5C)
-        static let muted = UIColor(hex: 0x5B6470)
+        static let solid = Pigment.ink
+        static let outline = Pigment.ink
+        static let danger = Pigment.rose
+        static let muted = Pigment.ink.withAlphaComponent(0.6)
+        /// The dark wood of the painted planks and posts (DIRT_DK in tools/painted/gameart.js).
+        static let wood = UIColor(hex: 0x7A4B31)
     }
 
     // Subclasses override these from their level.
@@ -135,11 +137,19 @@ class StrokeScene: GameSceneBase {
             let path = CGMutablePath()
             path.addLines(between: points)
             let node = SKShapeNode(path: path)
-            node.strokeColor = UIColor(hex: 0x6B4F2A)
+            node.strokeColor = Palette.wood
             node.lineWidth = 6
             node.lineCap = .round
             node.lineJoin = .round
             node.zPosition = 2
+            // An ink line a little wider underneath gives the branch the painted props' outline.
+            let edge = SKShapeNode(path: path)
+            edge.strokeColor = Palette.outline
+            edge.lineWidth = 9
+            edge.lineCap = .round
+            edge.lineJoin = .round
+            edge.zPosition = -0.5
+            node.addChild(edge)
             node.userData = ["points": points.map { NSValue(cgPoint: $0) }, "halfWidth": CGFloat(3)]
             if solid { node.physicsBody = solidBody(SKPhysicsBody(edgeChainFrom: path)) }
             addChild(node)
@@ -221,24 +231,28 @@ class StrokeScene: GameSceneBase {
 
     func addForbidden(_ rect: CGRect) {
         forbidden.append(rect)
-        let dashed = CGPath(rect: rect, transform: nil).copy(dashingWithPhase: 0, lengths: [4, 4])
-        let node = SKShapeNode(path: dashed)
-        node.strokeColor = Palette.danger.withAlphaComponent(0.6)
-        node.lineWidth = 1
-        node.fillColor = Palette.danger.withAlphaComponent(0.08)
-        node.zPosition = 3
-        addChild(node)
-        let label = SKLabelNode(fontNamed: "Menlo")
+        let wash = SKShapeNode(rect: rect)
+        wash.fillColor = Palette.danger.withAlphaComponent(0.18)
+        wash.strokeColor = .clear
+        wash.zPosition = 3
+        addChild(wash)
+        let dashed = CGPath(rect: rect, transform: nil).copy(dashingWithPhase: 0, lengths: [6, 4])
+        let edge = SKShapeNode(path: dashed)
+        edge.strokeColor = Palette.outline.withAlphaComponent(0.75)
+        edge.lineWidth = 1.5
+        edge.zPosition = 3
+        addChild(edge)
+        let label = SKLabelNode(fontNamed: Painted.font)
         label.text = "no ink"
-        label.fontSize = 11
-        label.fontColor = Palette.danger.withAlphaComponent(0.8)
-        label.position = CGPoint(x: rect.midX, y: rect.maxY - 18)
+        label.fontSize = 13
+        label.fontColor = Palette.outline.withAlphaComponent(0.75)
+        label.position = CGPoint(x: rect.midX, y: rect.maxY - 20)
         label.zPosition = 3
         addChild(label)
     }
 
     func addHint() {
-        addHintLabel(hintText, color: Palette.muted, backdrop: backgroundColor)
+        addHintLabel(hintText)
     }
 
     // MARK: - Hooks for subclasses
@@ -395,10 +409,10 @@ class StrokeScene: GameSceneBase {
         node.zPosition = 60
         addChild(node)
         node.run(.sequence([.wait(forDuration: 0.15), .fadeOut(withDuration: Motion.decorative(0.35)), .removeFromParent()]))
-        let label = SKLabelNode(fontNamed: "Menlo-Bold")
+        let label = SKLabelNode(fontNamed: Painted.font)
         label.text = reason
-        label.fontSize = 12
-        label.fontColor = Palette.danger
+        label.fontSize = 14
+        label.fontColor = Pigment.clayDark
         label.position = CGPoint(x: min(max(first.x, 40), 362), y: min(first.y + 24, 740))
         label.zPosition = 60
         addChild(label)

@@ -4,12 +4,10 @@ import UIKit
 /// Pull the Pin: chambers of water and lava held up by pins. Pull order is the puzzle.
 final class PinScene: GameSceneBase, ReplayableScene {
     private enum Palette {
-        static let wall = UIColor(hex: 0x262A32)
-        static let outline = UIColor(hex: 0x3F4553)
-        static let drain = UIColor(hex: 0x0B0D10)
-        static let goal = UIColor(hex: 0xFF8A5B)
-        static let muted = UIColor(hex: 0x6B7280)
-        static let steam = UIColor(hex: 0x9AA0AC)
+        static let outline = Pigment.ink
+        static let drain = Pigment.night
+        static let goal = Pigment.clay
+        static let steam = Pigment.cream
     }
 
     static let frameThickness: CGFloat = 14
@@ -76,6 +74,7 @@ final class PinScene: GameSceneBase, ReplayableScene {
         physicsWorld.gravity = CGVector(dx: 0, dy: -6)
         physicsWorld.speed = 1
 
+        addPaper("paper_cave")
         addBounds()
         if level.frame ?? true { addFrame() }
         for decor in level.decor ?? [] {
@@ -154,7 +153,7 @@ final class PinScene: GameSceneBase, ReplayableScene {
         node.fillColor = .white
         node.fillTexture = Sprite.texture(named: "terrain_stone_block_center")
         node.strokeColor = Palette.outline
-        node.lineWidth = 1
+        node.lineWidth = 2
         node.zPosition = 2
         node.physicsBody = wallBody(SKPhysicsBody(polygonFrom: path))
         addChild(node)
@@ -162,9 +161,9 @@ final class PinScene: GameSceneBase, ReplayableScene {
 
     private func addDrain(_ rect: CGRect) {
         let node = SKShapeNode(rect: rect)
-        node.fillColor = Palette.drain
-        node.strokeColor = Palette.muted
-        node.lineWidth = 1
+        node.fillColor = Palette.drain.withAlphaComponent(0.55)
+        node.strokeColor = Palette.outline
+        node.lineWidth = 2
         addChild(node)
         let hatch = CGMutablePath()
         var x = rect.minX
@@ -174,7 +173,7 @@ final class PinScene: GameSceneBase, ReplayableScene {
             x += 10
         }
         let lines = SKShapeNode(path: hatch)
-        lines.strokeColor = Palette.muted.withAlphaComponent(0.6)
+        lines.strokeColor = Palette.outline.withAlphaComponent(0.7)
         lines.lineWidth = 1
         addChild(lines)
         let body = SKPhysicsBody(rectangleOf: rect.size, center: CGPoint(x: rect.midX, y: rect.midY))
@@ -188,9 +187,9 @@ final class PinScene: GameSceneBase, ReplayableScene {
     /// A row of bars: liquid falls in and is gone, anything solid drops straight through.
     private func addGrate(_ rect: CGRect) {
         let node = SKShapeNode(rect: rect)
-        node.fillColor = Palette.drain.withAlphaComponent(0.6)
-        node.strokeColor = Palette.muted
-        node.lineWidth = 1
+        node.fillColor = Palette.drain.withAlphaComponent(0.3)
+        node.strokeColor = Palette.outline
+        node.lineWidth = 2
         node.zPosition = 3
         addChild(node)
         let bars = CGMutablePath()
@@ -201,7 +200,7 @@ final class PinScene: GameSceneBase, ReplayableScene {
             x += 8
         }
         let lines = SKShapeNode(path: bars)
-        lines.strokeColor = UIColor(hex: 0xB9BEC9)
+        lines.strokeColor = Palette.outline
         lines.lineWidth = 2
         lines.zPosition = 3
         addChild(lines)
@@ -214,11 +213,14 @@ final class PinScene: GameSceneBase, ReplayableScene {
     }
 
     private func addGoal(_ rect: CGRect) {
-        let dashed = CGPath(rect: rect, transform: nil).copy(dashingWithPhase: 0, lengths: [6, 4])
+        let wash = SKShapeNode(rect: rect)
+        wash.fillColor = Palette.goal.withAlphaComponent(0.12)
+        wash.strokeColor = .clear
+        addChild(wash)
+        let dashed = CGPath(rect: rect, transform: nil).copy(dashingWithPhase: 0, lengths: [7, 5])
         let node = SKShapeNode(path: dashed)
         node.strokeColor = Palette.goal
-        node.lineWidth = 1
-        node.fillColor = Palette.goal.withAlphaComponent(0.08)
+        node.lineWidth = 2
         addChild(node)
         let sign = SKSpriteNode(texture: Sprite.signExit.texture, size: CGSize(width: 30, height: 30))
         sign.position = CGPoint(x: rect.maxX - 20, y: rect.minY + 16)
@@ -239,7 +241,7 @@ final class PinScene: GameSceneBase, ReplayableScene {
     }
 
     private func addHint() {
-        addHintLabel(level.hint, color: Palette.muted, backdrop: backgroundColor)
+        addHintLabel(level.hint)
     }
 
     // MARK: - Input
@@ -353,8 +355,9 @@ final class PinScene: GameSceneBase, ReplayableScene {
 
     private func puff(at point: CGPoint) {
         let node = SKShapeNode(circleOfRadius: 4)
-        node.fillColor = Palette.steam.withAlphaComponent(0.7)
-        node.strokeColor = .clear
+        node.fillColor = Palette.steam.withAlphaComponent(0.85)
+        node.strokeColor = Palette.outline.withAlphaComponent(0.5)
+        node.lineWidth = 1
         node.position = point
         node.zPosition = 8
         addChild(node)
@@ -381,7 +384,7 @@ final class PinScene: GameSceneBase, ReplayableScene {
         Haptics.shared.slam()
         Audio.play(.sizzle)
         treasure.run(.sequence([
-            .group([.colorize(with: UIColor(hex: 0xFF6A3D), colorBlendFactor: 0.8, duration: 0.2),
+            .group([.colorize(with: Pigment.clay, colorBlendFactor: 0.8, duration: 0.2),
                     .scale(to: 0.3, duration: Motion.decorative(0.5)), .fadeOut(withDuration: Motion.decorative(0.5))]),
             .run { [weak self] in self?.lose("The treasure melted.") },
         ]))

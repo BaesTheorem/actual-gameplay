@@ -10,7 +10,6 @@ final class DogScene: StrokeScene, ReplayableScene {
     override var pinnedInk: Bool { level.pinnedInk ?? false }
     override var forbiddenRects: [LevelRect] { level.forbidden ?? [] }
     override var hintText: String? { level.hint }
-    override var strokeColor: UIColor { UIColor(hex: 0x2B303A) }
 
     var levelID: String { level.id }
     var levelName: String { level.name }
@@ -36,7 +35,7 @@ final class DogScene: StrokeScene, ReplayableScene {
         self.level = level
         self.levelIndex = index
         super.init(size: GameSceneBase.canvas)
-        backgroundColor = UIColor(hex: 0xC3E3FF)
+        backgroundColor = Pigment.paper
     }
 
     required init?(coder aDecoder: NSCoder) { fatalError("scenes are built in code") }
@@ -72,11 +71,12 @@ final class DogScene: StrokeScene, ReplayableScene {
     }
 
     private func addBackdrop() {
-        let clouds = SKSpriteNode(texture: Sprite.cloudsBackdrop.texture, size: CGSize(width: 402, height: 402 * 0.7))
-        clouds.position = CGPoint(x: 201, y: 74 + 402 * 0.35 - 30)
-        clouds.alpha = 0.9
-        clouds.zPosition = -10
-        addChild(clouds)
+        addPaper("paper")
+        let hills = SKSpriteNode(texture: Sprite.hills.texture, size: CGSize(width: 402, height: 260))
+        hills.anchorPoint = CGPoint(x: 0.5, y: 0)
+        hills.position = CGPoint(x: 201, y: 74)
+        hills.zPosition = -10
+        addChild(hills)
         for (i, sprite) in [Sprite.cloud1, .cloud3, .cloud2].enumerated() {
             let cloud = SKSpriteNode(texture: sprite.texture)
             let scale: CGFloat = 0.35 + 0.1 * CGFloat(i)
@@ -94,18 +94,18 @@ final class DogScene: StrokeScene, ReplayableScene {
     }
 
     private func addHiveMarker(_ hive: DogLevel.Hive) {
-        let marker = SKSpriteNode(texture: Sprite.beeRest.texture, size: CGSize(width: 26, height: 26))
+        let marker = SKSpriteNode(texture: Painted.texture("ui_hive"), size: CGSize(width: 30, height: 30))
         marker.position = CGPoint(x: hive.x, y: hive.y)
         marker.zPosition = 4
         marker.alpha = 0.9
         marker.name = "hive"
         addChild(marker)
-        let count = SKLabelNode(fontNamed: "HelveticaNeue-Bold")
+        let count = SKLabelNode(fontNamed: Painted.font)
         count.text = "\(hive.count)"
-        count.fontSize = 11
-        count.fontColor = UIColor(hex: 0x3B2A10)
+        count.fontSize = 13
+        count.fontColor = Pigment.ink
         count.verticalAlignmentMode = .center
-        count.position = CGPoint(x: hive.x, y: hive.y - 20)
+        count.position = CGPoint(x: hive.x, y: hive.y - 23)
         count.zPosition = 4
         count.name = "hive"
         addChild(count)
@@ -142,12 +142,14 @@ final class DogScene: StrokeScene, ReplayableScene {
         pushHUD()
     }
 
-    /// The bees' map: everything solid, inflated by a bee, flooded from the dogs.
+    /// The bees' map: everything solid, inflated by a bee, flooded from the dogs. The bees with no
+    /// route re-plan their crew work on the same map.
     private func rebuildField() {
         field.rebuild(solids: solids(),
                       targets: dogs.map { (center: $0.position, radius: DogNode.radius) },
                       clearance: BeeNode.radius)
         routeOpen = swarm.bees.contains { field.nearbyDirection(at: $0.position) != nil }
+        swarm.survey(scene: self, dogs: dogs.map(\.position), field: field)
     }
 
     private func release() {
@@ -202,7 +204,7 @@ final class DogScene: StrokeScene, ReplayableScene {
 
     private func win() {
         let ink = inkUsed
-        for dog in dogs { dog.relax() }
+        for dog in dogs { dog.saved() }
         Haptics.shared.success()
         Audio.play(.win)
         finish(.won(stars: level.stars(forInk: ink), coins: 0, score: Double(ink)))
@@ -210,6 +212,7 @@ final class DogScene: StrokeScene, ReplayableScene {
     }
 
     private func lose(_ reason: String) {
+        for dog in dogs { dog.caught() }
         Haptics.shared.failure()
         Audio.play(.lose)
         finish(.lost(reason: reason))
@@ -222,7 +225,11 @@ final class DogScene: StrokeScene, ReplayableScene {
         if let started = launchedAt {
             let left = max(0, level.surviveSeconds - (elapsed - started))
             readout += String(format: "   %.1fs   %d bees", left, swarm.alive)
-            if swarm.shoving { readout += "   shove!" } else if routeOpen { readout += "   way in!" }
+            if swarm.shoving {
+                readout += swarm.crew.active ? "   heave!" : "   shove!"
+            } else if routeOpen {
+                readout += "   way in!"
+            }
         } else if let at = launchAt {
             readout += String(format: "   bees in %.1f", max(0, at - elapsed))
         } else {

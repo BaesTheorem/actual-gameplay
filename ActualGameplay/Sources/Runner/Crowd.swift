@@ -2,7 +2,8 @@ import SpriteKit
 import UIKit
 
 /// A crowd of runners. `count` is the truth; at most 150 of them are drawn, arranged on a
-/// sunflower spiral around the anchor so any number reads as one blob.
+/// sunflower spiral around the anchor so any number reads as one blob. Each runner plays a painted
+/// clip from its own frame, so the crowd does not stride in lockstep.
 final class Crowd {
     final class Member {
         let node: SKSpriteNode
@@ -27,13 +28,23 @@ final class Crowd {
     var anchorX: CGFloat = 0
     var anchorZ: CGFloat
     private let frames: [SKTexture]
+    private let timePerFrame: TimeInterval
+    private let anchor: CGPoint
     private let size: CGSize
+    /// 1 faces the clip's way (screen right), -1 mirrors it.
+    private let facing: CGFloat
 
-    init(count: Int, anchorZ: CGFloat, frames: [SKTexture], size: CGSize) {
+    /// `height` is the clip frame's height in points at depth scale 1; the anchor is the clip's ground point.
+    init(count: Int, anchorZ: CGFloat, clip name: String, height: CGFloat, facing: CGFloat = 1) {
         self.count = 0
         self.anchorZ = anchorZ
-        self.frames = frames
-        self.size = size
+        let clip = Painted.clip(name)
+        let native = clip?.size ?? CGSize(width: height, height: height)
+        frames = clip?.textures ?? []
+        timePerFrame = 1 / max(1, clip?.fps ?? 10)
+        anchor = clip?.anchor ?? CGPoint(x: 0.5, y: 0)
+        size = CGSize(width: native.width * height / max(1, native.height), height: height)
+        self.facing = facing
         setCount(count, animated: false)
     }
 
@@ -57,8 +68,13 @@ final class Crowd {
 
     private func addMember(index: Int, animated: Bool) {
         let node = SKSpriteNode(texture: frames.first, size: size)
+        node.anchorPoint = anchor
         if frames.count > 1 {
-            node.run(.repeatForever(.animate(with: frames, timePerFrame: 0.12)))
+            // Start each runner on a different frame of the cycle.
+            let start = (index * 5) % frames.count
+            let cycle = Array(frames[start...] + frames[..<start])
+            node.texture = cycle[0]
+            node.run(.repeatForever(.animate(with: cycle, timePerFrame: timePerFrame)))
         }
         let slot = Crowd.slot(index)
         let member = Member(node: node,
@@ -115,7 +131,7 @@ final class Crowd {
             let scale = Projection.scale(z)
             member.node.position = Projection.point(x: member.x, z: z)
             member.node.zPosition = 100 - z
-            member.node.xScale = scale
+            member.node.xScale = scale * facing
             member.node.yScale = scale * (1 + wobble * CGFloat(sin(time * 16 + Double(member.phase))))
         }
     }
