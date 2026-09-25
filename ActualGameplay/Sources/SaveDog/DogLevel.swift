@@ -1,7 +1,7 @@
 import CoreGraphics
 import Foundation
 
-/// A Save the Dog level. Draw a shield, then bees swarm the dog for `duration` seconds.
+/// A Save the Clawd level. Draw a shield, then bees swarm him for `duration` seconds.
 /// Canvas coordinates (402 x 874, origin bottom-left).
 struct DogLevel: Decodable {
     struct Dog: Decodable {

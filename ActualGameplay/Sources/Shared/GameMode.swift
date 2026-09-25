@@ -10,7 +10,7 @@ enum GameMode: String, CaseIterable, Identifiable, Codable {
 
     var title: String {
         switch self {
-        case .saveDog: return "Save the Dog"
+        case .saveDog: return "Save the Clawd"
         case .pinPull: return "Pull the Pin"
         case .runner: return "Crowd Run"
         }

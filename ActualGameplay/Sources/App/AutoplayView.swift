@@ -66,6 +66,8 @@ final class AutoplayRunner: ObservableObject {
     private var timer: Timer?
     private var phaseWatch: AnyCancellable?
     private var completed = false
+    private var filmTimer: Timer?
+    private var frame = 0
 
     var count: Int { trials.count }
     var passedCount: Int { entries.filter(\.passed).count }
@@ -119,6 +121,18 @@ final class AutoplayRunner: ObservableObject {
         timer = Timer.scheduledTimer(withTimeInterval: timeout, repeats: false) { [weak self] _ in
             self?.complete(scene: scene, trial: trial, position: position, phase: nil)
         }
+        if LaunchArguments.film {
+            frame = 0
+            filmTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+                guard let self, let image = scene.snapshot() else { return }
+                self.save(image, name: "\(self.mode.rawValue)-\(AutoplayRunner.safe(trial.id))-f\(String(format: "%02d", self.frame)).png")
+                self.frame += 1
+            }
+        }
+    }
+
+    static func safe(_ id: String) -> String {
+        String(id.map { $0.isLetter || $0.isNumber || $0 == "-" || $0 == "." ? $0 : "_" })
     }
 
     /// Apply a trial's variation, or fall back to the stored solution.
@@ -149,6 +163,8 @@ final class AutoplayRunner: ObservableObject {
         completed = true
         timer?.invalidate()
         timer = nil
+        filmTimer?.invalidate()
+        filmTimer = nil
         phaseWatch = nil
         let seconds = Date().timeIntervalSince(startedAt)
         var outcome = "timeout"
@@ -167,8 +183,7 @@ final class AutoplayRunner: ObservableObject {
             detail = "level has no stored solution"
         }
         if let image = scene.snapshot() {
-            let safe = trial.id.map { $0.isLetter || $0.isNumber || $0 == "-" || $0 == "." ? $0 : "_" }
-            save(image, name: "\(mode.rawValue)-\(String(safe)).png")
+            save(image, name: "\(mode.rawValue)-\(AutoplayRunner.safe(trial.id)).png")
         }
         entries.append(Entry(id: trial.id, name: scene.levelName, outcome: outcome,
                              seconds: (seconds * 100).rounded() / 100, stars: stars, detail: detail))

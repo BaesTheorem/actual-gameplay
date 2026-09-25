@@ -1,12 +1,12 @@
 # Actual Gameplay
 
-The three games that only exist in mobile ads, built for real: save-the-dog drawing puzzles,
+The three games that only exist in mobile ads, built for real: save-the-character drawing puzzles,
 pin-pull liquid puzzles, and a crowd runner with gates. No ads, no purchases, no network.
 iPhone, SwiftUI shell, SpriteKit scenes.
 
 ## The games
 
-**Save the Dog.** A dog, a limited pot of ink, and hives full of bees. Draw a shield; it
+**Save the Clawd.** Clawd, a limited pot of ink, and hives full of bees. Draw a shield; it
 falls like anything you draw; a moment later the bees stream in and hunt him for ten
 seconds. They path-find: a bee with a way in routes around walls and through any gap it
 fits through. Bees with no way in work as a crew: they pick the least secure loose part of
@@ -62,10 +62,24 @@ The audit asks the questions a replay cannot. For Pull the Pin it tries every si
 every ordered pair, and everything in order and reversed, and flags a level where a naive
 sequence wins. `scripts/audit.py pinPull --exhaustive` goes further and proves the harder
 claim: it plays every ordered pull sequence up to par, pruning any that already won or
-already died, and reports each level as UNIQUE or lists the other orders that win. For Save the Dog it replays the solution shifted and scaled eight ways and tries five
-naive strokes (a bar over the dog, walls beside him, a roof), and flags levels that are
+already died, and reports each level as UNIQUE or lists the other orders that win. For Save the Clawd it replays the solution shifted and scaled eight ways and tries five
+naive strokes (a bar over him, walls beside him, a roof), and flags levels that are
 fragile (the wobbled solution loses) or trivial (a naive stroke wins). For Crowd Run it compares greedy steering against never
 steering, always-left, and random. Both write per-trial snapshots under `build/`.
+
+Three more tools sit beside them, for designing rather than checking:
+
+    scripts/preview.py pinPull|saveDog [NN ...]   draw a level file as an annotated picture, no simulator
+    scripts/replay.py saveDog --film              save a frame every half second and tile each run into a strip
+    scripts/audit.py saveDog --random 16          add sixteen plausible random strokes per level; report the share that win
+
+The preview draws the geometry with the things that decide whether a level works: where each
+pool falls once its pin goes and onto what, how far the gem sits from lava on the same shelf and
+whether a divider stands between them, where a stored stroke rests on something solid, how much
+ink it spends against the star lines, and which openings at his height a bee could fit through.
+The film turns a replay into a contact sheet of the run so a failure can be read as a sequence
+instead of guessed from its last frame. The random strokes give a level a difficulty number: a
+level a quarter of them beat is easy, whatever its stored solution looks like.
 
 Both scripts show the simulator window and wait for it to finish booting, then warm it up
 with a throwaway launch. A simulator with no visible window has its display link throttled
@@ -89,11 +103,11 @@ screens so a stored solution behaves the same everywhere. A Pull the Pin level c
 only), `decor`, and the actors it needs for its `winWhen`. Two rules matter when placing
 liquid: a pool spreads until something stops it, so give every pool a wall at each end, and
 keep lava out of the gem's compartment, since they are meant to meet on the floor after the
-pin goes, not on the shelf beforehand. A Save the Dog level can carry
+pin goes, not on the shelf beforehand. A Save the Clawd level can carry
 `statics` (rect, circle, chain, with a terrain `skin`), `killers` (spike strips), `saws`
 (they cut strokes), `props` (a ball or box the physics can move), `decor` (sprites with no
 body), `forbidden` (no-ink zones), one or more `dogs`, and `hives` with a count, an
-interval, and a delay. Store the solving strokes (Save the Dog) or the pull order (Pull the Pin) as `solution`,
+interval, and a delay. Store the solving strokes (Save the Clawd) or the pull order (Pull the Pin) as `solution`,
 then run the replay and the audit. The retired ball-physics levels the draw mode started
 with are kept under `attic/` for reference.
 
@@ -102,7 +116,7 @@ with are kept under `attic/` for reference.
 The art is painted: flat watercolour washes and ink outlines on paper, drawn with the
 [Claude Animation Base](https://github.com/JohnHeibel/ClaudeAnimationBase) kit (p5.js and
 p5.brush, MIT) through the fork at `~/Documents/claude-animation`. Clawd, the Claude Code
-mascot, plays the lead in all three games: the dog in Save the Dog, a miner in a hard hat in
+mascot, plays the lead in all three games: the one to protect in Save the Clawd, a miner in a hard hat in
 Pull the Pin, and every runner in Crowd Run, against a violet rival crowd and a boss with its
 lid blown open.
 
@@ -122,12 +136,23 @@ come from the kit's palette. Titles, HUD numbers and button labels are set in Pe
 (Font Diner, Apache 2.0), body text in the rounded system font, and icons in Material Symbols
 Sharp. Credits for all of it are in `Art/CREDITS.txt`.
 
-## Music
+## Music and sound
 
 Kevin MacLeod (incompetech.com), licensed under Creative Commons: By Attribution 4.0
 (http://creativecommons.org/licenses/by/4.0/). Tracks: "Wallpaper", "Pixelland",
 "Investigations", "Digital Lemonade". Per-track credits are in `ActualGameplay/Audio/CREDITS.txt`
 and in the app's settings screen. Launch with `--silent` to keep automation quiet.
+
+The effects in `ActualGameplay/Audio/sfx/` are Kenney's Impact, Interface, Digital and RPG audio
+packs (CC0), the organic pack of Romain Simon's [UI SFX](https://github.com/romainsimon/uisfx) for
+the menus (CC0), and six sounds generated for the game: the bee buzz, the pen scratch and the saw
+whir (loops), and the splash, the sizzle and the bees' heave. `tools/sfx/make_synth.py` rebuilds them: on
+its own it regenerates the generated ones, and with `--fetch` it downloads the packs and redoes the
+picks. `Sources/Shared/Audio.swift` maps each `SoundEvent` to its files and volume; the files are
+matched for loudness, so those volumes are the mix. Effects have their own switch in Settings, and
+`--silent` mutes them along with the music. Everything in `Audio/` ships in the app, the script
+included, so keep scratch files (a `__pycache__`, say) out of it. `CREDITS.txt` lists every file and
+where it came from.
 
 ## Layout
 
@@ -135,7 +160,7 @@ and in the app's settings screen. Launch with `--silent` to keep automation quie
 - `ActualGameplay/Sources/Shared`: scene base class, session contract, progress store, replay protocol.
 - `ActualGameplay/Sources/{SaveDog,PinPull,Runner}`: one folder per mode.
 - `ActualGameplay/Levels/<mode>/NN.json`: hand-authored levels, copied into the bundle as a folder.
-- `ActualGameplay/Audio/`: the soundtrack and its credits, also copied as a folder.
+- `ActualGameplay/Audio/`: the soundtrack, the effects in `sfx/` and the script that makes them, and their credits, also copied as a folder.
 - `ActualGameplay/Art/`: Kenney sprites and their credits, also copied as a folder.
 - `ActualGameplayTests/`: geometry, stroke bodies, level invariants, generator determinism and survivability, progress round trips.
 - `scripts/gen-icons.py`: regenerates the Material Symbols glyph enum.

@@ -11,6 +11,7 @@ trials per level and reports the ones that look trivial (a naive move wins), fra
     scripts/audit.py runner             greedy, straight, always-left, and random steering
     scripts/audit.py <mode> --no-build  reuse the last simulator build
     scripts/audit.py <mode> --only 05,07
+    scripts/audit.py saveDog --random 20     add twenty plausible random strokes per level; prints the share that win
     scripts/audit.py pinPull --exhaustive   every pull sequence up to par, pruned at deaths; UNIQUE or the other winners
 
 Writes build/audit/<mode>.json (raw) and prints the verdicts. The plan is generated
@@ -21,6 +22,7 @@ from __future__ import annotations
 
 import itertools
 import json
+import math
 import pathlib
 import shutil
 import sys
@@ -95,7 +97,52 @@ def draw_trials(levels: list[dict], only: set[str] | None) -> list[dict]:
             }
             for name, stroke in dumb.items():
                 trials.append({"id": f"{lid}/dumb:{name}", "level": index, "strokes": [stroke]})
+        for k, stroke in enumerate(random_strokes(level, RANDOM_N)):
+            trials.append({"id": f"{lid}/random:{k:02d}", "level": index, "strokes": [stroke]})
     return trials
+
+
+RANDOM_N = 0   # set by --random N: that many plausible random strokes per level, for a difficulty number
+
+
+def random_strokes(level: dict, n: int, seed: int = 7) -> list[list[list[float]]]:
+    """Plausible strokes a player might try: lines and arcs near him, within the ink budget.
+
+    The point is a difficulty number, not a solver. A level where a quarter of these win is easy;
+    one where none do is a puzzle that needs the idea, not a lucky scribble.
+    """
+    import random
+    rng = random.Random(seed * 1000 + int(level["id"]))
+    dogs = level.get("dogs") or []
+    if not dogs:
+        return []
+    x, y = dogs[0]["x"], dogs[0]["y"]
+    budget = level.get("inkBudget", 200)
+    out = []
+    for _ in range(n):
+        kind = rng.choice(("bar", "bar", "arc", "arc", "arc", "wall", "l", "tent"))
+        length = rng.uniform(0.45, 0.95) * budget
+        cx = x + rng.uniform(-40, 40)
+        top = min(y + rng.uniform(25, 90), 760)
+        if kind == "bar":
+            pts = [[cx - length / 2, top], [cx + length / 2, top]]
+        elif kind == "arc":
+            r = min(length / math.pi, 140)
+            lift = rng.uniform(0, 30)
+            pts = [[cx + r * math.cos(a), y - 10 + lift + r * math.sin(a)] for a in [math.pi * i / 10 for i in range(11)]]
+        elif kind == "wall":
+            side = rng.choice((-1, 1))
+            pts = [[cx + side * rng.uniform(28, 60), y - 14], [cx + side * rng.uniform(28, 60), y - 14 + min(length, 140)]]
+        elif kind == "l":
+            side = rng.choice((-1, 1))
+            h = min(length * 0.45, 120)
+            pts = [[cx - side * length * 0.35, top], [cx + side * 30, top], [cx + side * 30, top - h]]
+        else:
+            half = min(length / 2.3, 120)
+            pts = [[cx - half, y - 12], [cx, y - 12 + half * 0.9], [cx + half, y - 12]]
+        pts = [[round(min(max(px, 8), 394), 1), round(min(max(py, 40), 800), 1)] for px, py in pts]
+        out.append(pts)
+    return out
 
 
 def runner_trials(only: set[str] | None) -> list[dict]:
@@ -162,13 +209,18 @@ def verdicts(mode: str, entries: list[dict], levels: list[dict] | None = None) -
                     flags.append(f"FRAGILE: only {len(jit & won)}/{len(jit)} perturbed solutions win")
             if dumb & won:
                 flags.append(f"TRIVIAL: dumb stroke wins ({', '.join(sorted(n[5:] for n in dumb & won))})")
+            rnd = {n for n in trials if n.startswith("random:")}
+            if rnd:
+                share = len(rnd & won) / len(rnd)
+                flags.append(f"random strokes win {len(rnd & won)}/{len(rnd)}" + (" EASY" if share >= 0.25 else ""))
         elif mode == "runner":
             if "policy:greedy" not in won:
                 flags.append("BROKEN: greedy autopilot loses")
             lazy = {n for n in ("policy:straight", "policy:left", "policy:random") if n in won}
             if len(lazy) >= 2:
                 flags.append(f"TRIVIAL: lazy steering wins ({', '.join(sorted(lazy))})")
-        status = "ok" if not flags else "; ".join(flags)
+        status = "ok" if not [f for f in flags if not f.startswith("random strokes")] else "; ".join(flags)
+        if flags and status == "ok": status = "ok; " + "; ".join(flags)
         detail = " ".join(f"{n}={'W' if e['outcome'] == 'won' else 'x'}" for n, e in sorted(trials.items()))
         lines.append(f"{lid}  {status}\n      {detail}")
     return lines
@@ -280,9 +332,12 @@ def exhaustive_pins(levels: list[dict], only: set[str] | None) -> tuple[list[dic
 
 def main() -> None:
     args = sys.argv[1:]
-    positional = [a for i, a in enumerate(args) if not a.startswith("--") and (i == 0 or args[i - 1] != "--only")]
+    positional = [a for i, a in enumerate(args) if not a.startswith("--") and (i == 0 or args[i - 1] not in ("--only", "--random"))]
     mode = positional[0] if positional else "pinPull"
     only = set(args[args.index("--only") + 1].split(",")) if "--only" in args else None
+    global RANDOM_N
+    if "--random" in args:
+        RANDOM_N = int(args[args.index("--random") + 1])
     if mode == "pinPull" and "--exhaustive" in args:
         levels = load_levels("pinpull")
         _SIM_READY["udid"] = None

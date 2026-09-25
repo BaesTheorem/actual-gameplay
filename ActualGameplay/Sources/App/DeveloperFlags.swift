@@ -32,6 +32,8 @@ enum LaunchArguments {
     }
     /// Run the trial plan the audit script wrote into the app's container.
     static var audit: GameMode? { value(after: "--audit").flatMap(GameMode.init(rawValue:)) }
+    /// With --autoplay or --audit, save a snapshot of every trial twice a second, for strips.
+    static var film: Bool { CommandLine.arguments.contains("--film") }
     /// With --autoplay, only these level ids (comma separated), e.g. `--only 04,07`.
     static var only: Set<String>? { value(after: "--only").map { Set($0.split(separator: ",").map(String.init)) } }
 

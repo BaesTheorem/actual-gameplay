@@ -9,6 +9,7 @@ Exits nonzero if any level did not end in a win.
     scripts/replay.py saveDog             build, install, run
     scripts/replay.py saveDog --no-build  reuse the last simulator build
     scripts/replay.py saveDog --only 04,07   just those level ids
+    scripts/replay.py saveDog --film         also save a frame every half second and tile each level into build/replay/film-<id>.jpg
 """
 from __future__ import annotations
 
@@ -81,6 +82,28 @@ def install(udid: str) -> pathlib.Path:
     return pathlib.Path(run(["xcrun", "simctl", "get_app_container", udid, BUNDLE, "data"]).stdout.strip())
 
 
+def tile_films(out_dir: pathlib.Path, mode: str) -> None:
+    """Every trial filmed with --film becomes one strip: its half-second frames left to right, six per row."""
+    from PIL import Image
+    frames: dict[str, list[pathlib.Path]] = {}
+    for png in sorted(out_dir.glob(f"{mode}-*-f[0-9][0-9].png")):
+        frames.setdefault(png.name[:-8], []).append(png)
+    for trial, files in frames.items():
+        ims = [Image.open(f) for f in files]
+        w, h = ims[0].size
+        tw, th = 300, int(300 * h / w)
+        cols = min(6, len(ims))
+        rows = -(-len(ims) // cols)
+        strip = Image.new("RGB", (cols * (tw + 4), rows * (th + 18)), (60, 55, 65))
+        for i, im in enumerate(ims):
+            x, y = (i % cols) * (tw + 4), (i // cols) * (th + 18)
+            strip.paste(im.convert("RGB").resize((tw, th)), (x, y))
+        strip.save(out_dir / f"film-{trial}.jpg", quality=85)
+        for f in files:
+            f.unlink()
+        print(f"  film-{trial}.jpg  ({len(ims)} frames, 0.5 s apart)")
+
+
 def main() -> None:
     args = sys.argv[1:]
     positional = [a for i, a in enumerate(args) if not a.startswith("--") and (i == 0 or args[i - 1] != "--only")]
@@ -101,6 +124,8 @@ def main() -> None:
     launch = ["xcrun", "simctl", "launch", udid, BUNDLE, "--autoplay", mode, "--silent"]
     if "--only" in args:
         launch += ["--only", args[args.index("--only") + 1]]
+    if "--film" in args:
+        launch.append("--film")
     result = run(launch)
     if result.returncode:
         raise SystemExit(result.stderr)
@@ -117,6 +142,8 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     for png in results_dir.glob("*.png"):
         shutil.copy(png, out_dir / png.name)
+    if "--film" in args:
+        tile_films(out_dir, mode)
     failed = 0
     print(f"{'id':>3}  {'name':<16} {'outcome':<8} {'time':>6}  stars  detail")
     for entry in entries:
