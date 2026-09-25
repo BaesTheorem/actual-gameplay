@@ -95,7 +95,10 @@ struct LevelTile: View {
     let action: () -> Void
 
     var body: some View {
-        Button(action: action) {
+        Button(action: {
+            Audio.play(.select)
+            action()
+        }) {
             VStack(spacing: 2) {
                 if locked {
                     MSIcon(.lock, size: 26)

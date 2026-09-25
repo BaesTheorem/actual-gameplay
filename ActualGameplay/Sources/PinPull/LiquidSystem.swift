@@ -49,6 +49,11 @@ final class LiquidSystem {
     let layer = SKNode()
     private(set) var particles: [SKSpriteNode] = []
     private var surfaces: [LiquidKind: SKEffectNode] = [:]
+    /// Water particles that were falling fast and stopped short in the last step: water landing on
+    /// something. For the splash sound; nothing in the simulation reads it.
+    private(set) var waterLandings = 0
+    /// Each particle's speed at the last step, index for index with `particles`.
+    private var lastSpeeds: [CGFloat] = []
 
     /// A white disc whose alpha falls off as (1 - (d/R)^2)^2, peaking at 0.75. The shader's cut at
     /// 0.5 shows a lone particle at about 0.43 R and merges neighbours whose falloffs overlap.
@@ -157,6 +162,8 @@ final class LiquidSystem {
     func removeAll() {
         for surface in surfaces.values { surface.removeAllChildren() }
         particles.removeAll()
+        lastSpeeds.removeAll()
+        waterLandings = 0
     }
 
     /// Clamp speeds, drop removed particles from the list, and report the fastest one.
@@ -164,12 +171,20 @@ final class LiquidSystem {
     func step() -> CGFloat {
         var fastest: CGFloat = 0
         var compact = false
-        for particle in particles {
+        let tracked = lastSpeeds.count == particles.count
+        if !tracked { lastSpeeds = Array(repeating: 0, count: particles.count) }
+        waterLandings = 0
+        for (i, particle) in particles.enumerated() {
             guard particle.parent != nil, let body = particle.physicsBody else {
                 compact = true
                 continue
             }
             let speed = Physics.speed(body)
+            // 200 pt/s is a fall of about 20 pt; losing most of it in one step is an impact.
+            if tracked, body.categoryBitMask == PinCategory.water, lastSpeeds[i] > 200, speed < lastSpeeds[i] * 0.4 {
+                waterLandings += 1
+            }
+            lastSpeeds[i] = speed
             if speed > LiquidSystem.maxSpeed {
                 Physics.clamp(body, to: LiquidSystem.maxSpeed)
                 fastest = max(fastest, LiquidSystem.maxSpeed)
@@ -177,7 +192,11 @@ final class LiquidSystem {
                 fastest = speed
             }
         }
-        if compact { particles.removeAll { $0.parent == nil } }
+        if compact {
+            let kept = particles.indices.filter { particles[$0].parent != nil }
+            lastSpeeds = kept.map { lastSpeeds[$0] }
+            particles = kept.map { particles[$0] }
+        }
         return fastest
     }
 }

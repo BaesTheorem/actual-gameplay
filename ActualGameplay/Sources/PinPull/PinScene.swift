@@ -36,6 +36,9 @@ final class PinScene: GameSceneBase, ReplayableScene {
     private var replayQueue: [String] = []
     private var lastHUD = ""
     private var steamBudget = 0
+    /// A pull can let water fall; the first water to land after it splashes.
+    private var splashArmed = false
+    private var lastSizzle: TimeInterval = -10
 
     init(level: PinLevel, index: Int) {
         self.level = level
@@ -67,6 +70,8 @@ final class PinScene: GameSceneBase, ReplayableScene {
         calmFrames = 0
         lastPullTime = -10
         lastHUD = ""
+        splashArmed = false
+        lastSizzle = -10
         hero = nil
         treasure = nil
         liquid.removeAll()
@@ -263,6 +268,7 @@ final class PinScene: GameSceneBase, ReplayableScene {
         calmFrames = 0
         Haptics.shared.thud()
         Audio.play(.pinPull)
+        splashArmed = true
         pushHUD()
         return true
     }
@@ -273,6 +279,11 @@ final class PinScene: GameSceneBase, ReplayableScene {
         elapsed += dt
         steamBudget = 6
         var fastest = liquid.step()
+        // A few particles, not one stray drop.
+        if splashArmed, liquid.waterLandings >= 3 {
+            splashArmed = false
+            Audio.play(.splash)
+        }
         for node in [hero as SKNode?, treasure as SKNode?].compactMap({ $0 }) {
             if let body = node.physicsBody { fastest = max(fastest, Physics.speed(body)) }
         }
@@ -325,9 +336,9 @@ final class PinScene: GameSceneBase, ReplayableScene {
             } else if event.matches(PinCategory.hero, PinCategory.goal) {
                 latched.insert("heroGoal")
             } else if event.matches(PinCategory.treasure, PinCategory.hero) {
-                latched.insert("treasureHero")
+                if latched.insert("treasureHero").inserted { Audio.play(.gemLand) }
             } else if event.matches(PinCategory.treasure, PinCategory.goal) {
-                latched.insert("treasureGoal")
+                if latched.insert("treasureGoal").inserted { Audio.play(.gemLand) }
             }
         }
         if heroBurned {
@@ -347,6 +358,11 @@ final class PinScene: GameSceneBase, ReplayableScene {
         let mid = CGPoint(x: (water.position.x + lava.position.x) / 2, y: (water.position.y + lava.position.y) / 2)
         liquid.remove(water)
         liquid.remove(lava)
+        // Water meeting lava hisses, and again every 0.8 s for as long as the reaction lasts.
+        if elapsed - lastSizzle > 0.8 {
+            lastSizzle = elapsed
+            Audio.play(.sizzle)
+        }
         if steamBudget > 0 {
             steamBudget -= 1
             puff(at: mid)
@@ -382,7 +398,7 @@ final class PinScene: GameSceneBase, ReplayableScene {
         guard let treasure, !dying else { return }
         dying = true
         Haptics.shared.slam()
-        Audio.play(.sizzle)
+        Audio.play(.melt)
         treasure.run(.sequence([
             .group([.colorize(with: Pigment.clay, colorBlendFactor: 0.8, duration: 0.2),
                     .scale(to: 0.3, duration: Motion.decorative(0.5)), .fadeOut(withDuration: Motion.decorative(0.5))]),
@@ -394,6 +410,7 @@ final class PinScene: GameSceneBase, ReplayableScene {
         guard let hero, !dying else { return }
         dying = true
         Haptics.shared.slam()
+        Audio.play(.cooked)
         Audio.play(.sizzle)
         hero.die { [weak self] in self?.lose("The hero got cooked.") }
     }

@@ -114,7 +114,7 @@ struct UpgradeRow: View {
                 .frame(width: 84, height: 40)
                 .background(PaintedFrame(affordable ? "ui_button_clay" : "ui_button_paper"))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PlainTapButtonStyle(sound: .purchase))
             .disabled(!affordable)
         }
         .padding(.horizontal, 14)

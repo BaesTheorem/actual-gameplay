@@ -1,7 +1,7 @@
 import SpriteKit
 import UIKit
 
-/// Save the Dog: draw a shield, then the bees come. Survive the swarm and the dog is safe.
+/// Save the Clawd: draw a shield, then the bees come. Survive the swarm and he is safe.
 final class DogScene: StrokeScene, ReplayableScene {
     let level: DogLevel
     let levelIndex: Int
@@ -30,6 +30,7 @@ final class DogScene: StrokeScene, ReplayableScene {
     private var launchedAt: TimeInterval?
     private var lastHUD = ""
     private var routeOpen = false
+    private var wasShoving = false
 
     init(level: DogLevel, index: Int) {
         self.level = level
@@ -48,6 +49,7 @@ final class DogScene: StrokeScene, ReplayableScene {
         launchAt = nil
         launchedAt = nil
         lastHUD = ""
+        wasShoving = false
         physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
 
         addBackdrop()
@@ -120,6 +122,7 @@ final class DogScene: StrokeScene, ReplayableScene {
     override func tick(dt: TimeInterval) {
         super.tick(dt: dt)
         guard !finished else { return }
+        if !(level.saws ?? []).isEmpty { Audio.startLoop(.saw) }
         if let at = launchAt, launchedAt == nil, elapsed >= at { release() }
         if let started = launchedAt {
             let now = elapsed - started
@@ -130,6 +133,7 @@ final class DogScene: StrokeScene, ReplayableScene {
                 fieldCountdown = 0.4
             }
             swarm.update(dt: dt, now: now, targets: targets, field: field)
+            updateSwarmSound()
             if now >= level.surviveSeconds {
                 win()
                 return
@@ -152,6 +156,15 @@ final class DogScene: StrokeScene, ReplayableScene {
         swarm.survey(scene: self, dogs: dogs.map(\.position), field: field)
     }
 
+    /// The buzz grows with the swarm, as the square root of the bees out (a dozen is full), and a
+    /// shove that is really pushing on something gets a whoosh as it starts: a crew heave, or the
+    /// stuck bees' beat when nothing has a way in.
+    private func updateSwarmSound() {
+        Audio.startLoop(.buzz, volume: Float(min(1, (Double(swarm.alive) / 12).squareRoot())))
+        if swarm.shoving, !wasShoving, swarm.crew.active || !routeOpen { Audio.play(.heave) }
+        wasShoving = swarm.shoving
+    }
+
     private func release() {
         launchedAt = elapsed
         rebuildField()
@@ -161,21 +174,23 @@ final class DogScene: StrokeScene, ReplayableScene {
             child.run(.fadeAlpha(to: 0.35, duration: 0.3))
         }
         Haptics.shared.slam()
-        Audio.play(.pop)
     }
 
     override func handle(contacts: [ContactEvent]) {
         guard !finished else { return }
+        super.handle(contacts: contacts)
         for event in contacts {
             if let (stroke, killer) = event.pair(StrokeCategory.drawn, StrokeCategory.killer), killer.name == "saw" {
                 cut(stroke, at: event.contact.contactPoint)
                 continue
             }
             if let (dog, _) = event.pair(StrokeCategory.actor, StrokeCategory.bee), let node = dog as? DogNode {
+                Audio.play(.caught)
                 lose("The bees got \(node.dogID).")
                 return
             }
             if let (dog, killer) = event.pair(StrokeCategory.actor, StrokeCategory.killer), let node = dog as? DogNode {
+                Audio.play(.caught)
                 lose(killer.name == "saw" ? "\(node.dogID.capitalized) met the saw." : "\(node.dogID.capitalized) landed on the spikes.")
                 return
             }
@@ -199,6 +214,7 @@ final class DogScene: StrokeScene, ReplayableScene {
             chip.run(.sequence([.group([.moveBy(x: dx, y: dy, duration: 0.35), .fadeOut(withDuration: 0.35)]), .removeFromParent()]))
         }
         Haptics.shared.thud()
+        Audio.play(.strokeCut)
         fieldCountdown = 0
     }
 

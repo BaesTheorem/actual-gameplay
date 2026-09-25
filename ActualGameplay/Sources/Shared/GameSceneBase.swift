@@ -46,6 +46,7 @@ class GameSceneBase: SKScene, SKPhysicsContactDelegate {
     func afterPhysics() {}
 
     func resetLevel() {
+        Audio.stopAllLoops()
         removeAllActions()
         removeAllChildren()
         physicsWorld.removeAllJoints()
@@ -55,6 +56,11 @@ class GameSceneBase: SKScene, SKPhysicsContactDelegate {
         lastTime = nil
         isPaused = false
         buildLevel()
+    }
+
+    override func willMove(from view: SKView) {
+        super.willMove(from: view)
+        Audio.stopAllLoops()
     }
 
     override func update(_ currentTime: TimeInterval) {
@@ -125,10 +131,11 @@ class GameSceneBase: SKScene, SKPhysicsContactDelegate {
         return UIImage(cgImage: texture.cgImage())
     }
 
-    /// Report the outcome once. Later calls in the same attempt are ignored.
+    /// Report the outcome once. Later calls in the same attempt are ignored. The loops end with the level.
     func finish(_ outcome: GamePhase) {
         guard !finished else { return }
         finished = true
+        Audio.stopAllLoops()
         DispatchQueue.main.async { [weak self] in self?.session?.finish(outcome) }
     }
 }

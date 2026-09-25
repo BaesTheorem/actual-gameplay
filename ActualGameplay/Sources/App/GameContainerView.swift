@@ -39,6 +39,7 @@ struct GameContainerView: View {
         .statusBarHidden(true)
         .defersSystemGestures(on: .bottom)
         .onAppear { MusicPlayer.shared.play(session.mode.track) }
+        .onDisappear { Audio.stopAllLoops() }
         .onChange(of: scenePhase) { _, phase in
             session.setPaused(phase != .active)
         }

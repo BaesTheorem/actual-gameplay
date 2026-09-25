@@ -38,6 +38,16 @@ final class GameSession: ObservableObject {
         scene.session = self
     }
 
+    /// The session owns the scene, so when it goes the scene is done: stop any loop it left running. This
+    /// covers autoplay, which shows scenes without a GameContainerView.
+    deinit {
+        if Thread.isMainThread {
+            Audio.stopAllLoops()
+        } else {
+            DispatchQueue.main.async { Audio.stopAllLoops() }
+        }
+    }
+
     /// Called by the scene, once per attempt. Ignored unless the game is still in play.
     func finish(_ outcome: GamePhase) {
         guard case .playing = phase else { return }

@@ -21,6 +21,8 @@ struct SettingsView: View {
                         Toggle(isOn: hapticsBinding) { Text("Haptics").font(Theme.label(17)) }
                         HairlineDivider()
                         Toggle(isOn: musicBinding) { Text("Music").font(Theme.label(17)) }
+                        HairlineDivider()
+                        Toggle(isOn: soundBinding) { Text("Sound effects").font(Theme.label(17)) }
                     }
                     .tint(Theme.sap)
                     .padding(16)
@@ -50,7 +52,7 @@ struct SettingsView: View {
                     .padding(16)
                     .paintedCard()
                     HStack(spacing: 10) {
-                        Button("Auto-play Save the Dog") { autoplayMode = .saveDog }
+                        Button("Auto-play Save the Clawd") { autoplayMode = .saveDog }
                             .buttonStyle(OutlinedButtonStyle())
                         Button("Auto-play Pull the Pin") { autoplayMode = .pinPull }
                             .buttonStyle(OutlinedButtonStyle())
@@ -71,7 +73,10 @@ struct SettingsView: View {
             }
         }
         .confirmationDialog("Reset all progress?", isPresented: $confirmReset, titleVisibility: .visible) {
-            Button("Reset everything", role: .destructive) { store.resetAll() }
+            Button("Reset everything", role: .destructive) {
+                store.resetAll()
+                applySettings()
+            }
         }
         .fullScreenCover(item: $autoplayMode) { mode in
             AutoplayView(mode: mode)
@@ -84,6 +89,19 @@ struct SettingsView: View {
             set: { value in
                 store.update { $0.settings.music = value }
                 MusicPlayer.shared.enabled = value && !LaunchArguments.silent
+                Audio.play(value ? .toggleOn : .toggleOff)
+            }
+        )
+    }
+
+    /// Effects switch before the toggle sound plays, so switching them on is heard and switching them off is not.
+    private var soundBinding: Binding<Bool> {
+        Binding(
+            get: { store.progress.settings.sound },
+            set: { value in
+                store.update { $0.settings.sound = value }
+                Audio.enabled = value && !LaunchArguments.silent
+                Audio.play(value ? .toggleOn : .toggleOff)
             }
         )
     }
@@ -94,7 +112,16 @@ struct SettingsView: View {
             set: { value in
                 store.update { $0.settings.haptics = value }
                 Haptics.shared.enabled = value
+                Audio.play(value ? .toggleOn : .toggleOff)
             }
         )
+    }
+
+    /// Hand the stored settings to the players, as launch does. A reset turns all three back on.
+    private func applySettings() {
+        let settings = store.progress.settings
+        Haptics.shared.enabled = settings.haptics
+        MusicPlayer.shared.enabled = settings.music && !LaunchArguments.silent
+        Audio.enabled = settings.sound && !LaunchArguments.silent
     }
 }

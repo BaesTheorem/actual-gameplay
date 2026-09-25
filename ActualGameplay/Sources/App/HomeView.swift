@@ -105,6 +105,6 @@ struct ModeCard: View {
             .padding(14)
             .paintedCard()
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PlainTapButtonStyle())
     }
 }

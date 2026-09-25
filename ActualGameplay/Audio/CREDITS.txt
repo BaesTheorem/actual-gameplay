@@ -15,3 +15,55 @@ http://creativecommons.org/licenses/by/4.0/
 "Digital Lemonade" Kevin MacLeod (incompetech.com)
 Licensed under Creative Commons: By Attribution 4.0 License
 http://creativecommons.org/licenses/by/4.0/
+
+
+Sound effects in Actual Gameplay (sfx/)
+
+None of these require attribution; it is given anyway. tools/sfx/make_synth.py rebuilds the whole set:
+with no arguments it regenerates the synthesized sounds, and with --fetch it also downloads the
+packs below and redoes the picks.
+
+Kenney (kenney.nl), released under Creative Commons Zero (CC0):
+http://creativecommons.org/publicdomain/zero/1.0/
+Each pick is trimmed, faded, matched for loudness, and saved as 16-bit 44.1 kHz mono WAV.
+  Impact Sounds
+    ink_land_1.wav        impactWood_light_000
+    ink_land_2.wav        impactWood_light_002
+    ink_land_3.wav        impactWood_light_004
+    gem_clink.wav         impactGlass_light_001
+    cooked.wav            impactSoft_heavy_002
+    hit_1.wav             impactPunch_medium_000
+    hit_2.wav             impactPunch_medium_001
+    hit_3.wav             impactPunch_medium_003
+    boss.wav              impactBell_heavy_001
+  Interface Sounds
+    caught.wav            error_001
+    pop_1.wav             drop_002
+    pop_2.wav             drop_003
+    win.wav               confirmation_004
+  Digital Audio
+    gate_good.wav         pepSound3
+    gate_bad.wav          pepSound1
+    lose.wav              phaserDown3
+  RPG Audio
+    saw_cut.wav           chop
+    pin_slide.wav         drawKnife2
+    coins.wav             handleCoins
+
+UI SFX by Romain Simon (uisfx.com, github.com/romainsimon/uisfx), npm package uisfx 0.4.0.
+Audio released under Creative Commons Zero (CC0). The organic pack, MP3s as shipped:
+    ui_press.mp3          press
+    ui_select.mp3         select
+    ui_toggle_on.mp3      toggle-on
+    ui_toggle_off.mp3     toggle-off
+    ui_purchase.mp3       purchase
+    ui_invalid_drop.mp3   invalid-drop
+
+Generated for this game by tools/sfx/make_synth.py (numpy), part of this repository and under its
+MIT license:
+    loop_buzz.wav         the swarm
+    loop_scratch.wav      the pen while ink flows
+    loop_saw.wav          a spinning saw
+    splash.wav            water landing
+    sizzle.wav            water meeting lava
+    heave.wav             the bees' shove

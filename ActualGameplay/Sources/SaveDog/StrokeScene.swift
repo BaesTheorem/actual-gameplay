@@ -42,6 +42,14 @@ class StrokeScene: GameSceneBase {
     private var replayTemplate: [(time: TimeInterval, points: [CGPoint])] = []
     private var pendingReplay: [(time: TimeInterval, points: [CGPoint])] = []
     private weak var activeTouch: UITouch?
+    /// Ink laid down since the last frame, and the pen scratch level it drives.
+    private var inkSinceTick: CGFloat = 0
+    private var scratchLevel: CGFloat = 0
+
+    /// What a falling stroke can land on. Strokes report these as contacts, for the landing sound only:
+    /// the collision mask is untouched.
+    private static let landingMask = StrokeCategory.wall | StrokeCategory.drawn | StrokeCategory.prop
+        | StrokeCategory.actor | StrokeCategory.killer
 
     var replaying: Bool { !replayTemplate.isEmpty }
     var replayDrained: Bool { pendingReplay.isEmpty }
@@ -269,25 +277,59 @@ class StrokeScene: GameSceneBase {
         guard !finished, activeTouch == nil, let touch = touches.first else { return }
         activeTouch = touch
         capture.begin(at: touch.location(in: self))
+        inkSinceTick = 0
+        scratchLevel = 0
+        if capture.isDrawing { Audio.startLoop(.scratch, volume: 0) }
     }
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = activeTouch, touches.contains(touch) else { return }
+        let before = capture.inkLeft
         capture.move(to: touch.location(in: self))
+        inkSinceTick += max(0, before - capture.inkLeft)
         pushHUD()
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = activeTouch, touches.contains(touch) else { return }
         activeTouch = nil
+        Audio.stopLoop(.scratch)
         if let raw = capture.end() { commit(raw: raw) }
     }
 
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = activeTouch, touches.contains(touch) else { return }
         activeTouch = nil
+        Audio.stopLoop(.scratch)
         capture.cancel()
         pushHUD()
+    }
+
+    /// The pen scratch follows the ink: louder the faster it flows, silent while the finger rests or the
+    /// pot is dry. About 800 pt of ink a second is full level.
+    private func updateScratch(dt: TimeInterval) {
+        guard capture.isDrawing, !finished, dt > 0 else { return }
+        let flow = min(1, inkSinceTick / CGFloat(dt) / 800).squareRoot()
+        inkSinceTick = 0
+        scratchLevel += (flow - scratchLevel) * min(1, CGFloat(dt) * 25)
+        Audio.setLoopVolume(.scratch, Float(scratchLevel))
+    }
+
+    /// A stroke's first touch on anything solid is its landing: one knock per stroke. A saw is not a
+    /// landing; it cuts the stroke, and that has its own sound.
+    override func handle(contacts: [ContactEvent]) {
+        var landed = false
+        for event in contacts {
+            for (stroke, other) in [(event.a, event.b), (event.b, event.a)] {
+                guard stroke.physicsBody?.categoryBitMask == StrokeCategory.drawn,
+                      (other.physicsBody?.categoryBitMask ?? 0) & StrokeScene.landingMask != 0,
+                      other.name != "saw",
+                      let data = stroke.userData, data["landed"] == nil else { continue }
+                data["landed"] = true
+                landed = true
+            }
+        }
+        if landed { Audio.play(.strokeLand) }
     }
 
     /// The one path every stroke takes, drawn by a finger or replayed from a level file.
@@ -313,6 +355,7 @@ class StrokeScene: GameSceneBase {
         var cost: CGFloat = 0
         for piece in pieces {
             let node = StrokeBody.makeNode(points: piece, dynamic: !pinnedInk, color: strokeColor)
+            if !pinnedInk { node.physicsBody?.contactTestBitMask |= StrokeScene.landingMask }
             addChild(node)
             cost += StrokeBody.inkCost(rawLength: Geometry.polylineLength(piece))
             committedStrokes.append(piece)
@@ -324,7 +367,8 @@ class StrokeScene: GameSceneBase {
         }
         calmFrames = 0
         Haptics.shared.tap()
-        Audio.play(.tap)
+        // Pinned ink never falls, so it lands where it is drawn.
+        if pinnedInk { Audio.play(.strokeLand) }
         strokeDidCommit()
         pushHUD()
         return true
@@ -418,6 +462,7 @@ class StrokeScene: GameSceneBase {
         addChild(label)
         label.run(.sequence([.wait(forDuration: 0.7), .fadeOut(withDuration: 0.3), .removeFromParent()]))
         Haptics.shared.thud()
+        Audio.play(.strokeRejected)
     }
 
     // MARK: - Frame
@@ -425,6 +470,7 @@ class StrokeScene: GameSceneBase {
     /// Advances time, commits due replay strokes, tracks calm. Subclasses call super first.
     override func tick(dt: TimeInterval) {
         elapsed += dt
+        updateScratch(dt: dt)
         while let next = pendingReplay.first, elapsed >= next.time {
             pendingReplay.removeFirst()
             commit(raw: next.points)

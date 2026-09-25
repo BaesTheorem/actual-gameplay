@@ -150,6 +150,7 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
     private var fighting = false
     private var fightClock: TimeInterval = 0
     private var lastHUD = ""
+    private var bossAnnounced = false
 
     init(level: Int, economy: RunnerEconomy) {
         self.level = level
@@ -172,6 +173,7 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
         fighting = false
         fightClock = 0
         lastHUD = ""
+        bossAnnounced = false
         gates = []
         obstacles = []
         stripes = []
@@ -322,10 +324,12 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
         for gate in gates where !gate.consumed && gate.pair.z - travel <= Projection.anchorZ {
             let leftSide = anchorX < 0
             let op = leftSide ? gate.pair.left : gate.pair.right
+            let before = crowd.count
             crowd.setCount(op.apply(crowd.count))
             gate.choose(leftSide: leftSide)
             if op.isGood { Haptics.shared.tap() } else { Haptics.shared.thud() }
-            Audio.play(.gate)
+            Audio.play(op.isGood ? .gateGood : .gateBad)
+            pops(crowd.count - before)
             if crowd.count == 0 {
                 lose("The gate wiped out the crowd.")
                 return
@@ -339,7 +343,8 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
             let killed = crowd.kill(inside: node.obstacle.hazard.span(at: time))
             if killed > 0 {
                 Haptics.shared.thud()
-                Audio.play(.pop)
+                Audio.play(.hit)
+                pops(killed)
             }
             if crowd.count == 0 {
                 lose("Nobody made it past the hazard.")
@@ -354,6 +359,14 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
         // The crowd hits the boss from the first tick of the fight to the last.
         bossSprite?.play("clawd_boss_hit")
         Haptics.shared.slam()
+        Audio.play(.hit)
+    }
+
+    /// A pop for each runner gained or lost, six at most, spaced so the limiter lets each one through.
+    private func pops(_ change: Int) {
+        let count = min(abs(change), 6)
+        guard count > 0 else { return }
+        run(.repeat(.sequence([.run { Audio.play(.pop) }, .wait(forDuration: 0.05)]), count: count), withKey: "pops")
     }
 
     /// Attrition: each 0.05 s both sides lose a slice of the bigger side, ours divided by strength.
@@ -375,6 +388,8 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
                 bossBar.xScale = CGFloat(enemyStrength) / CGFloat(max(1, track.finale.strength))
             }
             Haptics.shared.tap()
+            // Runners popping against a crowd; blows landing on a boss.
+            Audio.play(boss == nil ? .pop : .hit)
             if enemyStrength <= 0 && crowd.count > 0 {
                 win()
             } else if crowd.count <= 0 && enemyStrength > 0 {
@@ -397,6 +412,8 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
         let stars = share >= 0.85 ? 3 : share >= 0.5 ? 2 : 1
         Haptics.shared.success()
         Audio.play(.win)
+        // The coins land after the fanfare, as the result card shows them.
+        run(.sequence([.wait(forDuration: 0.5), .run { Audio.play(.coin) }]))
         finish(.won(stars: stars, coins: coins, score: Double(alive)))
         pushHUD()
     }
@@ -507,6 +524,10 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
             boss.setScale(s)
             boss.isHidden = z > Projection.farZ
             boss.zPosition = 100 - z
+            if !boss.isHidden, !bossAnnounced {
+                bossAnnounced = true
+                Audio.play(.bossRoar)
+            }
             if let enemyLabel {
                 enemyLabel.position = CGPoint(x: boss.position.x, y: boss.position.y + 104 * s + 6)
                 enemyLabel.text = "HP \(enemyStrength)"

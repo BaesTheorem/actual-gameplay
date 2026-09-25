@@ -83,10 +83,21 @@ struct MSIcon: View {
 
 /// A painted button: clay when filled, paper when not. `tint` is kept so call sites compile, but the paint
 /// carries the colour now; `art` swaps in another painted piece (the rose one for destructive actions).
-struct OutlinedButtonStyle: ButtonStyle {
+/// A press plays the UI tap.
+struct OutlinedButtonStyle: PrimitiveButtonStyle {
     var tint: Color = Theme.onSurface
     var filled: Bool = false
     var art: String? = nil
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.sounding(.tap).buttonStyle(OutlinedButtonFace(filled: filled, art: art))
+    }
+}
+
+/// The paint behind `OutlinedButtonStyle`, dimmed while pressed.
+private struct OutlinedButtonFace: ButtonStyle {
+    let filled: Bool
+    let art: String?
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -114,7 +125,29 @@ struct IconButton: View {
                 .frame(width: 44, height: 44)
                 .background(PaintedFrame("ui_button_paper"))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PlainTapButtonStyle())
+    }
+}
+
+/// The plain style plus a sound, for buttons that paint their own face.
+struct PlainTapButtonStyle: PrimitiveButtonStyle {
+    var sound: SoundEvent = .tap
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.sounding(sound).buttonStyle(.plain)
+    }
+}
+
+extension PrimitiveButtonStyleConfiguration {
+    /// The same button, playing `sound` as its action fires, so the sound means the press counted. Always
+    /// give the result a style of its own rather than letting it inherit the one being defined.
+    func sounding(_ sound: SoundEvent) -> Button<Label> {
+        Button(role: role) {
+            Audio.play(sound)
+            trigger()
+        } label: {
+            label
+        }
     }
 }
 
