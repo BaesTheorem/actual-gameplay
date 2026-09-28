@@ -39,6 +39,8 @@
   character('clawd_hard_ko', 8, BAR, 8 / BAR, t => ({ ...feel('ko', t), hat: 'hard' }));
   // the other crowd, and the boss
   character('clawd_foe_run', 12, 0.5, 24, run(0.5, { tint: '#6F5AA0', tintK: 0.85, eyes: 'angry', mouth: 'teeth' }));
+  character('clawd_foe_idle', 12, BAR, 12 / BAR, t => ({ ...feel('angry', t), tint: '#6F5AA0', tintK: 0.85 }));
+  character('clawd_foe_ko', 8, BAR, 8 / BAR, t => ({ ...feel('dizzy', t), tint: '#6F5AA0', tintK: 0.85 }));
   character('clawd_boss_idle', 12, 2 * BEAT, 12 / (2 * BEAT), t => ({ ...feel('furious', t), tint: '#6F5AA0', tintK: 0.5 }), 30, BOSS);
   character('clawd_boss_hit', 8, BAR, 8 / BAR, t => ({ ...feel('dizzy', t), tint: '#6F5AA0', tintK: 0.5 }), 30, BOSS);
 

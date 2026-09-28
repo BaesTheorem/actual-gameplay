@@ -82,7 +82,10 @@ final class LevelDecodingTests: XCTestCase {
             for pin in level.pins {
                 XCTAssertTrue(pin.side == "left" || pin.side == "right", "\(id): pin \(pin.id) side")
                 XCTAssertGreaterThan(pin.w, 0, "\(id): pin \(pin.id) width")
-                XCTAssertTrue(canvas.contains(CGRect(x: pin.x, y: pin.y, width: pin.w, height: 14)), "\(id): pin \(pin.id) outside the canvas")
+                XCTAssertLessThanOrEqual(abs(pin.angle ?? 0), 75, "\(id): pin \(pin.id) is tilted past 75 degrees")
+                for corner in pin.corners {
+                    XCTAssertTrue(canvas.contains(corner), "\(id): pin \(pin.id) outside the canvas")
+                }
             }
             for pool in level.pools ?? [] {
                 XCTAssertTrue(pool.liquid == "water" || pool.liquid == "lava", "\(id): pool liquid \(pool.liquid)")
@@ -96,9 +99,25 @@ final class LevelDecodingTests: XCTestCase {
                 XCTAssertTrue(canvas.contains(rect), "\(id): rect \(rect) outside the canvas")
             }
             for pin in level.pins {
-                let bar = CGRect(x: pin.x, y: pin.y, width: pin.w, height: 14).insetBy(dx: 0.5, dy: 0.5)
-                for wall in (level.walls ?? []).map(\.cgRect) where bar.intersects(wall) {
+                // The bar as the rotated rectangle it is, shrunk half a point so touching a wall is fine.
+                let quad = LevelDecodingTests.shrink(pin.corners, by: 0.5)
+                for wall in (level.walls ?? []).map(\.cgRect) where LevelDecodingTests.overlaps(quad, wall) {
                     XCTFail("\(id): pin \(pin.id) passes through a wall at \(wall)")
+                }
+            }
+            for (n, foe) in (level.actors.foes ?? []).enumerated() {
+                let spot = CGPoint(x: foe.x, y: foe.y)
+                XCTAssertTrue(canvas.contains(spot), "\(id): goblin \(n) outside the canvas")
+                if let hero = level.actors.hero {
+                    let gap = hypot(foe.x - hero.x, foe.y - hero.y) - HeroNode.radius - FoeNode.radius
+                    XCTAssertGreaterThan(gap, 2, "\(id): the hero starts touching goblin \(n)")
+                }
+                for pool in level.pools ?? [] {
+                    XCTAssertGreaterThan(LevelDecodingTests.distance(spot, pool.cgRect), FoeNode.radius,
+                                         "\(id): goblin \(n) starts in \(pool.liquid), which knocks him out before a pull")
+                }
+                for wall in (level.walls ?? []).map(\.cgRect) {
+                    XCTAssertGreaterThan(LevelDecodingTests.distance(spot, wall), FoeNode.radius - 1, "\(id): goblin \(n) starts inside a wall")
                 }
             }
 
@@ -115,5 +134,35 @@ final class LevelDecodingTests: XCTestCase {
             for pinID in solution { XCTAssertTrue(pinIDs.contains(pinID), "\(id): solution pin \(pinID) missing") }
             XCTAssertLessThanOrEqual(solution.count, level.parPins, "\(id): the stored solution should earn three stars")
         }
+    }
+
+    /// Separating axes: a convex quad and a rect overlap unless one of their edge normals splits them.
+    static func overlaps(_ quad: [CGPoint], _ rect: CGRect) -> Bool {
+        let box = [CGPoint(x: rect.minX, y: rect.minY), CGPoint(x: rect.maxX, y: rect.minY),
+                   CGPoint(x: rect.maxX, y: rect.maxY), CGPoint(x: rect.minX, y: rect.maxY)]
+        var axes = [CGPoint(x: 1, y: 0), CGPoint(x: 0, y: 1)]
+        for i in 0..<quad.count {
+            let a = quad[i], b = quad[(i + 1) % quad.count]
+            axes.append(CGPoint(x: a.y - b.y, y: b.x - a.x))
+        }
+        for axis in axes {
+            let p = quad.map { $0.x * axis.x + $0.y * axis.y }
+            let q = box.map { $0.x * axis.x + $0.y * axis.y }
+            if p.max()! <= q.min()! || q.max()! <= p.min()! { return false }
+        }
+        return true
+    }
+
+    /// Pull each corner toward the quad's centre by `inset` along both of its axes.
+    static func shrink(_ quad: [CGPoint], by inset: CGFloat) -> [CGPoint] {
+        let u = (quad[1] - quad[0]).normalized, v = (quad[3] - quad[0]).normalized
+        let signs: [(CGFloat, CGFloat)] = [(1, 1), (-1, 1), (-1, -1), (1, -1)]
+        return zip(quad, signs).map { corner, sign in corner + u * (sign.0 * inset) + v * (sign.1 * inset) }
+    }
+
+    static func distance(_ p: CGPoint, _ rect: CGRect) -> CGFloat {
+        let dx = max(rect.minX - p.x, 0, p.x - rect.maxX)
+        let dy = max(rect.minY - p.y, 0, p.y - rect.maxY)
+        return hypot(dx, dy)
     }
 }

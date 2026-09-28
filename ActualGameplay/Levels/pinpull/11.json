@@ -1,121 +1,132 @@
 {
   "id": "11",
-  "name": "The wrong way out",
-  "hint": "One tank, two ways out. The other one is a hole.",
-  "parPins": 2,
-  "winWhen": "treasureReachesHero",
+  "name": "Ride the pin",
+  "hint": "The goblin waits at the bottom of the slide, and there is nothing under its low end but the exit.",
+  "parPins": 3,
+  "winWhen": "heroReachesGoal",
   "walls": [
     {
-      "x": 194,
-      "y": 380,
+      "x": 200,
+      "y": 68,
       "w": 14,
-      "h": 106
+      "h": 386
     },
     {
-      "x": 194,
-      "y": 486,
-      "w": 66,
-      "h": 14
+      "x": 200,
+      "y": 560,
+      "w": 14,
+      "h": 154
     },
     {
-      "x": 166,
-      "y": 314,
-      "w": 14,
-      "h": 146
+      "x": 108,
+      "y": 68,
+      "w": 26,
+      "h": 80
     }
   ],
-  "drains": [
+  "slabs": [
     {
-      "x": 260,
-      "y": 440,
-      "w": 104,
-      "h": 20
+      "x1": 364,
+      "y1": 540,
+      "x2": 214,
+      "y2": 470,
+      "t": 14
     }
   ],
   "pins": [
     {
       "id": "p1",
-      "x": 260,
-      "y": 486,
-      "w": 104,
-      "side": "right"
-    },
-    {
-      "id": "p2",
       "x": 38,
-      "y": 486,
-      "w": 156,
+      "y": 600,
+      "w": 162,
       "side": "left"
     },
     {
+      "id": "p2",
+      "x": 214,
+      "y": 650,
+      "w": 150,
+      "side": "right"
+    },
+    {
       "id": "p3",
-      "x": 38,
-      "y": 300,
-      "w": 326,
+      "x": 214,
+      "y": 560,
+      "w": 150,
       "side": "right"
     },
     {
       "id": "p4",
-      "x": 38,
-      "y": 620,
-      "w": 326,
-      "side": "left"
+      "x": 82,
+      "y": 455.5,
+      "w": 120,
+      "side": "left",
+      "angle": -40.0
     },
     {
       "id": "p5",
-      "x": 208,
-      "y": 380,
-      "w": 156,
-      "side": "right"
+      "x": 38,
+      "y": 670,
+      "w": 162,
+      "side": "left"
     }
   ],
   "pools": [
     {
+      "liquid": "lava",
+      "x": 220,
+      "y": 664,
+      "w": 138,
+      "h": 24,
+      "count": 60
+    },
+    {
       "liquid": "water",
-      "x": 60,
-      "y": 500,
-      "w": 280,
-      "h": 50,
-      "count": 115
-    },
-    {
-      "liquid": "lava",
-      "x": 44,
-      "y": 314,
-      "w": 110,
-      "h": 40,
-      "count": 45
-    },
-    {
-      "liquid": "lava",
-      "x": 60,
-      "y": 634,
-      "w": 280,
+      "x": 220,
+      "y": 574,
+      "w": 138,
       "h": 40,
       "count": 90
     },
     {
       "liquid": "lava",
-      "x": 214,
-      "y": 394,
-      "w": 136,
-      "h": 36,
+      "x": 44,
+      "y": 684,
+      "w": 150,
+      "h": 20,
+      "count": 40
+    },
+    {
+      "liquid": "lava",
+      "x": 44,
+      "y": 68,
+      "w": 60,
+      "h": 24,
       "count": 45
     }
   ],
   "actors": {
     "hero": {
-      "x": 220,
-      "y": 84
+      "x": 120,
+      "y": 630
     },
-    "treasure": {
-      "x": 220,
-      "y": 325
+    "foes": [
+      {
+        "x": 168,
+        "y": 470
+      }
+    ],
+    "goal": {
+      "x": 134,
+      "y": 68,
+      "w": 66,
+      "h": 80
     }
   },
   "solution": [
-    "p2",
-    "p3"
+    "p3",
+    "p1",
+    "p4"
   ],
   "settleSeconds": 6
 }

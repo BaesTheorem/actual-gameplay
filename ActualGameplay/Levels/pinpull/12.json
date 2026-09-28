@@ -1,167 +1,145 @@
 {
   "id": "12",
-  "name": "All of it",
-  "hint": "Everything you have learned, over a pit of fire.",
-  "parPins": 2,
-  "winWhen": "treasureReachesHero",
-  "frame": false,
+  "name": "The whole tower",
+  "hint": "Lava clears the room, water clears the lava, and the gem rides the water. Then you.",
+  "parPins": 3,
+  "winWhen": "both",
   "walls": [
     {
-      "x": 24,
-      "y": 54,
+      "x": 200,
+      "y": 68,
       "w": 14,
-      "h": 660
+      "h": 386
     },
     {
-      "x": 364,
-      "y": 54,
+      "x": 200,
+      "y": 560,
       "w": 14,
-      "h": 660
-    },
+      "h": 154
+    }
+  ],
+  "slabs": [
     {
-      "x": 38,
-      "y": 54,
-      "w": 112,
-      "h": 14
-    },
-    {
-      "x": 260,
-      "y": 314,
-      "w": 14,
-      "h": 146
-    },
-    {
-      "x": 260,
-      "y": 474,
-      "w": 14,
-      "h": 146
-    },
-    {
-      "x": 260,
-      "y": 634,
-      "w": 14,
-      "h": 70
-    },
-    {
-      "x": 166,
-      "y": 394,
-      "w": 14,
-      "h": 46
-    },
-    {
-      "x": 166,
-      "y": 194,
-      "w": 14,
-      "h": 46
+      "x1": 364,
+      "y1": 570,
+      "x2": 214,
+      "y2": 470,
+      "t": 14
     }
   ],
   "pins": [
     {
       "id": "p1",
-      "x": 150,
-      "y": 54,
-      "w": 214,
-      "side": "right"
+      "x": 38,
+      "y": 600,
+      "w": 162,
+      "side": "left"
     },
     {
       "id": "p2",
       "x": 38,
-      "y": 620,
-      "w": 326,
-      "side": "left"
+      "y": 440,
+      "w": 162,
+      "side": "left",
+      "angle": 5.0
     },
     {
       "id": "p3",
-      "x": 38,
-      "y": 460,
-      "w": 222,
-      "side": "left"
+      "x": 214,
+      "y": 650,
+      "w": 150,
+      "side": "right"
     },
     {
       "id": "p4",
       "x": 38,
-      "y": 300,
-      "w": 326,
-      "side": "right"
+      "y": 670,
+      "w": 162,
+      "side": "left"
     },
     {
       "id": "p5",
-      "x": 38,
-      "y": 380,
-      "w": 128,
-      "side": "left"
+      "x": 214,
+      "y": 330,
+      "w": 150,
+      "side": "right"
     },
     {
       "id": "p6",
-      "x": 38,
-      "y": 180,
-      "w": 128,
-      "side": "left"
+      "x": 214,
+      "y": 590,
+      "w": 150,
+      "side": "right"
     }
   ],
   "pools": [
     {
       "liquid": "water",
-      "x": 278,
-      "y": 634,
-      "w": 80,
-      "h": 60,
+      "x": 220,
+      "y": 664,
+      "w": 90,
+      "h": 40,
       "count": 110
     },
     {
       "liquid": "lava",
-      "x": 280,
-      "y": 314,
-      "w": 76,
-      "h": 36,
+      "x": 220,
+      "y": 604,
+      "w": 138,
+      "h": 20,
+      "count": 30
+    },
+    {
+      "liquid": "lava",
+      "x": 44,
+      "y": 684,
+      "w": 150,
+      "h": 20,
+      "count": 40
+    },
+    {
+      "liquid": "lava",
+      "x": 220,
+      "y": 344,
+      "w": 138,
+      "h": 20,
       "count": 45
     },
     {
       "liquid": "lava",
       "x": 44,
-      "y": 474,
-      "w": 200,
-      "h": 36,
-      "count": 50
-    },
-    {
-      "liquid": "lava",
-      "x": 60,
-      "y": 394,
-      "w": 100,
-      "h": 36,
-      "count": 35
-    },
-    {
-      "liquid": "lava",
-      "x": 60,
-      "y": 194,
-      "w": 100,
-      "h": 36,
-      "count": 35
-    },
-    {
-      "liquid": "lava",
-      "x": 154,
-      "y": 36,
-      "w": 206,
-      "h": 16,
-      "count": 40
+      "y": 68,
+      "w": 150,
+      "h": 20,
+      "count": 45
     }
   ],
   "actors": {
     "hero": {
-      "x": 200,
-      "y": 84
+      "x": 176,
+      "y": 630
     },
     "treasure": {
-      "x": 200,
-      "y": 325
+      "x": 336,
+      "y": 676
+    },
+    "foes": [
+      {
+        "x": 176,
+        "y": 464
+      }
+    ],
+    "goal": {
+      "x": 44,
+      "y": 434,
+      "w": 150,
+      "h": 90
     }
   },
   "solution": [
-    "p2",
-    "p4"
+    "p6",
+    "p3",
+    "p1"
   ],
   "settleSeconds": 6
 }

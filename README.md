@@ -21,11 +21,15 @@ ink for one shield. Three stars for a low-ink clear.
 **Pull the Pin.** Chambers of water and lava held up by pins. Tap a pin to slide it out.
 Water and lava cancel each other, lava ends the hero and melts the gem, drains swallow
 whatever reaches them, and grates take the liquid while anything solid drops through.
-Twelve levels of three to six pins, and each has exactly one pull order that wins: every
-other order burns the hero, melts the gem, or throws away the water you needed. The wrong
-pin is never merely a wasted tap. The pull count stays low on purpose. Water and lava cancel
-one for one no matter what order they meet in, so a level that needs two fires put out has
-two answers, not one; the difficulty is in which pin, not how many.
+Seven of the twelve levels are towers: the hero starts on an upper floor and comes down as
+pins go, goblins wait in the chambers and have to be flooded, burned or dropped into a pit
+before he passes, slabs and tilted pins pour a chamber sideways through a side door, and a
+gem sometimes rides the water. Each level has exactly one pull order that wins: every other
+order burns the hero, melts the gem, hands him to a goblin, or throws away the water you
+needed. The pull count stays low on purpose. Water and lava cancel one for one no matter
+what order they meet in, so a level that needs two fires put out has two answers, not one;
+the forcing always comes from a victim in the way, and the difficulty is in which pin, not
+how many.
 
 **Crowd Run.** Drag to steer a crowd down a road. Green gates grow it, red ones shrink it,
 walls and blades and spikes thin it, and whatever is left fights a crowd or a boss at the

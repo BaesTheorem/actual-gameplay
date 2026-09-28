@@ -1,7 +1,7 @@
 import SpriteKit
 import UIKit
 
-/// Pull the Pin: chambers of water and lava held up by pins. Pull order is the puzzle.
+/// Pull the Pin: a tower of chambers holding water, lava and goblins up on pins. Pull order is the puzzle.
 final class PinScene: GameSceneBase, ReplayableScene {
     private enum Palette {
         static let outline = Pigment.ink
@@ -25,6 +25,7 @@ final class PinScene: GameSceneBase, ReplayableScene {
     private var pulled: [String] = []
     private var hero: HeroNode?
     private var treasure: TreasureNode?
+    private var foes: [FoeNode] = []
     private var latched = Set<String>()
     private var winLatchedAt: TimeInterval?
     private var dying = false
@@ -74,6 +75,7 @@ final class PinScene: GameSceneBase, ReplayableScene {
         lastSizzle = -10
         hero = nil
         treasure = nil
+        foes = []
         liquid.removeAll()
         replayQueue = replayTemplate ?? []
         physicsWorld.gravity = CGVector(dx: 0, dy: -6)
@@ -111,6 +113,12 @@ final class PinScene: GameSceneBase, ReplayableScene {
             node.position = CGPoint(x: spot.x, y: spot.y)
             addChild(node)
             treasure = node
+        }
+        for spot in level.actors.foes ?? [] {
+            let node = FoeNode()
+            node.position = CGPoint(x: spot.x, y: spot.y)
+            addChild(node)
+            foes.append(node)
         }
         addHint()
         pushHUD()
@@ -240,7 +248,7 @@ final class PinScene: GameSceneBase, ReplayableScene {
     }
 
     private func addPin(_ pin: PinLevel.Pin) {
-        let node = PinNode(id: pin.id, x: pin.x, y: pin.y, w: pin.w, side: pin.side)
+        let node = PinNode(id: pin.id, x: pin.x, y: pin.y, w: pin.w, side: pin.side, angle: pin.radians)
         pins[pin.id] = node
         addChild(node)
     }
@@ -254,7 +262,7 @@ final class PinScene: GameSceneBase, ReplayableScene {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard !finished, !dying, let touch = touches.first else { return }
         let point = touch.location(in: self)
-        if let pin = pins.values.first(where: { !$0.pulled && $0.hitRect.contains(point) }) {
+        if let pin = pins.values.first(where: { !$0.pulled && $0.hits(point) }) {
             pull(pin.pinID)
         }
     }
@@ -284,7 +292,8 @@ final class PinScene: GameSceneBase, ReplayableScene {
             splashArmed = false
             Audio.play(.splash)
         }
-        for node in [hero as SKNode?, treasure as SKNode?].compactMap({ $0 }) {
+        // A goblin still falling is as unsettled as the hero: he may be about to land on him.
+        for node in [hero as SKNode?, treasure as SKNode?].compactMap({ $0 }) + foes.filter(\.isActive) {
             if let body = node.physicsBody { fastest = max(fastest, Physics.speed(body)) }
         }
         // 6 pt/s: a settled pile reads below it, a treasure creeping down a slab reads above it.
@@ -322,9 +331,16 @@ final class PinScene: GameSceneBase, ReplayableScene {
         var heroBurned = false
         var treasureLost = false
         var treasureMelted = false
+        var catchers: [FoeNode] = []
         for event in contacts {
             if event.matches(PinCategory.lava, PinCategory.hero) {
                 heroBurned = true
+            } else if let (foe, _) = event.pair(PinCategory.foe, PinCategory.liquid) {
+                knockOut(foe)
+            } else if let (foe, _) = event.pair(PinCategory.foe, PinCategory.hero), let goblin = foe as? FoeNode {
+                catchers.append(goblin)
+            } else if let (foe, _) = event.pair(PinCategory.foe, PinCategory.drain) {
+                (foe as? FoeNode)?.sink()
             } else if event.matches(PinCategory.lava, PinCategory.treasure) {
                 treasureMelted = true
             } else if let (water, lava) = event.pair(PinCategory.water, PinCategory.lava) {
@@ -341,8 +357,12 @@ final class PinScene: GameSceneBase, ReplayableScene {
                 if latched.insert("treasureGoal").inserted { Audio.play(.gemLand) }
             }
         }
+        // A goblin the flood reached in the same frame he reached the hero is already out of it.
+        let caught = catchers.contains(where: \.isActive)
         if heroBurned {
             heroDies()
+        } else if caught {
+            goblinCatchesHero()
         } else if treasureMelted {
             treasureMelts()
         } else if treasureLost {
@@ -350,6 +370,16 @@ final class PinScene: GameSceneBase, ReplayableScene {
         } else if winConditionMet, winLatchedAt == nil {
             winLatchedAt = elapsed
             calmFrames = 0
+        }
+    }
+
+    /// Water or lava on a goblin: he is out of play this frame, with a puff where he stood.
+    private func knockOut(_ node: SKNode) {
+        guard let foe = node as? FoeNode, foe.isActive else { return }
+        foe.knockOut()
+        Audio.play(.hit)
+        for offset in [CGPoint(x: -10, y: 4), CGPoint(x: 0, y: 14), CGPoint(x: 10, y: 4)] {
+            puff(at: foe.position + offset)
         }
     }
 
@@ -413,6 +443,15 @@ final class PinScene: GameSceneBase, ReplayableScene {
         Audio.play(.cooked)
         Audio.play(.sizzle)
         hero.die { [weak self] in self?.lose("The hero got cooked.") }
+    }
+
+    private func goblinCatchesHero() {
+        guard let hero, !dying else { return }
+        dying = true
+        Haptics.shared.slam()
+        Audio.play(.cooked)
+        Audio.play(.caught)
+        hero.die { [weak self] in self?.lose("The goblin got the hero.") }
     }
 
     private func win() {

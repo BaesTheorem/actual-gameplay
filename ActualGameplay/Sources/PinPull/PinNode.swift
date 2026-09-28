@@ -1,8 +1,9 @@
 import SpriteKit
 import UIKit
 
-/// A horizontal bar with a knob outside the chamber wall. Tapping it slides the bar out, and
-/// whatever rested on it falls. One way: a pulled pin is gone.
+/// A bar with a knob outside the chamber wall. Tapping it slides the bar out along its length, and
+/// whatever rested on it falls. One way: a pulled pin is gone. A pin can be tilted about its centre,
+/// so it holds liquid on a slope and lets it pour sideways.
 final class PinNode: SKNode {
     static let thickness: CGFloat = 14
     /// Knob center beyond the bar end: past a 14 pt wall with room to spare.
@@ -10,23 +11,25 @@ final class PinNode: SKNode {
 
     let pinID: String
     private(set) var pulled = false
-    /// Tap target in scene coordinates: the bar with slack above and below, plus the knob.
-    let hitRect: CGRect
 
     private let direction: CGFloat
     private let width: CGFloat
+    /// Radians, counterclockwise.
+    private let angle: CGFloat
+    /// Tap target in the pin's own frame: the bar with slack above and below, plus the knob.
+    private let hitBox: CGRect
 
-    init(id: String, x: CGFloat, y: CGFloat, w: CGFloat, side: String) {
+    init(id: String, x: CGFloat, y: CGFloat, w: CGFloat, side: String, angle: CGFloat = 0) {
         pinID = id
         width = w
         direction = side == "left" ? -1 : 1
-        let center = CGPoint(x: x + w / 2, y: y + PinNode.thickness / 2)
-        let knobCenter = CGPoint(x: center.x + direction * (w / 2 + PinNode.knobOffset), y: center.y)
-        let barRect = CGRect(x: x, y: y, width: w, height: PinNode.thickness).insetBy(dx: 0, dy: -14)
-        let knobRect = CGRect(x: knobCenter.x - 22, y: knobCenter.y - 22, width: 44, height: 44)
-        hitRect = barRect.union(knobRect)
+        self.angle = angle
+        let knobCenter = CGPoint(x: direction * (w / 2 + PinNode.knobOffset), y: 0)
+        let barBox = CGRect(x: -w / 2, y: -PinNode.thickness / 2, width: w, height: PinNode.thickness).insetBy(dx: 0, dy: -14)
+        hitBox = barBox.union(CGRect(x: knobCenter.x - 22, y: knobCenter.y - 22, width: 44, height: 44))
         super.init()
-        position = center
+        position = CGPoint(x: x + w / 2, y: y + PinNode.thickness / 2)
+        zRotation = angle
         zPosition = 4
 
         // Stem first, so the bar's inked end sits over the joint.
@@ -44,8 +47,10 @@ final class PinNode: SKNode {
         addChild(bar)
 
         // 30 pt: the painted disc is 24 pt across, the size of the old knob, so it still clears the screen edge.
+        // It stays upright on a tilted pin, so its paint catches the light the same way on every pin.
         let knob = SKSpriteNode(texture: Painted.texture("pin_knob"), size: CGSize(width: 30, height: 30))
-        knob.position = CGPoint(x: direction * (w / 2 + PinNode.knobOffset), y: 0)
+        knob.position = knobCenter
+        knob.zRotation = -angle
         addChild(knob)
 
         let body = SKPhysicsBody(rectangleOf: CGSize(width: w, height: PinNode.thickness))
@@ -58,10 +63,19 @@ final class PinNode: SKNode {
 
     required init?(coder aDecoder: NSCoder) { fatalError("built in code") }
 
+    /// Whether a tap at this scene point lands on the pin. Tested in the pin's own frame, so a tilted
+    /// pin takes taps along its length and not across a box around it.
+    func hits(_ point: CGPoint) -> Bool {
+        let dx = point.x - position.x, dy = point.y - position.y
+        let c = cos(angle), s = sin(angle)
+        return hitBox.contains(CGPoint(x: dx * c + dy * s, y: -dx * s + dy * c))
+    }
+
     func pull() {
         guard !pulled else { return }
         pulled = true
-        let slide = SKAction.moveBy(x: direction * (width + 60), y: 0, duration: Motion.decorative(0.25))
+        let travel = direction * (width + 60)
+        let slide = SKAction.moveBy(x: travel * cos(angle), y: travel * sin(angle), duration: Motion.decorative(0.25))
         slide.timingMode = .easeIn
         run(.sequence([slide, .removeFromParent()]))
     }

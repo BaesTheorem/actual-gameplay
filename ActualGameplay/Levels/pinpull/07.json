@@ -1,139 +1,130 @@
 {
   "id": "07",
-  "name": "Everything else is fire",
-  "hint": "One tank of water and four pins holding lava. Only one order saves the gem.",
+  "name": "Down the well",
+  "hint": "The goblin is standing on the lid of the gem's well.",
   "parPins": 2,
   "winWhen": "treasureReachesHero",
   "walls": [
     {
-      "x": 260,
-      "y": 314,
+      "x": 200,
+      "y": 194,
       "w": 14,
-      "h": 146
+      "h": 56
     },
     {
-      "x": 260,
-      "y": 474,
+      "x": 200,
+      "y": 320,
       "w": 14,
-      "h": 146
-    },
+      "h": 360
+    }
+  ],
+  "slabs": [
     {
-      "x": 260,
-      "y": 634,
-      "w": 14,
-      "h": 70
-    },
-    {
-      "x": 178,
-      "y": 474,
-      "w": 14,
-      "h": 46
-    },
-    {
-      "x": 178,
-      "y": 574,
-      "w": 14,
-      "h": 46
-    },
-    {
-      "x": 178,
-      "y": 414,
-      "w": 14,
-      "h": 46
+      "x1": 364,
+      "y1": 360,
+      "x2": 214,
+      "y2": 290,
+      "t": 14
     }
   ],
   "pins": [
     {
       "id": "p1",
       "x": 38,
-      "y": 620,
-      "w": 326,
+      "y": 600,
+      "w": 162,
       "side": "left"
     },
     {
       "id": "p2",
       "x": 38,
-      "y": 460,
-      "w": 222,
+      "y": 480,
+      "w": 162,
       "side": "left"
     },
     {
       "id": "p3",
       "x": 38,
-      "y": 300,
-      "w": 326,
-      "side": "right"
+      "y": 320,
+      "w": 162,
+      "side": "left"
     },
     {
       "id": "p4",
-      "x": 38,
-      "y": 560,
-      "w": 140,
-      "side": "left"
+      "x": 214,
+      "y": 400,
+      "w": 150,
+      "side": "right"
     },
     {
       "id": "p5",
       "x": 38,
-      "y": 400,
-      "w": 140,
+      "y": 180,
+      "w": 162,
       "side": "left"
     }
   ],
   "pools": [
     {
+      "liquid": "lava",
+      "x": 44,
+      "y": 614,
+      "w": 150,
+      "h": 20,
+      "count": 40
+    },
+    {
       "liquid": "water",
-      "x": 278,
-      "y": 634,
-      "w": 80,
-      "h": 60,
+      "x": 44,
+      "y": 194,
+      "w": 50,
+      "h": 40,
+      "count": 35
+    },
+    {
+      "liquid": "water",
+      "x": 126,
+      "y": 194,
+      "w": 68,
+      "h": 40,
+      "count": 45
+    },
+    {
+      "liquid": "lava",
+      "x": 220,
+      "y": 414,
+      "w": 138,
+      "h": 40,
       "count": 110
     },
     {
       "liquid": "lava",
-      "x": 280,
-      "y": 314,
-      "w": 76,
-      "h": 36,
-      "count": 45
-    },
-    {
-      "liquid": "lava",
       "x": 44,
-      "y": 474,
-      "w": 128,
-      "h": 36,
-      "count": 45
-    },
-    {
-      "liquid": "lava",
-      "x": 44,
-      "y": 574,
-      "w": 128,
-      "h": 36,
-      "count": 45
-    },
-    {
-      "liquid": "lava",
-      "x": 44,
-      "y": 414,
-      "w": 128,
-      "h": 36,
-      "count": 45
+      "y": 68,
+      "w": 314,
+      "h": 20,
+      "count": 40
     }
   ],
   "actors": {
     "hero": {
-      "x": 150,
-      "y": 84
+      "x": 110,
+      "y": 510
     },
     "treasure": {
-      "x": 150,
-      "y": 325
-    }
+      "x": 110,
+      "y": 206
+    },
+    "foes": [
+      {
+        "x": 138,
+        "y": 350
+      }
+    ]
   },
   "solution": [
-    "p1",
-    "p3"
+    "p3",
+    "p2"
   ],
   "settleSeconds": 6
 }

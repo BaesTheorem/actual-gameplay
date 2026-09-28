@@ -1,139 +1,133 @@
 {
   "id": "05",
-  "name": "The wrong pool",
-  "hint": "Two tanks of water. Only one of them is over the fire.",
+  "name": "Down the chute",
+  "hint": "The lava is right under his floor. Send it down the chute first.",
   "parPins": 2,
-  "winWhen": "treasureReachesHero",
+  "winWhen": "heroReachesGoal",
   "walls": [
     {
-      "x": 230,
-      "y": 314,
+      "x": 200,
+      "y": 454,
       "w": 14,
-      "h": 166
+      "h": 66
     },
     {
-      "x": 230,
-      "y": 494,
-      "w": 14,
-      "h": 106
-    },
-    {
-      "x": 230,
-      "y": 614,
+      "x": 200,
+      "y": 590,
       "w": 14,
       "h": 90
     },
     {
-      "x": 296,
-      "y": 314,
+      "x": 226,
+      "y": 654,
       "w": 14,
-      "h": 166
-    },
+      "h": 36
+    }
+  ],
+  "slabs": [
     {
-      "x": 296,
-      "y": 494,
-      "w": 14,
-      "h": 106
-    },
-    {
-      "x": 296,
-      "y": 614,
-      "w": 14,
-      "h": 90
+      "x1": 364,
+      "y1": 620,
+      "x2": 214,
+      "y2": 548,
+      "t": 14
     }
   ],
   "pins": [
     {
       "id": "p1",
       "x": 38,
-      "y": 300,
-      "w": 326,
-      "side": "right"
+      "y": 610,
+      "w": 162,
+      "side": "left"
     },
     {
       "id": "p2",
-      "x": 244,
-      "y": 480,
-      "w": 120,
-      "side": "right"
+      "x": 38,
+      "y": 520,
+      "w": 162,
+      "side": "left"
     },
     {
       "id": "p3",
       "x": 38,
-      "y": 480,
-      "w": 192,
+      "y": 440,
+      "w": 162,
       "side": "left"
     },
     {
       "id": "p4",
-      "x": 244,
-      "y": 600,
-      "w": 120,
-      "side": "right"
+      "x": 35,
+      "y": 359,
+      "w": 260,
+      "side": "left",
+      "angle": -15
     },
     {
       "id": "p5",
-      "x": 38,
-      "y": 600,
-      "w": 192,
-      "side": "left"
+      "x": 240,
+      "y": 640,
+      "w": 124,
+      "side": "right"
     }
   ],
   "pools": [
     {
       "liquid": "lava",
-      "x": 314,
-      "y": 314,
-      "w": 44,
-      "h": 40,
-      "count": 30
-    },
-    {
-      "liquid": "water",
-      "x": 314,
-      "y": 494,
-      "w": 44,
-      "h": 60,
-      "count": 40
-    },
-    {
-      "liquid": "water",
       "x": 44,
-      "y": 494,
-      "w": 180,
-      "h": 40,
-      "count": 55
-    },
-    {
-      "liquid": "lava",
-      "x": 314,
-      "y": 614,
-      "w": 44,
-      "h": 60,
+      "y": 624,
+      "w": 150,
+      "h": 20,
       "count": 40
     },
     {
       "liquid": "lava",
       "x": 44,
-      "y": 614,
-      "w": 180,
-      "h": 36,
+      "y": 454,
+      "w": 150,
+      "h": 30,
       "count": 50
+    },
+    {
+      "liquid": "lava",
+      "x": 246,
+      "y": 654,
+      "w": 112,
+      "h": 20,
+      "count": 40
+    },
+    {
+      "liquid": "lava",
+      "x": 44,
+      "y": 68,
+      "w": 220,
+      "h": 20,
+      "count": 50
+    }
+  ],
+  "drains": [
+    {
+      "x": 270,
+      "y": 240,
+      "w": 94,
+      "h": 20
     }
   ],
   "actors": {
     "hero": {
-      "x": 270,
-      "y": 84
+      "x": 110,
+      "y": 550
     },
-    "treasure": {
-      "x": 270,
-      "y": 325
+    "goal": {
+      "x": 50,
+      "y": 380,
+      "w": 130,
+      "h": 60
     }
   },
   "solution": [
-    "p2",
-    "p1"
+    "p3",
+    "p2"
   ],
   "settleSeconds": 6
 }

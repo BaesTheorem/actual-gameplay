@@ -1,47 +1,29 @@
 {
   "id": "10",
-  "name": "Slide to the exit",
-  "hint": "The exit is under the lava. He will slide straight into it.",
+  "name": "Gem in the flood",
+  "hint": "The gem rides the water. Let the flood in first, then drop in after it.",
   "parPins": 2,
-  "winWhen": "heroReachesGoal",
+  "winWhen": "both",
   "walls": [
     {
-      "x": 260,
-      "y": 314,
+      "x": 200,
+      "y": 68,
       "w": 14,
-      "h": 146
+      "h": 386
     },
     {
-      "x": 260,
-      "y": 474,
+      "x": 200,
+      "y": 560,
       "w": 14,
-      "h": 146
-    },
-    {
-      "x": 260,
-      "y": 634,
-      "w": 14,
-      "h": 70
-    },
-    {
-      "x": 178,
-      "y": 474,
-      "w": 14,
-      "h": 46
-    },
-    {
-      "x": 178,
-      "y": 574,
-      "w": 14,
-      "h": 46
+      "h": 154
     }
   ],
   "slabs": [
     {
-      "x1": 100,
-      "y1": 280,
-      "x2": 290,
-      "y2": 120,
+      "x1": 364,
+      "y1": 570,
+      "x2": 214,
+      "y2": 470,
       "t": 14
     }
   ],
@@ -49,81 +31,99 @@
     {
       "id": "p1",
       "x": 38,
-      "y": 620,
-      "w": 326,
+      "y": 600,
+      "w": 162,
       "side": "left"
     },
     {
       "id": "p2",
       "x": 38,
-      "y": 460,
-      "w": 222,
-      "side": "left"
+      "y": 440,
+      "w": 162,
+      "side": "left",
+      "angle": 5.0
     },
     {
       "id": "p3",
-      "x": 38,
-      "y": 300,
-      "w": 326,
+      "x": 214,
+      "y": 590,
+      "w": 150,
       "side": "right"
     },
     {
       "id": "p4",
+      "x": 214,
+      "y": 660,
+      "w": 150,
+      "side": "right"
+    },
+    {
+      "id": "p5",
       "x": 38,
-      "y": 560,
-      "w": 140,
+      "y": 670,
+      "w": 162,
       "side": "left"
     }
   ],
   "pools": [
     {
       "liquid": "water",
-      "x": 278,
-      "y": 634,
+      "x": 220,
+      "y": 604,
       "w": 80,
-      "h": 60,
-      "count": 110
+      "h": 40,
+      "count": 90
     },
     {
       "liquid": "lava",
-      "x": 280,
-      "y": 314,
-      "w": 76,
-      "h": 36,
-      "count": 45
-    },
-    {
-      "liquid": "lava",
-      "x": 44,
-      "y": 474,
-      "w": 128,
-      "h": 36,
-      "count": 45
+      "x": 220,
+      "y": 674,
+      "w": 138,
+      "h": 24,
+      "count": 60
     },
     {
       "liquid": "lava",
       "x": 44,
-      "y": 574,
-      "w": 128,
-      "h": 36,
+      "y": 684,
+      "w": 150,
+      "h": 20,
+      "count": 40
+    },
+    {
+      "liquid": "lava",
+      "x": 44,
+      "y": 68,
+      "w": 150,
+      "h": 20,
       "count": 45
     }
   ],
   "actors": {
     "hero": {
-      "x": 150,
-      "y": 330
+      "x": 176,
+      "y": 630
     },
+    "treasure": {
+      "x": 330,
+      "y": 616
+    },
+    "foes": [
+      {
+        "x": 176,
+        "y": 464
+      }
+    ],
     "goal": {
-      "x": 280,
-      "y": 68,
-      "w": 84,
-      "h": 60
+      "x": 44,
+      "y": 434,
+      "w": 150,
+      "h": 90
     }
   },
   "solution": [
-    "p1",
-    "p3"
+    "p3",
+    "p1"
   ],
   "settleSeconds": 6
 }

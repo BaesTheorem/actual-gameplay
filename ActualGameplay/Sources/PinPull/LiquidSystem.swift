@@ -12,6 +12,8 @@ enum PinCategory {
     static let drain: UInt32 = 1 << 7
     /// Swallows liquid like a drain, but the hero and the treasure fall straight through it.
     static let grate: UInt32 = 1 << 8
+    /// A goblin: water or lava ends him, and he ends the hero.
+    static let foe: UInt32 = 1 << 9
     static let liquid: UInt32 = water | lava
 }
 
