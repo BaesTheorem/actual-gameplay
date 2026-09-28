@@ -56,6 +56,16 @@ final class RunnerGeneratorTests: XCTestCase {
         }
     }
 
+    func testRivalsDoNotGrowWithTheStartCrowd() {
+        for level in 0..<300 {
+            let base = RunnerGenerator.makeTrack(level: level, startCrowd: 5)
+            let upgraded = RunnerGenerator.makeTrack(level: level, startCrowd: 45)
+            XCTAssertEqual(base.segments, upgraded.segments, "level \(level)")
+            XCTAssertEqual(base.finale, upgraded.finale, "level \(level)")
+            XCTAssertGreaterThanOrEqual(upgraded.bestPath, base.bestPath, "level \(level)")
+        }
+    }
+
     func testGateOps() {
         XCTAssertEqual(GateOp.add(5).apply(10), 15)
         XCTAssertEqual(GateOp.subtract(12).apply(10), 0)
@@ -69,7 +79,7 @@ final class RunnerGeneratorTests: XCTestCase {
         let base = RunnerEconomy.base
         XCTAssertEqual(base.startCrowd, 5)
         XCTAssertEqual(base.memberPower, 1)
-        XCTAssertEqual(base.coins(forSurvivors: 10), 20)
+        XCTAssertEqual(base.coins(level: 0, stars: 3), 30)
         let maxed = RunnerEconomy(levels: ["startCrowd": 20, "memberPower": 10, "coinMultiplier": 10])
         XCTAssertEqual(maxed.startCrowd, 45)
         XCTAssertEqual(maxed.memberPower, 2.5, accuracy: 1e-9)

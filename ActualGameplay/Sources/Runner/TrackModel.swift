@@ -86,6 +86,56 @@ enum Finale: Equatable {
     }
 }
 
+/// The finale as arithmetic, one 0.05 s tick at a time: both sides lose a thirtieth of the bigger
+/// side, ours divided by member power. The fraction of a runner that division leaves is carried to
+/// the next tick, so power counts in a fight of any size; at power 1 nothing is ever carried.
+struct FinaleFight: Equatable {
+    enum Outcome: Equatable {
+        case going
+        case won(survivors: Int)
+        case lost(lastRunner: Bool)
+    }
+
+    private(set) var mine: Int
+    private(set) var theirs: Int
+    let power: Double
+    private var owed: Double = 0
+
+    init(mine: Int, theirs: Int, power: Double) {
+        self.mine = mine
+        self.theirs = theirs
+        self.power = power
+    }
+
+    mutating func tick() -> Outcome {
+        let before = (mine: mine, theirs: theirs)
+        let slice = max(1, Int((Double(max(mine, theirs)) / 30).rounded(.up)))
+        owed += Double(slice) / power
+        let loss = Int(owed.rounded(.down))
+        owed -= Double(loss)
+        theirs = max(0, theirs - slice)
+        mine = max(0, mine - loss)
+        if theirs <= 0 && mine > 0 { return .won(survivors: mine) }
+        if mine <= 0 && theirs > 0 { return .lost(lastRunner: false) }
+        if mine <= 0 && theirs <= 0 {
+            return Double(before.mine) * power >= Double(before.theirs) ? .won(survivors: 1) : .lost(lastRunner: true)
+        }
+        return .going
+    }
+
+    /// Survivors of the whole fight, 0 for a loss.
+    static func survivors(mine: Int, theirs: Int, power: Double) -> Int {
+        var fight = FinaleFight(mine: mine, theirs: theirs, power: power)
+        while true {
+            switch fight.tick() {
+            case .going: continue
+            case .won(let survivors): return survivors
+            case .lost: return 0
+            }
+        }
+    }
+}
+
 struct Track: Equatable {
     let level: Int
     let segments: [Segment]
@@ -93,6 +143,6 @@ struct Track: Equatable {
     let finaleZ: CGFloat
     let speed: CGFloat
     let startCrowd: Int
-    /// The crowd a perfect run arrives with: best gate every time, no obstacle losses.
+    /// The crowd a perfect run arrives with at these upgrades: best gate every time, no obstacle losses.
     let bestPath: Int
 }

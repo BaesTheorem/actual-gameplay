@@ -142,6 +142,7 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
     private var bossSprite: PaintedSprite?
     private var bossBar: SKSpriteNode?
     private var enemyStrength = 0
+    private var clash: FinaleFight?
     private var gates: [GateNode] = []
     private var obstacles: [ObstacleNode] = []
     private var stripes: [SKSpriteNode] = []
@@ -172,6 +173,7 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
         randomPicks = [:]
         fighting = false
         fightClock = 0
+        clash = nil
         lastHUD = ""
         bossAnnounced = false
         gates = []
@@ -356,6 +358,7 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
     private func startFight() {
         fighting = true
         fightClock = 0
+        clash = FinaleFight(mine: crowd.count, theirs: enemyStrength, power: economy.memberPower)
         // The crowd hits the boss from the first tick of the fight to the last.
         bossSprite?.play("clawd_boss_hit")
         Haptics.shared.slam()
@@ -369,20 +372,19 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
         run(.repeat(.sequence([.run { Audio.play(.pop) }, .wait(forDuration: 0.05)]), count: count), withKey: "pops")
     }
 
-    /// Attrition: each 0.05 s both sides lose a slice of the bigger side, ours divided by strength.
-    /// Whoever is larger (after strength) wins, which is what the generator sized the finale for.
+    /// Attrition, a tick every 0.05 s (see FinaleFight). Whoever is larger after member strength
+    /// wins, which is what the generator sized the finale for.
     private func fight(dt: TimeInterval) {
         if let enemy {
             enemy.anchorZ = max(Projection.anchorZ + 1.2, enemy.anchorZ - 8 * CGFloat(dt))
         }
         fightClock += dt
-        while fightClock >= 0.05, !finished {
+        while fightClock >= 0.05, !finished, var state = clash {
             fightClock -= 0.05
-            let before = (mine: crowd.count, theirs: enemyStrength)
-            let slice = max(1, Int((Double(max(before.mine, before.theirs)) / 30).rounded(.up)))
-            let myLoss = max(1, Int((Double(slice) / economy.memberPower).rounded(.up)))
-            enemyStrength = max(0, enemyStrength - slice)
-            crowd.setCount(before.mine - myLoss)
+            let outcome = state.tick()
+            clash = state
+            enemyStrength = state.theirs
+            crowd.setCount(state.mine)
             enemy?.setCount(enemyStrength)
             if let bossBar {
                 bossBar.xScale = CGFloat(enemyStrength) / CGFloat(max(1, track.finale.strength))
@@ -390,19 +392,18 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
             Haptics.shared.tap()
             // Runners popping against a crowd; blows landing on a boss.
             Audio.play(boss == nil ? .pop : .hit)
-            if enemyStrength <= 0 && crowd.count > 0 {
-                win()
-            } else if crowd.count <= 0 && enemyStrength > 0 {
-                lose(boss == nil ? "Their crowd was bigger." : "The boss was too much.")
-            } else if crowd.count <= 0 && enemyStrength <= 0 {
-                if Double(before.mine) * economy.memberPower >= Double(before.theirs) { win(survivors: 1) } else { lose("It came down to the last runner.") }
+            switch outcome {
+            case .going:
+                break
+            case .won(let survivors):
+                win(survivors: survivors)
+            case .lost(let lastRunner):
+                lose(lastRunner ? "It came down to the last runner." : boss == nil ? "Their crowd was bigger." : "The boss was too much.")
             }
         }
     }
 
-    private func win(survivors: Int? = nil) {
-        let alive = survivors ?? crowd.count
-        let coins = economy.coins(forSurvivors: alive)
+    private func win(survivors alive: Int) {
         // Stars measure the run against the best a player with these upgrades could do: the
         // finale costs about strength / memberPower runners no matter how well you steer, so a
         // perfect run is three stars at any upgrade level.
@@ -410,6 +411,7 @@ final class RunnerScene: GameSceneBase, ReplayableScene {
         let attainable = max(1.0, Double(track.bestPath) - fightCost)
         let share = Double(alive) / attainable
         let stars = share >= 0.85 ? 3 : share >= 0.5 ? 2 : 1
+        let coins = economy.coins(level: level, stars: stars)
         Haptics.shared.success()
         Audio.play(.win)
         // The coins land after the fanfare, as the result card shows them.

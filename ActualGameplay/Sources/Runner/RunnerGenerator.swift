@@ -2,10 +2,14 @@ import CoreGraphics
 import Foundation
 
 /// Deterministic tracks from the level number. The same level is the same track on every device,
-/// and the finale is sized from the best possible run so a good player can always win.
+/// and the finale is sized from the best run a player without upgrades could make, so a good player
+/// can always win and extra starting runners are a real edge.
 enum RunnerGenerator {
     /// How many runs the autoplay harness drives at base upgrades.
     static let replayLevels = 5
+
+    /// The crowd a run starts with before upgrades, and the one every finale is sized for.
+    static let baseCrowd = 5
 
     static func seed(for level: Int) -> UInt64 { 1_000_003 &* UInt64(level + 1) }
 
@@ -17,7 +21,7 @@ enum RunnerGenerator {
         let tier = min(level / 5, 4)
         var segments: [Segment] = []
         var z: CGFloat = 12
-        var running = 5
+        var running = baseCrowd
         var betterSide = 0   // +1 right, -1 left
         var sameSideRun = 0
         for _ in 0..<count {
@@ -49,19 +53,23 @@ enum RunnerGenerator {
         let finaleZ = z + 4
 
         var best = startCrowd
+        var par = baseCrowd
         for segment in segments {
             if case .gates(let pair) = segment {
                 best = max(pair.left.apply(best), pair.right.apply(best))
+                par = max(pair.left.apply(par), pair.right.apply(par))
             }
         }
         best = max(best, 2)
+        par = max(par, 2)
 
+        // The rivals do not grow with the starting crowd: that is what the upgrade buys.
         let finale: Finale
         if (level + 1) % 5 == 0 {
-            finale = .boss(hp: max(1, min(best - 1, Int((0.75 * Double(best)).rounded(.down)))))
+            finale = .boss(hp: max(1, min(par - 1, Int((0.75 * Double(par)).rounded(.down)))))
         } else {
             let ratio = 0.6 + 0.02 * Double(min(level, 12))
-            finale = .crowd(max(1, min(best - 1, Int((Double(best) * ratio).rounded(.down)))))
+            finale = .crowd(max(1, min(par - 1, Int((Double(par) * ratio).rounded(.down)))))
         }
         return Track(level: level, segments: segments, finale: finale, finaleZ: finaleZ,
                      speed: speed(for: level), startCrowd: startCrowd, bestPath: best)

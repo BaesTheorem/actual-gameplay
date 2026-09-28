@@ -9,6 +9,9 @@ struct RunnerHubView: View {
     @EnvironmentObject private var store: ProgressStore
     @Environment(\.dismiss) private var dismiss
     @State private var run: RunSelection?
+    /// The run whose win has been paid. Retry after a win replays the same track, and that replay
+    /// must not pay again or skip a run.
+    @State private var paid: UUID?
 
     private var runner: RunnerProgress { store.progress.runner }
     private var economy: RunnerEconomy { RunnerEconomy(levels: runner.upgrades) }
@@ -67,7 +70,8 @@ struct RunnerHubView: View {
     }
 
     private func record(_ phase: GamePhase) {
-        guard case .won(_, let coins, _) = phase else { return }
+        guard case .won(_, let coins, _) = phase, let id = run?.id, paid != id else { return }
+        paid = id
         store.update { progress in
             progress.runner.coins += coins
             progress.runner.level += 1
@@ -103,6 +107,9 @@ struct UpgradeRow: View {
                 Text(upgrade.title).font(Theme.label(17))
                 Text("Lv \(level)/\(upgrade.maxLevel)   \(upgrade.effectText(atLevel: level))")
                     .font(Theme.mono(12)).foregroundStyle(Theme.onSurfaceMuted)
+                if let preview = upgrade.previewText(atLevel: level) {
+                    Text(preview).font(Theme.label(13)).foregroundStyle(Theme.ink)
+                }
             }
             Spacer()
             Button(action: action) {

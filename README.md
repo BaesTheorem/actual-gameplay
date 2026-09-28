@@ -30,7 +30,11 @@ two answers, not one; the difficulty is in which pin, not how many.
 **Crowd Run.** Drag to steer a crowd down a road. Green gates grow it, red ones shrink it,
 walls and blades and spikes thin it, and whatever is left fights a crowd or a boss at the
 end. Endless and procedural (the same run is the same track on every device), with coins
-that buy a bigger starting crowd, stronger runners, and a coin bonus between runs.
+that buy a bigger starting crowd, stronger runners, and a coin bonus between runs. Prices
+follow what each level buys: `scripts/economy.py` plays every run as a probability tree for an
+imperfect player and prices each upgrade level at the same number of wins per point of win
+odds, so the shop can say "+5% odds at run 16" next to the cost. Rivals are sized to the
+base crowd of five, so extra starting runners are a real edge rather than a bigger fight.
 
 ## Build
 
@@ -72,6 +76,7 @@ Three more tools sit beside them, for designing rather than checking:
     scripts/preview.py pinPull|saveDog [NN ...]   draw a level file as an annotated picture, no simulator
     scripts/replay.py saveDog --film              save a frame every half second and tile each run into a strip
     scripts/audit.py saveDog --random 16          add sixteen plausible random strokes per level; report the share that win
+    scripts/economy.py                            Crowd Run's economy as arithmetic: win odds, prices, and a check of the Swift tables
 
 The preview draws the geometry with the things that decide whether a level works: where each
 pool falls once its pin goes and onto what, how far the gem sits from lava on the same shelf and
