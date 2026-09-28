@@ -244,13 +244,14 @@
     paint(rectPts(-100, -100, W + 200, H + 200), { fill: PAL.indigo, fillOp: 95, bleed: 0.02, tex: 0.5, ink: null });
     paint(rectPts(-100, -100, W + 200, H + 200), { fill: PAL.night, fillOp: 60, bleed: 0.02, tex: 0.6, ink: null });
   } });
-  // the app icon: a happy Clawd on paper with an ink frame, 1080 square (resized to 1024 by the script)
+  // the app icon: a happy Clawd on paper, washes running off every edge. No frame: iOS masks the
+  // square itself, and a painted border inside that mask read as a black box around the icon.
   add('icon', { box: [CX - 540, 0, 1080, 1080], anchor: [0.5, 0.5], frames: 1, len: 1, fps: 1, paper: true, draw: t => {
     boilSeed('icon');
-    paint(rectPts(CX - 540, 0, 1080, 1080), { fill: PAL.sky, fillOp: 70, bleed: 0.05, tex: 0.5, ink: null });
-    paint(ellPts(CX, 640, 430, 300, 40, 8), { fill: PAL.sap, fillOp: 90, bleed: 0.2, tex: 0.6, ink: null });
-    clawd(CX, 930, 58, { ...feel('happy', 0.2), boilKey: 'icon' });
-    paint(rrPts(CX - 540 + 28, 28, 1080 - 56, 1080 - 56, 90, 3), { ink: PAL.ink, sw: 4 });
+    paint(rectPts(CX - 640, -100, 1280, 1280), { fill: PAL.sky, fillOp: 75, bleed: 0.05, tex: 0.5, ink: null });
+    paint(ellPts(CX, 760, 620, 330, 40, 8), { fill: PAL.sap, fillOp: 95, bleed: 0.2, tex: 0.6, ink: null });
+    paint(ellPts(CX - 60, 1150, 900, 420, 40, 8), { wash: mixCol(PAL.sap, PAL.sky, 0.35), washOp: 235, ink: null });
+    clawd(CX, 950, 66, { ...feel('happy', 0.2), boilKey: 'icon' });
   } });
 
   // ---------- the render hook ----------

@@ -96,11 +96,15 @@ struct ModeCard: View {
                 ClawdSwatch(clip: mode.preview.clip, frame: mode.preview.frame, art: mode.swatch, size: 68)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(mode.title).font(Theme.label(21)).foregroundStyle(Theme.ink)
-                    Text(mode.blurb).font(Theme.body(13)).foregroundStyle(Theme.onSurfaceMuted).lineLimit(2)
+                        .lineLimit(1).minimumScaleFactor(0.7)
+                    Text(mode.blurb).font(Theme.body(13)).foregroundStyle(Theme.onSurfaceMuted)
+                        .fixedSize(horizontal: false, vertical: true)
                     Text(summary).font(Theme.mono(12)).foregroundStyle(Theme.ink)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-                Spacer(minLength: 0)
-                MSIcon(.chevronRight, size: 24).foregroundStyle(Theme.ink)
+                .layoutPriority(1)
+                Spacer(minLength: 4)
+                MSIcon(.chevronRight, size: 24).foregroundStyle(Theme.ink).fixedSize()
             }
             .padding(14)
             .paintedCard()

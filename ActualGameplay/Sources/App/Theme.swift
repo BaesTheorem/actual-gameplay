@@ -76,7 +76,7 @@ struct MSIcon: View {
 
     var body: some View {
         Text(name.glyph)
-            .font(.custom(MSIconName.fontName, size: size))
+            .font(.custom(MSIconName.fontName, fixedSize: size))   // an icon keeps its box at any text size
             .frame(width: size, height: size)
     }
 }

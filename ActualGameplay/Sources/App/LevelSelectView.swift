@@ -23,7 +23,7 @@ struct LevelSelectView: View {
                 HStack(spacing: 12) {
                     IconButton(icon: .arrowBack) { dismiss() }
                     VStack(alignment: .leading, spacing: 0) {
-                        Text(mode.title.uppercased()).font(Theme.title(26))
+                        Text(mode.title.uppercased()).font(Theme.title(26)).lineLimit(1).minimumScaleFactor(0.6)
                         Text("\(clearedCount)/\(count) cleared").font(Theme.mono(13)).foregroundStyle(Theme.onSurfaceMuted)
                     }
                     Spacer()
