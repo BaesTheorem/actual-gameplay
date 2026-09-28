@@ -13,10 +13,13 @@ fits through. Bees with no way in work as a crew: they pick the least secure loo
 the shield they can reach, line up along it, wind up, and heave on it together, alternating
 the middle and the far end, straight and tilted up, and move on to the next weakest part
 when one will not budge. Footing and mass decide what survives, so a bar balanced on a
-point or a lid resting on him goes, and a shape that stands on its own feet holds. Twelve levels, each a
-different problem: a lid over a pit, one open side of a cave, a hole in a roof, bees rising
-through the floor, a boulder to route into a gap, saw blades that cut ink, two dogs with
-ink for one shield. Three stars for a low-ink clear.
+point or a lid resting on him goes, and a shape that stands on its own feet holds. Sixteen levels,
+each a different problem: a lid over a pit, a plinth in the water with a socket to fit, a hole in a
+roof and only enough ink to plug it, one open side of a low cave, two of them on facing cliffs
+over lava, a step beside a moat with the far bank as the only other footing, blades at his feet
+with posts beyond them, saws either side of a slope, a no-ink zone right over his head, bees
+rising through the floor, a boulder to route into a gap, a plinth in the moat. Water and lava
+are real hazards: ink that lands in them sinks, and so does he. Three stars for a low-ink clear.
 
 **Pull the Pin.** Chambers of water and lava held up by pins. Tap a pin to slide it out.
 Water and lava cancel each other, lava ends the hero and melts the gem, drains swallow

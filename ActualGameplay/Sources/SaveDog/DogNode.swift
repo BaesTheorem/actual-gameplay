@@ -25,7 +25,7 @@ final class DogNode: SKSpriteNode {
         body.allowsRotation = false
         body.categoryBitMask = StrokeCategory.actor
         body.collisionBitMask = StrokeCategory.wall | StrokeCategory.drawn | StrokeCategory.killer | StrokeCategory.actor | StrokeCategory.prop
-        body.contactTestBitMask = StrokeCategory.bee | StrokeCategory.killer
+        body.contactTestBitMask = StrokeCategory.bee | StrokeCategory.killer | StrokeCategory.liquid
         physicsBody = body
     }
 

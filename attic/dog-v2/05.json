@@ -1,54 +1,54 @@
 {
-  "id": "11",
+  "id": "05",
   "name": "Holes below",
-  "hint": "Two holes, far apart. Nothing from the sky today.",
-  "inkBudget": 130,
+  "hint": "Nothing comes from the sky today.",
+  "inkBudget": 180,
   "stars": [
-    116,
-    124
+    156,
+    172
   ],
   "statics": [
     {
       "type": "rect",
       "x": 0,
       "y": 34,
-      "w": 60,
+      "w": 120,
       "h": 40,
       "skin": "grass"
     },
     {
       "type": "rect",
-      "x": 96,
+      "x": 156,
       "y": 34,
-      "w": 210,
+      "w": 90,
       "h": 40,
       "skin": "grass"
     },
     {
       "type": "rect",
-      "x": 342,
+      "x": 282,
       "y": 34,
-      "w": 60,
+      "w": 120,
       "h": 40,
       "skin": "grass"
     }
   ],
   "dogs": [
     {
-      "id": "clawd",
+      "id": "dog",
       "x": 201,
       "y": 92
     }
   ],
   "hives": [
     {
-      "x": 78,
+      "x": 138,
       "y": 50,
       "count": 7,
       "interval": 0.2
     },
     {
-      "x": 324,
+      "x": 264,
       "y": 50,
       "count": 7,
       "interval": 0.2
@@ -59,11 +59,11 @@
       {
         "points": [
           [
-            50,
+            100,
             80
           ],
           [
-            106,
+            176,
             80
           ]
         ]
@@ -72,11 +72,11 @@
         "delay": 0.3,
         "points": [
           [
-            296,
+            226,
             80
           ],
           [
-            352,
+            302,
             80
           ]
         ]

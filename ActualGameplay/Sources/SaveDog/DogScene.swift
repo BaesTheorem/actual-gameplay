@@ -56,7 +56,9 @@ final class DogScene: StrokeScene, ReplayableScene {
         addBounds(floor: false)
         for decor in level.decor ?? [] { addDecor(decor) }
         for item in level.statics ?? [] { addStatic(item) }
-        for rect in level.killers ?? [] { addKiller(rect.cgRect) }
+        for rect in level.killers ?? [] {
+            if rect.isLiquid { addLiquid(rect.cgRect, kind: rect.kind ?? "water") } else { addKiller(rect.cgRect) }
+        }
         for saw in level.saws ?? [] { addSaw(saw) }
         for prop in level.props ?? [] { addProp(prop) }
         for spot in level.dogs {
@@ -184,6 +186,15 @@ final class DogScene: StrokeScene, ReplayableScene {
                 cut(stroke, at: event.contact.contactPoint)
                 continue
             }
+            if let (piece, _) = event.pair(StrokeCategory.drawn | StrokeCategory.prop, StrokeCategory.liquid) {
+                sink(piece)
+                continue
+            }
+            if let (dog, pit) = event.pair(StrokeCategory.actor, StrokeCategory.liquid), let node = dog as? DogNode {
+                Audio.play(.splash)
+                lose(pit.name == "lava" ? "\(node.dogID.capitalized) went into the lava." : "\(node.dogID.capitalized) went under.")
+                return
+            }
             if let (dog, _) = event.pair(StrokeCategory.actor, StrokeCategory.bee), let node = dog as? DogNode {
                 Audio.play(.caught)
                 lose("The bees got \(node.dogID).")
@@ -195,6 +206,14 @@ final class DogScene: StrokeScene, ReplayableScene {
                 return
             }
         }
+    }
+
+    /// Ink or a prop went into a pit. It sinks out of the puzzle: no footing, no plug, gone.
+    private func sink(_ piece: SKNode) {
+        guard piece.parent != nil, piece.physicsBody != nil else { return }
+        piece.physicsBody = nil
+        Audio.play(.splash)
+        piece.run(.sequence([.group([.fadeOut(withDuration: Motion.decorative(0.35)), .moveBy(x: 0, y: -14, duration: 0.35)]), .removeFromParent()]))
     }
 
     /// A saw took a stroke. It goes in a puff of sawdust and the map is rebuilt at once.

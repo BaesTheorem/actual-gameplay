@@ -1,11 +1,11 @@
 {
   "id": "09",
-  "name": "Moat",
-  "hint": "Spikes below. Land the shield on the island, not on him.",
-  "inkBudget": 260,
+  "name": "Between the blades",
+  "hint": "Two blades at his feet and two posts beyond them. Nothing that touches a blade survives.",
+  "inkBudget": 210,
   "stars": [
     190,
-    240
+    200
   ],
   "statics": [
     {
@@ -13,38 +13,57 @@
       "x": 0,
       "y": 34,
       "w": 402,
-      "h": 20,
+      "h": 40,
+      "skin": "grass"
+    },
+    {
+      "type": "rect",
+      "x": 107,
+      "y": 74,
+      "w": 14,
+      "h": 52,
       "skin": "stone"
     },
     {
       "type": "rect",
-      "x": 160,
-      "y": 200,
-      "w": 82,
-      "h": 30,
+      "x": 281,
+      "y": 74,
+      "w": 14,
+      "h": 52,
       "skin": "stone"
     }
   ],
-  "killers": [
+  "saws": [
     {
-      "x": 20,
-      "y": 54,
-      "w": 362,
-      "h": 16
+      "x": 151,
+      "y": 96,
+      "r": 22
+    },
+    {
+      "x": 251,
+      "y": 96,
+      "r": 22
     }
   ],
   "dogs": [
     {
-      "id": "dog",
+      "id": "clawd",
       "x": 201,
-      "y": 248
+      "y": 92
     }
   ],
   "hives": [
     {
-      "x": 201,
-      "y": 700,
-      "count": 12
+      "x": 40,
+      "y": 720,
+      "count": 7,
+      "interval": 0.15
+    },
+    {
+      "x": 362,
+      "y": 720,
+      "count": 7,
+      "interval": 0.15
     }
   ],
   "solution": {
@@ -52,40 +71,12 @@
       {
         "points": [
           [
-            166,
-            234
+            111,
+            130
           ],
           [
-            169,
-            260
-          ],
-          [
-            176,
-            279
-          ],
-          [
-            188,
-            292
-          ],
-          [
-            201,
-            296
-          ],
-          [
-            214,
-            292
-          ],
-          [
-            226,
-            279
-          ],
-          [
-            233,
-            260
-          ],
-          [
-            236,
-            234
+            291,
+            130
           ]
         ]
       }

@@ -1,80 +1,60 @@
 {
   "id": "12",
-  "name": "Saws",
-  "hint": "Blades cut ink. Keep the shield on the pillar.",
-  "inkBudget": 200,
+  "name": "Slope",
+  "hint": "Uneven ground and a saw on each side. Keep it narrow and make both feet land.",
+  "inkBudget": 340,
   "stars": [
-    150,
-    180
+    280,
+    310
   ],
-  "duration": 12,
   "statics": [
     {
       "type": "rect",
       "x": 0,
       "y": 34,
       "w": 402,
-      "h": 20,
-      "skin": "stone"
+      "h": 40,
+      "skin": "grass"
     },
     {
-      "type": "rect",
-      "x": 161,
-      "y": 54,
-      "w": 80,
-      "h": 246,
-      "skin": "stone"
+      "type": "chain",
+      "points": [
+        [
+          0,
+          210
+        ],
+        [
+          60,
+          200
+        ],
+        [
+          340,
+          74
+        ]
+      ]
     }
   ],
-  "killers": [
+  "decor": [
     {
-      "x": 20,
-      "y": 54,
-      "w": 141,
-      "h": 16
-    },
-    {
-      "x": 241,
-      "y": 54,
-      "w": 141,
-      "h": 16
-    }
-  ],
-  "saws": [
-    {
-      "x": 138,
-      "y": 330,
-      "r": 16
-    },
-    {
-      "x": 264,
-      "y": 330,
-      "r": 16
+      "sprite": "bush",
+      "x": 370,
+      "y": 92,
+      "w": 40,
+      "h": 34
     }
   ],
   "dogs": [
     {
-      "id": "dog",
+      "id": "clawd",
       "x": 201,
-      "y": 318
+      "y": 157
     }
   ],
   "hives": [
     {
-      "x": 30,
-      "y": 700,
-      "count": 10
-    },
-    {
-      "x": 372,
-      "y": 700,
-      "count": 10
-    },
-    {
       "x": 201,
-      "y": 760,
-      "count": 10,
-      "delay": 4
+      "y": 700,
+      "count": 14
     }
   ],
   "solution": {
@@ -82,44 +62,56 @@
       {
         "points": [
           [
-            172,
-            304
+            150,
+            164
           ],
           [
-            174,
-            329
+            152,
+            200
           ],
           [
-            180,
-            348
+            165,
+            228
           ],
           [
-            190,
-            360
+            185,
+            243
           ],
           [
             201,
-            364
+            246
           ],
           [
-            212,
-            360
+            217,
+            240
           ],
           [
-            222,
-            348
+            237,
+            220
           ],
           [
-            228,
-            329
+            250,
+            180
           ],
           [
-            230,
-            304
+            252,
+            118
           ]
         ]
       }
     ],
-    "waitSeconds": 17
-  }
+    "waitSeconds": 14
+  },
+  "saws": [
+    {
+      "x": 122,
+      "y": 190,
+      "r": 16
+    },
+    {
+      "x": 282,
+      "y": 118,
+      "r": 16
+    }
+  ]
 }

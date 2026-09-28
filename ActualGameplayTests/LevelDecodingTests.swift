@@ -10,7 +10,7 @@ final class LevelDecodingTests: XCTestCase {
     func testSaveDogLevelsAreConsistent() throws {
         let catalog = LevelCatalog.shared
         let ids = catalog.ids(for: .saveDog)
-        XCTAssertEqual(ids.count, 12, "expected 12 Save the Dog levels, found \(ids)")
+        XCTAssertEqual(ids.count, 16, "expected 16 Save the Clawd levels, found \(ids)")
         XCTAssertEqual(Set(ids).count, ids.count, "duplicate level ids")
 
         for (index, id) in ids.enumerated() {

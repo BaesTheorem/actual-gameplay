@@ -1,11 +1,11 @@
 {
-  "id": "01",
-  "name": "First shield",
-  "hint": "Draw a roof over him. Then the bees come.",
-  "inkBudget": 500,
+  "id": "08",
+  "name": "Two dogs",
+  "hint": "One shield can cover both. Two shields cost more.",
+  "inkBudget": 520,
   "stars": [
-    300,
-    400
+    320,
+    440
   ],
   "statics": [
     {
@@ -20,23 +20,28 @@
   "decor": [
     {
       "sprite": "bush",
-      "x": 80,
+      "x": 40,
       "y": 92,
-      "w": 44,
-      "h": 38
+      "w": 40,
+      "h": 34
     },
     {
-      "sprite": "mushroom_red",
-      "x": 330,
-      "y": 87,
-      "w": 26,
-      "h": 26
+      "sprite": "rock",
+      "x": 360,
+      "y": 88,
+      "w": 32,
+      "h": 28
     }
   ],
   "dogs": [
     {
-      "id": "clawd",
-      "x": 201,
+      "id": "dog",
+      "x": 150,
+      "y": 92
+    },
+    {
+      "id": "pup",
+      "x": 252,
       "y": 92
     }
   ],
@@ -44,7 +49,7 @@
     {
       "x": 201,
       "y": 700,
-      "count": 12
+      "count": 16
     }
   ],
   "solution": {
@@ -52,44 +57,44 @@
       {
         "points": [
           [
-            149,
+            109,
             78
           ],
           [
-            153,
-            118
+            116,
+            122
           ],
           [
-            164,
-            148
+            136,
+            155
           ],
           [
-            181,
-            166
+            166,
+            176
           ],
           [
             201,
-            173
+            183
           ],
           [
-            221,
-            166
+            236,
+            176
           ],
           [
-            238,
-            148
+            266,
+            155
           ],
           [
-            249,
-            118
+            286,
+            122
           ],
           [
-            253,
+            293,
             78
           ]
         ]
       }
     ],
-    "waitSeconds": 14
+    "waitSeconds": 15
   }
 }

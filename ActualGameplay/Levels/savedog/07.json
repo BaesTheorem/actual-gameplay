@@ -1,60 +1,63 @@
 {
   "id": "07",
-  "name": "Slope",
-  "hint": "Uneven ground. Make the feet land.",
-  "inkBudget": 400,
+  "name": "Two cliffs",
+  "hint": "Two of them, one on each cliff. A roof over one leaves the other to the bees.",
+  "inkBudget": 460,
   "stars": [
-    300,
-    360
+    430,
+    445
   ],
   "statics": [
     {
       "type": "rect",
       "x": 0,
       "y": 34,
-      "w": 402,
-      "h": 40,
-      "skin": "grass"
+      "w": 140,
+      "h": 166,
+      "skin": "stone"
     },
     {
-      "type": "chain",
-      "points": [
-        [
-          0,
-          210
-        ],
-        [
-          60,
-          200
-        ],
-        [
-          340,
-          74
-        ]
-      ]
+      "type": "rect",
+      "x": 262,
+      "y": 34,
+      "w": 140,
+      "h": 166,
+      "skin": "stone"
     }
   ],
-  "decor": [
+  "killers": [
     {
-      "sprite": "bush",
-      "x": 370,
-      "y": 92,
-      "w": 40,
-      "h": 34
+      "x": 140,
+      "y": 34,
+      "w": 122,
+      "h": 40,
+      "kind": "lava"
     }
   ],
   "dogs": [
     {
-      "id": "dog",
-      "x": 201,
-      "y": 157
+      "id": "clawd",
+      "x": 110,
+      "y": 218
+    },
+    {
+      "id": "pup",
+      "x": 292,
+      "y": 218
     }
   ],
   "hives": [
     {
-      "x": 201,
-      "y": 700,
-      "count": 14
+      "x": 40,
+      "y": 720,
+      "count": 8,
+      "interval": 0.15
+    },
+    {
+      "x": 362,
+      "y": 720,
+      "count": 8,
+      "interval": 0.15
     }
   ],
   "solution": {
@@ -62,40 +65,16 @@
       {
         "points": [
           [
-            150,
-            164
-          ],
-          [
-            152,
-            200
-          ],
-          [
-            165,
-            228
-          ],
-          [
-            185,
-            243
+            40,
+            214
           ],
           [
             201,
-            246
+            350
           ],
           [
-            217,
-            240
-          ],
-          [
-            237,
-            220
-          ],
-          [
-            250,
-            180
-          ],
-          [
-            252,
-            118
+            362,
+            214
           ]
         ]
       }

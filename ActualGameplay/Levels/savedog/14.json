@@ -1,0 +1,130 @@
+{
+  "id": "14",
+  "name": "Two caves",
+  "hint": "Each cave has one open side. Two L's.",
+  "inkBudget": 280,
+  "stars": [
+    230,
+    260
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 34,
+      "w": 402,
+      "h": 40,
+      "skin": "grass"
+    },
+    {
+      "type": "rect",
+      "x": 20,
+      "y": 160,
+      "w": 100,
+      "h": 20,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 20,
+      "y": 74,
+      "w": 14,
+      "h": 86,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 282,
+      "y": 160,
+      "w": 100,
+      "h": 20,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 368,
+      "y": 74,
+      "w": 14,
+      "h": 86,
+      "skin": "stone"
+    }
+  ],
+  "decor": [
+    {
+      "sprite": "torch_on_a",
+      "x": 44,
+      "y": 130,
+      "w": 16,
+      "h": 26
+    },
+    {
+      "sprite": "torch_on_b",
+      "x": 358,
+      "y": 130,
+      "w": 16,
+      "h": 26
+    }
+  ],
+  "dogs": [
+    {
+      "id": "clawd",
+      "x": 60,
+      "y": 92
+    },
+    {
+      "id": "pup",
+      "x": 342,
+      "y": 92
+    }
+  ],
+  "hives": [
+    {
+      "x": 201,
+      "y": 700,
+      "count": 8
+    },
+    {
+      "x": 201,
+      "y": 300,
+      "count": 8
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            120,
+            156
+          ],
+          [
+            120,
+            79
+          ],
+          [
+            88,
+            79
+          ]
+        ]
+      },
+      {
+        "delay": 0.3,
+        "points": [
+          [
+            282,
+            156
+          ],
+          [
+            282,
+            79
+          ],
+          [
+            314,
+            79
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 14
+  }
+}

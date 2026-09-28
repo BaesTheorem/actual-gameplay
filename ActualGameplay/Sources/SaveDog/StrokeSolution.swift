@@ -35,7 +35,10 @@ struct LevelRect: Decodable {
     var y: CGFloat
     var w: CGFloat
     var h: CGFloat
+    /// For killers: "spikes" (the default, solid), or "water" / "lava" (a pit; ink sinks, he does not swim).
+    var kind: String?
     var cgRect: CGRect { CGRect(x: x, y: y, width: w, height: h) }
+    var isLiquid: Bool { kind == "water" || kind == "lava" }
 }
 
 /// A rigid nudge applied to a replayed stroke: shift it, or scale it about its own centroid.

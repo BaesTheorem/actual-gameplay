@@ -1,11 +1,11 @@
 {
-  "id": "05",
+  "id": "03",
   "name": "Side door",
-  "hint": "Three walls and a low roof. Close the fourth side, and make it stand.",
-  "inkBudget": 90,
+  "hint": "Three walls are done. Close the fourth. An L stands where a line falls.",
+  "inkBudget": 160,
   "stars": [
-    72,
-    80
+    120,
+    140
   ],
   "statics": [
     {
@@ -19,9 +19,9 @@
     {
       "type": "rect",
       "x": 100,
-      "y": 114,
+      "y": 160,
       "w": 132,
-      "h": 14,
+      "h": 20,
       "skin": "stone"
     },
     {
@@ -29,7 +29,7 @@
       "x": 100,
       "y": 74,
       "w": 14,
-      "h": 40,
+      "h": 86,
       "skin": "stone"
     }
   ],
@@ -44,7 +44,7 @@
   ],
   "dogs": [
     {
-      "id": "clawd",
+      "id": "dog",
       "x": 170,
       "y": 92
     }
@@ -67,7 +67,7 @@
         "points": [
           [
             232,
-            110
+            156
           ],
           [
             232,

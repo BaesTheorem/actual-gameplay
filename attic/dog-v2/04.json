@@ -1,11 +1,11 @@
 {
   "id": "04",
-  "name": "The plug",
-  "hint": "One hole in the roof and only enough ink to stop it. Anything else slides off.",
-  "inkBudget": 80,
+  "name": "Plug the hole",
+  "hint": "One hole. Ninety ink. Do the math.",
+  "inkBudget": 130,
   "stars": [
-    56,
-    70
+    100,
+    115
   ],
   "statics": [
     {
@@ -18,71 +18,65 @@
     },
     {
       "type": "rect",
-      "x": 130,
+      "x": 120,
       "y": 74,
       "w": 14,
-      "h": 130,
-      "skin": "stone"
-    },
-    {
-      "type": "rect",
-      "x": 272,
-      "y": 74,
-      "w": 14,
-      "h": 130,
-      "skin": "stone"
-    },
-    {
-      "type": "rect",
-      "x": 130,
-      "y": 190,
-      "w": 96,
-      "h": 14,
-      "skin": "stone"
-    },
-    {
-      "type": "chain",
-      "points": [
-        [
-          130,
-          204
-        ],
-        [
-          226,
-          242
-        ]
-      ]
-    },
-    {
-      "type": "rect",
-      "x": 226,
-      "y": 190,
-      "w": 10,
-      "h": 14,
+      "h": 146,
       "skin": "stone"
     },
     {
       "type": "rect",
       "x": 268,
-      "y": 190,
-      "w": 18,
+      "y": 74,
+      "w": 14,
+      "h": 146,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 120,
+      "y": 206,
+      "w": 60,
+      "h": 14,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 222,
+      "y": 206,
+      "w": 60,
       "h": 14,
       "skin": "stone"
     }
   ],
+  "decor": [
+    {
+      "sprite": "torch_on_a",
+      "x": 146,
+      "y": 150,
+      "w": 16,
+      "h": 26
+    },
+    {
+      "sprite": "torch_on_b",
+      "x": 256,
+      "y": 150,
+      "w": 16,
+      "h": 26
+    }
+  ],
   "dogs": [
     {
-      "id": "clawd",
+      "id": "dog",
       "x": 201,
       "y": 92
     }
   ],
   "hives": [
     {
-      "x": 252,
+      "x": 201,
       "y": 700,
-      "count": 14,
-      "interval": 0.14
+      "count": 14
     }
   ],
   "solution": {
@@ -90,12 +84,12 @@
       {
         "points": [
           [
-            230,
-            222
+            156,
+            228
           ],
           [
-            276,
-            222
+            246,
+            228
           ]
         ]
       }

@@ -1,11 +1,11 @@
 {
-  "id": "01",
-  "name": "First shield",
-  "hint": "Draw a roof over him. Then the bees come.",
-  "inkBudget": 500,
+  "id": "15",
+  "name": "Low ceiling",
+  "hint": "No ink in the band. Draw low and tight.",
+  "inkBudget": 300,
   "stars": [
-    300,
-    400
+    200,
+    260
   ],
   "statics": [
     {
@@ -17,20 +17,12 @@
       "skin": "grass"
     }
   ],
-  "decor": [
+  "forbidden": [
     {
-      "sprite": "bush",
-      "x": 80,
-      "y": 92,
-      "w": 44,
-      "h": 38
-    },
-    {
-      "sprite": "mushroom_red",
-      "x": 330,
-      "y": 87,
-      "w": 26,
-      "h": 26
+      "x": 120,
+      "y": 132,
+      "w": 162,
+      "h": 100
     }
   ],
   "dogs": [
@@ -44,7 +36,7 @@
     {
       "x": 201,
       "y": 700,
-      "count": 12
+      "count": 14
     }
   ],
   "solution": {
@@ -52,39 +44,31 @@
       {
         "points": [
           [
-            149,
+            150,
             78
           ],
           [
-            153,
-            118
+            156,
+            104
           ],
           [
-            164,
-            148
-          ],
-          [
-            181,
-            166
+            172,
+            120
           ],
           [
             201,
-            173
+            126
           ],
           [
-            221,
-            166
+            230,
+            120
           ],
           [
-            238,
-            148
+            246,
+            104
           ],
           [
-            249,
-            118
-          ],
-          [
-            253,
+            252,
             78
           ]
         ]

@@ -1,11 +1,11 @@
 {
   "id": "08",
-  "name": "Two dogs",
-  "hint": "One shield can cover both. Two shields cost more.",
-  "inkBudget": 520,
+  "name": "Across the water",
+  "hint": "One foot on the low ground, one on the far bank. The water takes anything that lands in it.",
+  "inkBudget": 360,
   "stars": [
-    320,
-    440
+    335,
+    350
   ],
   "statics": [
     {
@@ -15,41 +15,43 @@
       "w": 402,
       "h": 40,
       "skin": "grass"
-    }
-  ],
-  "decor": [
-    {
-      "sprite": "bush",
-      "x": 40,
-      "y": 92,
-      "w": 40,
-      "h": 34
     },
     {
-      "sprite": "rock",
-      "x": 360,
-      "y": 88,
-      "w": 32,
-      "h": 28
+      "type": "rect",
+      "x": 100,
+      "y": 74,
+      "w": 62,
+      "h": 40,
+      "skin": "grass"
+    },
+    {
+      "type": "rect",
+      "x": 270,
+      "y": 74,
+      "w": 132,
+      "h": 80,
+      "skin": "grass"
     }
   ],
   "dogs": [
     {
-      "id": "dog",
-      "x": 150,
-      "y": 92
-    },
-    {
-      "id": "pup",
-      "x": 252,
-      "y": 92
+      "id": "clawd",
+      "x": 140,
+      "y": 132
     }
   ],
   "hives": [
     {
-      "x": 201,
+      "x": 40,
       "y": 700,
-      "count": 16
+      "count": 8,
+      "interval": 0.15
+    },
+    {
+      "x": 362,
+      "y": 700,
+      "count": 8,
+      "interval": 0.15
     }
   ],
   "solution": {
@@ -57,44 +59,29 @@
       {
         "points": [
           [
-            109,
+            60,
             78
           ],
           [
-            116,
-            122
+            140,
+            210
           ],
           [
-            136,
-            155
-          ],
-          [
-            166,
-            176
-          ],
-          [
-            201,
-            183
-          ],
-          [
-            236,
-            176
-          ],
-          [
-            266,
-            155
-          ],
-          [
-            286,
-            122
-          ],
-          [
-            293,
-            78
+            296,
+            158
           ]
         ]
       }
     ],
-    "waitSeconds": 15
-  }
+    "waitSeconds": 14
+  },
+  "killers": [
+    {
+      "x": 162,
+      "y": 74,
+      "w": 108,
+      "h": 40,
+      "kind": "water"
+    }
+  ]
 }

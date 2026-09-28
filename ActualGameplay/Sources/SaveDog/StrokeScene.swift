@@ -8,6 +8,8 @@ enum StrokeCategory {
     static let killer: UInt32 = 1 << 3
     static let bee: UInt32 = 1 << 4
     static let prop: UInt32 = 1 << 5
+    /// Water and lava pits: nothing rests on them, he dies in them, bees fly over them.
+    static let liquid: UInt32 = 1 << 6
 }
 
 /// Everything a draw-a-stroke level shares: ink capture, the commit path (trimmed around
@@ -164,6 +166,39 @@ class StrokeScene: GameSceneBase {
         default:
             break
         }
+    }
+
+    /// A pit of water or lava. Strokes fall through it and are gone from the puzzle, so it cannot be
+    /// footing, and he does not survive touching it. Bees are not fooled: it is not solid to them.
+    func addLiquid(_ rect: CGRect, kind: String) {
+        let lava = kind == "lava"
+        let node = SKShapeNode(rect: rect)
+        node.fillColor = lava ? Pigment.clay : Pigment.teal
+        node.strokeColor = .clear
+        node.zPosition = 3
+        node.name = lava ? "lava" : "water"
+        let top = CGMutablePath()
+        top.move(to: CGPoint(x: rect.minX, y: rect.maxY))
+        var x = rect.minX
+        var up = true
+        while x < rect.maxX {
+            let nx = min(x + 12, rect.maxX)
+            top.addQuadCurve(to: CGPoint(x: nx, y: rect.maxY), control: CGPoint(x: (x + nx) / 2, y: rect.maxY + (up ? 4 : -3)))
+            x = nx
+            up.toggle()
+        }
+        let surface = SKShapeNode(path: top)
+        surface.strokeColor = lava ? Pigment.ochre : Pigment.sky
+        surface.lineWidth = 3
+        surface.zPosition = 3.5
+        node.addChild(surface)
+        let body = SKPhysicsBody(rectangleOf: rect.size, center: CGPoint(x: rect.midX, y: rect.midY))
+        body.isDynamic = false
+        body.categoryBitMask = StrokeCategory.liquid
+        body.collisionBitMask = 0
+        body.contactTestBitMask = StrokeCategory.actor | StrokeCategory.drawn | StrokeCategory.prop
+        node.physicsBody = body
+        addChild(node)
     }
 
     func addKiller(_ rect: CGRect) {

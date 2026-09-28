@@ -1,64 +1,73 @@
 {
   "id": "03",
-  "name": "Side door",
-  "hint": "Three walls are done. Close the fourth. An L stands where a line falls.",
-  "inkBudget": 160,
+  "name": "Pedestal",
+  "hint": "Water on both sides, and only the plinth to build on. Make it fit the socket.",
+  "inkBudget": 190,
   "stars": [
-    120,
-    140
+    150,
+    170
   ],
   "statics": [
     {
       "type": "rect",
-      "x": 0,
+      "x": 161,
       "y": 34,
-      "w": 402,
-      "h": 40,
-      "skin": "grass"
-    },
-    {
-      "type": "rect",
-      "x": 100,
-      "y": 160,
-      "w": 132,
-      "h": 20,
+      "w": 80,
+      "h": 186,
       "skin": "stone"
     },
     {
       "type": "rect",
-      "x": 100,
-      "y": 74,
-      "w": 14,
-      "h": 86,
+      "x": 161,
+      "y": 220,
+      "w": 8,
+      "h": 10,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 233,
+      "y": 220,
+      "w": 8,
+      "h": 10,
       "skin": "stone"
     }
   ],
-  "decor": [
+  "killers": [
     {
-      "sprite": "torch_on_a",
-      "x": 126,
-      "y": 130,
-      "w": 16,
-      "h": 26
+      "x": 0,
+      "y": 34,
+      "w": 161,
+      "h": 40,
+      "kind": "water"
+    },
+    {
+      "x": 241,
+      "y": 34,
+      "w": 161,
+      "h": 40,
+      "kind": "water"
     }
   ],
   "dogs": [
     {
-      "id": "dog",
-      "x": 170,
-      "y": 92
+      "id": "clawd",
+      "x": 201,
+      "y": 238
     }
   ],
   "hives": [
     {
-      "x": 372,
-      "y": 300,
-      "count": 10
+      "x": 40,
+      "y": 700,
+      "count": 8,
+      "interval": 0.15
     },
     {
-      "x": 372,
+      "x": 362,
       "y": 700,
-      "count": 6
+      "count": 8,
+      "interval": 0.15
     }
   ],
   "solution": {
@@ -66,16 +75,24 @@
       {
         "points": [
           [
-            232,
-            156
+            172,
+            226
           ],
           [
-            232,
-            79
+            176,
+            258
           ],
           [
-            196,
-            79
+            201,
+            278
+          ],
+          [
+            226,
+            258
+          ],
+          [
+            230,
+            226
           ]
         ]
       }
