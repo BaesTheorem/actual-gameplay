@@ -9,15 +9,22 @@ struct HomeView: View {
     var body: some View {
         ZStack {
             PaperBackground()
-            VStack(alignment: .leading, spacing: 16) {
-                header
-                ForEach(GameMode.allCases) { mode in
-                    ModeCard(mode: mode, summary: summary(for: mode)) { activeMode = mode }
+            // The page scrolls once the text size outgrows the screen; below that the footer stays at
+            // the bottom. Without the scroll view a fixed VStack squeezes its texts to one line each.
+            GeometryReader { geo in
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 16) {
+                        header
+                        ForEach(GameMode.allCases) { mode in
+                            ModeCard(mode: mode, summary: summary(for: mode)) { activeMode = mode }
+                        }
+                        Spacer(minLength: 0)
+                        footer
+                    }
+                    .padding(20)
+                    .frame(minHeight: geo.size.height, alignment: .top)
                 }
-                Spacer(minLength: 0)
-                footer
             }
-            .padding(20)
         }
         .fullScreenCover(item: $activeMode) { mode in
             Group {
@@ -59,6 +66,7 @@ struct HomeView: View {
             Text("The games from the ads. Without the ads.")
                 .font(Theme.body(15))
                 .foregroundStyle(Theme.onSurfaceMuted)
+                .fixedSize(horizontal: false, vertical: true)
             HairlineDivider().padding(.top, 10)
         }
     }

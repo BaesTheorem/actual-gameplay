@@ -19,6 +19,9 @@ struct RunnerHubView: View {
     var body: some View {
         ZStack {
             PaperBackground()
+            // Scrolls once the text size outgrows the screen; a fixed stack squeezes the rows instead.
+            GeometryReader { geo in
+            ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 16) {
                 HStack(spacing: 12) {
                     IconButton(icon: .arrowBack) { dismiss() }
@@ -54,6 +57,9 @@ struct RunnerHubView: View {
             }
             .padding(20)
             .foregroundStyle(Theme.ink)
+            .frame(minHeight: geo.size.height, alignment: .top)
+            }
+            }
         }
         .fullScreenCover(item: $run) { selection in
             GameContainerView(mode: .runner, onNext: { run = RunSelection() }, onResult: record) {
