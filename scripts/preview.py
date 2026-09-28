@@ -147,9 +147,22 @@ def draw_pin(level: dict) -> Image.Image:
                     d.line([sx(xx), sy(pool["y"]), sx(xx), sy(top)], fill=col, width=1)
                 label(d, cx + 4, (pool["y"] + top) / 2, f"{holder} pulled: falls {pool['y'] - top:.0f} to {what}", fill=col)
     for p in level["pins"]:
-        rect(d, p["x"], p["y"], p["w"], 14, fill=PIN, outline=INK, width=2)
-        kx = p["x"] - 26 if p["side"] == "left" else p["x"] + p["w"] + 26
-        d.ellipse([sx(kx) - 11 * SCALE, sy(p["y"] + 7) - 11 * SCALE, sx(kx) + 11 * SCALE, sy(p["y"] + 7) + 11 * SCALE], fill=PIN, outline=INK, width=2)
+        angle = math.radians(p.get("angle") or 0)
+        if angle:
+            # A tilted pin turns about its centre, the way PinNode draws it; the knob rides the bar.
+            cx, cy = p["x"] + p["w"] / 2, p["y"] + 7
+            ca, sa = math.cos(angle), math.sin(angle)
+            def turn(dx, dy):
+                return (sx(cx + dx * ca - dy * sa), sy(cy + dx * sa + dy * ca))
+            hw = p["w"] / 2
+            d.polygon([turn(-hw, -7), turn(hw, -7), turn(hw, 7), turn(-hw, 7)], fill=PIN, outline=INK, width=2)
+            kx, ky = turn(-hw - 26, 0) if p["side"] == "left" else turn(hw + 26, 0)
+            d.ellipse([kx - 11 * SCALE, ky - 11 * SCALE, kx + 11 * SCALE, ky + 11 * SCALE], fill=PIN, outline=INK, width=2)
+            label(d, p["x"] + 4, p["y"] + 12, f"{p.get('angle')} deg", fill=INK)
+        else:
+            rect(d, p["x"], p["y"], p["w"], 14, fill=PIN, outline=INK, width=2)
+            kx = p["x"] - 26 if p["side"] == "left" else p["x"] + p["w"] + 26
+            d.ellipse([sx(kx) - 11 * SCALE, sy(p["y"] + 7) - 11 * SCALE, sx(kx) + 11 * SCALE, sy(p["y"] + 7) + 11 * SCALE], fill=PIN, outline=INK, width=2)
         order = (level.get("solution") or [])
         tag = p["id"] + (f" #{order.index(p['id']) + 1}" if p["id"] in order else "")
         label(d, p["x"] + 4, p["y"] + 12, tag, fill=INK, font=FONT)
