@@ -14,6 +14,9 @@ class GameSceneBase: SKScene, SKPhysicsContactDelegate {
     private(set) var finished = false
     private var lastTime: TimeInterval?
     private var built = false
+    /// Simulated seconds since the last reset: the sum of the capped frame steps. Wall time runs
+    /// ahead of it whenever frames are slow, which is what a replay timeout has to allow for.
+    private(set) var gameSeconds: TimeInterval = 0
 
     override init(size: CGSize) {
         super.init(size: size)
@@ -54,6 +57,7 @@ class GameSceneBase: SKScene, SKPhysicsContactDelegate {
         contacts.clear()
         finished = false
         lastTime = nil
+        gameSeconds = 0
         isPaused = false
         buildLevel()
     }
@@ -66,6 +70,7 @@ class GameSceneBase: SKScene, SKPhysicsContactDelegate {
     override func update(_ currentTime: TimeInterval) {
         let dt = lastTime.map { min(currentTime - $0, 1.0 / 20) } ?? 0
         lastTime = currentTime
+        gameSeconds += dt
         tick(dt: dt)
     }
 

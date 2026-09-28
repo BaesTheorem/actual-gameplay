@@ -68,6 +68,7 @@ final class AutoplayRunner: ObservableObject {
     private var completed = false
     private var filmTimer: Timer?
     private var frame = 0
+    private static let filmQueue = DispatchQueue(label: "autoplay.film", qos: .utility)
 
     var count: Int { trials.count }
     var passedCount: Int { entries.filter(\.passed).count }
@@ -118,15 +119,28 @@ final class AutoplayRunner: ObservableObject {
         phaseWatch = newSession.$phase.sink { [weak self] phase in
             if phase.isOver { self?.complete(scene: scene, trial: trial, position: position, phase: phase) }
         }
-        timer = Timer.scheduledTimer(withTimeInterval: timeout, repeats: false) { [weak self] _ in
-            self?.complete(scene: scene, trial: trial, position: position, phase: nil)
+        // The timeout is in simulated seconds: filming, a busy Mac or a hidden Simulator window
+        // all stretch frames, and a level is not slow because the machine running it was. Wall
+        // time only steps in as a cap on a scene that stopped ticking altogether.
+        let started = startedAt
+        timer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { [weak self] _ in
+            let stalled = Date().timeIntervalSince(started) > timeout * 4
+            if scene.gameSeconds >= timeout || stalled {
+                self?.complete(scene: scene, trial: trial, position: position, phase: nil)
+            }
         }
         if LaunchArguments.film {
             frame = 0
             filmTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
                 guard let self, let image = scene.snapshot() else { return }
-                self.save(image, name: "\(self.mode.rawValue)-\(AutoplayRunner.safe(trial.id))-f\(String(format: "%02d", self.frame)).png")
+                let name = "\(self.mode.rawValue)-\(AutoplayRunner.safe(trial.id))-f\(String(format: "%02d", self.frame)).jpg"
                 self.frame += 1
+                // Encoding is the slow part; only the capture has to happen on the main thread.
+                AutoplayRunner.filmQueue.async {
+                    let dir = AutoplayRunner.resultsDirectory
+                    try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+                    try? image.jpegData(compressionQuality: 0.8)?.write(to: dir.appendingPathComponent(name), options: .atomic)
+                }
             }
         }
     }

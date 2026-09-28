@@ -26,6 +26,7 @@ sys.stdout.reconfigure(line_buffering=True)  # progress shows up in background l
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 BUNDLE = "com.baestheorem.actualgameplay"
 SIM_NAME = os.environ.get("SIM_NAME", "iPhone 17 Pro")
+DD = os.environ.get("DD", "build/dd")   # derived data; set DD=build/dd-x when two runs share the machine
 ENV = {**os.environ, "DEVELOPER_DIR": os.environ.get("DEVELOPER_DIR", "/Applications/Xcode.app/Contents/Developer")}
 
 
@@ -46,7 +47,7 @@ def build(udid: str) -> None:
     run(["xcodegen", "generate"])
     result = run([
         "xcodebuild", "-project", "ActualGameplay.xcodeproj", "-scheme", "ActualGameplay",
-        "-destination", f"platform=iOS Simulator,id={udid}", "-derivedDataPath", "build/dd",
+        "-destination", f"platform=iOS Simulator,id={udid}", "-derivedDataPath", DD,
         "-configuration", "Debug", "CODE_SIGNING_ALLOWED=NO", "build",
     ])
     log = result.stdout + result.stderr
@@ -75,7 +76,7 @@ def wait_for_boot(udid: str) -> None:
 
 def install(udid: str) -> pathlib.Path:
     """Install the last simulator build and return the app's data container."""
-    app = ROOT / "build/dd/Build/Products/Debug-iphonesimulator/ActualGameplay.app"
+    app = ROOT / DD / "Build/Products/Debug-iphonesimulator/ActualGameplay.app"
     result = run(["xcrun", "simctl", "install", udid, str(app)])
     if result.returncode:
         raise SystemExit(result.stderr)
@@ -86,8 +87,8 @@ def tile_films(out_dir: pathlib.Path, mode: str) -> None:
     """Every trial filmed with --film becomes one strip: its half-second frames left to right, six per row."""
     from PIL import Image
     frames: dict[str, list[pathlib.Path]] = {}
-    for png in sorted(out_dir.glob(f"{mode}-*-f[0-9][0-9].png")):
-        frames.setdefault(png.name[:-8], []).append(png)
+    for shot in sorted(list(out_dir.glob(f"{mode}-*-f[0-9][0-9].jpg")) + list(out_dir.glob(f"{mode}-*-f[0-9][0-9].png"))):
+        frames.setdefault(shot.name[:-8], []).append(shot)
     for trial, files in frames.items():
         ims = [Image.open(f) for f in files]
         w, h = ims[0].size
@@ -140,8 +141,8 @@ def main() -> None:
     entries = json.loads(results_file.read_text())
     out_dir = ROOT / "build/replay"
     out_dir.mkdir(parents=True, exist_ok=True)
-    for png in results_dir.glob("*.png"):
-        shutil.copy(png, out_dir / png.name)
+    for shot in list(results_dir.glob("*.png")) + list(results_dir.glob("*.jpg")):
+        shutil.copy(shot, out_dir / shot.name)
     if "--film" in args:
         tile_films(out_dir, mode)
     failed = 0

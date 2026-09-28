@@ -35,6 +35,7 @@ WALL = (140, 138, 160)
 WATER = (58, 156, 152)
 LAVA = (217, 119, 87)
 HERO = (110, 159, 88)
+FOE = (123, 92, 168)                 # the violet rival Clawds
 GEM = (232, 170, 56)
 DRAIN = (31, 37, 80)
 GRATE = (120, 120, 150)
@@ -156,6 +157,12 @@ def draw_pin(level: dict) -> Image.Image:
     if hero:
         d.ellipse([sx(hero["x"]) - 16 * SCALE, sy(hero["y"]) - 16 * SCALE, sx(hero["x"]) + 16 * SCALE, sy(hero["y"]) + 16 * SCALE], fill=HERO, outline=INK, width=2)
         label(d, hero["x"] + 18, hero["y"] + 4, "hero", fill=HERO, font=FONT)
+    for k, foe in enumerate(level["actors"].get("foes") or []):
+        d.ellipse([sx(foe["x"]) - 16 * SCALE, sy(foe["y"]) - 16 * SCALE, sx(foe["x"]) + 16 * SCALE, sy(foe["y"]) + 16 * SCALE], fill=FOE, outline=INK, width=2)
+        label(d, foe["x"] + 18, foe["y"] + 4, f"goblin {k + 1}", fill=FOE, font=FONT)
+        below = first_surface_below(level, foe["x"], foe["y"] - 17)
+        if below:
+            label(d, foe["x"] + 18, foe["y"] - 10, f"on {below[1]}", fill=INK)
     t = level["actors"].get("treasure")
     if t:
         rect(d, t["x"] - 14, t["y"] - 12, 28, 24, fill=GEM, outline=INK, width=2)
@@ -199,8 +206,10 @@ def draw_dog(level: dict) -> Image.Image:
             pts = [(sx(x), sy(y)) for x, y in s["points"]]
             d.line(pts, fill=INK, width=3)
     for k in level.get("killers", []) or []:
-        rect(d, k["x"], k["y"], k["w"], k["h"], fill=FORBID, outline=INK, width=1)
-        label(d, k["x"] + 2, k["y"] + k["h"] + 12, "spikes", fill=FORBID)
+        kind = k.get("kind") or "spikes"
+        col = {"water": WATER, "lava": LAVA}.get(kind, FORBID)
+        rect(d, k["x"], k["y"], k["w"], k["h"], fill=col, outline=INK, width=1)
+        label(d, k["x"] + 2, k["y"] + k["h"] + 12, kind + (" (ink sinks)" if kind != "spikes" else ""), fill=col)
     for s in level.get("saws", []) or []:
         d.ellipse([sx(s["x"] - s["r"]), sy(s["y"] + s["r"]), sx(s["x"] + s["r"]), sy(s["y"] - s["r"])], outline=NOTE, width=3)
         label(d, s["x"] + s["r"] + 2, s["y"], "saw: cuts ink", fill=NOTE)
