@@ -44,31 +44,36 @@ def main(steps):
         page.on("pageerror", lambda e: print("PAGE ERROR", e))
         page.on("console", lambda m: m.type in ("error", "warning") and print("CONSOLE", m.type, m.text[:300]))
         page.on("response", lambda r: r.status >= 400 and print("HTTP", r.status, r.url))
+        def at(x, y):
+            """Canvas points (y up) to a place in the window, wherever the stage sits and whatever its scale."""
+            r = page.evaluate("(() => { const r = document.querySelector('#scene canvas').getBoundingClientRect(); return [r.left, r.top, r.width, r.height]; })()")
+            return r[0] + x / 402 * r[2], r[1] + (874 - y) / 874 * r[3]
+
         for step in steps:
             kind, _, arg = step.partition("=")
             if kind == "go":
                 page.goto(base + arg)
                 page.wait_for_timeout(1500)
-            elif kind == "size":  # the window, as WxH; taps still take canvas points only at 402x874
+            elif kind == "size":  # the window, as WxH
                 w, h = (int(v) for v in arg.split("x"))
                 page.set_viewport_size({"width": w, "height": h})
             elif kind == "wait":
                 page.wait_for_timeout(int(float(arg) * 1000))
             elif kind == "tap":  # canvas points, y up, as the levels are written
                 x, y = (float(v) for v in arg.split(","))
-                page.mouse.click(x, 874 - y)
+                page.mouse.click(*at(x, y))
             elif kind == "drag":  # x1,y1,x2,y2 in canvas points, y up; the finger lifts at the end
                 x1, y1, x2, y2 = (float(v) for v in arg.split(","))
-                page.mouse.move(x1, 874 - y1)
+                page.mouse.move(*at(x1, y1))
                 page.mouse.down()
-                page.mouse.move(x2, 874 - y2, steps=8)
+                page.mouse.move(*at(x2, y2), steps=8)
                 page.mouse.up()
             elif kind == "stroke":  # x1,y1;x2,y2;... in canvas points, y up: one finger through every point
                 pts = [tuple(float(v) for v in pair.split(",")) for pair in arg.split(";")]
-                page.mouse.move(pts[0][0], 874 - pts[0][1])
+                page.mouse.move(*at(*pts[0]))
                 page.mouse.down()
                 for x, y in pts[1:]:
-                    page.mouse.move(x, 874 - y, steps=6)
+                    page.mouse.move(*at(x, y), steps=6)
                 page.mouse.up()
             elif kind == "until":  # wait until a JavaScript expression is true
                 page.wait_for_function(arg, timeout=30000)

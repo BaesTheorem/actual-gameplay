@@ -27,8 +27,10 @@ const renderer = async () => {
 /// The stage was resized: keep the canvas sharp at the new scale.
 export const setStageScale = (scale: number) => {
   stageScale = scale;
-  if (app) app.renderer.resolution = Math.min(3, Math.max(1, devicePixelRatio * scale));
-  if (app) app.renderer.resize(W, H);
+  // The renderer does not exist until init has finished; it reads stageScale when it does.
+  if (!app?.renderer) return;
+  app.renderer.resolution = Math.min(3, Math.max(1, devicePixelRatio * scale));
+  app.renderer.resize(W, H);
 };
 
 export interface GameOptions {

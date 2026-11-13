@@ -7,20 +7,30 @@ import { Game, setStageScale } from "./app/game";
 import { MODES, levelCount, levelID, mode as findMode, type ModeInfo } from "./app/modes";
 import { showRunnerHub } from "./app/runnerhub";
 import { record, store, type Mode } from "./app/store";
-import { H, W } from "./scenes/kit";
+import { W } from "./scenes/kit";
 
 const VERSION = "0.1.0";
 const stage = document.getElementById("stage")!;
 const ui = document.getElementById("ui")!;
 let game: Game | null = null;
 
-// The stage keeps the phone's shape and scales to fit the window.
+// The stage keeps its shape and scales to fit the frame, which is the window minus the phone's
+// safe areas. The frame is measured, not the window: a phone browser changes the window's height
+// as its bars slide, and reports it wrongly for a moment when a home-screen app starts.
+const frame = document.getElementById("frame")!;
+const STAGE_H = 780;
 const fit = () => {
-  const scale = Math.min(innerWidth / W, innerHeight / H);
-  stage.style.transform = `scale(${scale}) translate(-50%, -50%)`;
+  const w = frame.clientWidth, hgt = frame.clientHeight;
+  if (w === 0 || hgt === 0) return;
+  const scale = Math.min(w / W, hgt / STAGE_H);
+  stage.style.transform = `translate(${(w - W * scale) / 2}px, ${(hgt - STAGE_H * scale) / 2}px) scale(${scale})`;
   setStageScale(scale);
 };
+document.body.style.backgroundImage = `url(${art.url("paper")})`;
+new ResizeObserver(fit).observe(frame);
 addEventListener("resize", fit);
+addEventListener("orientationchange", fit);
+visualViewport?.addEventListener("resize", fit);
 fit();
 
 const applySettings = () => {
