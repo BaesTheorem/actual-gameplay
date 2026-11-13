@@ -128,6 +128,20 @@ What the walking rules added is drawn with what was already here.
   the blast's reach, 64 pt, and a 5 pt shake. A broken wall throws six stone shards for every
   20 pt of its length. Gas on someone is sap dots that rise and a sap ring.
 
+## Number Tower's pieces
+
+- The tower is a building in cutaway: stone walls with an ink outline, a flat wash inside each
+  room, battlements on top, a door at street level for each way in. A doorway is a real gap in a
+  wall or a floor, so "these two rooms connect" is something a player sees, never reads.
+- A room he can enter now has a dashed ochre outline and an ochre wash. A cleared room is paler.
+  A locked room is darker and carries the padlock.
+- Every number sits on a cream plate with an ink outline, in Permanent Marker, never under 15
+  points. The hero's number is over his head, a rival's over its own, the boss's under a crown.
+- Pickups are objects with their effect beside them: a sword "+6", a potion "x3", spikes "-3", a
+  saw for a division. A rival that grows is green and carries a badge with an arrow and how much
+  it gains each move. A weak floor is drawn as split planks, with its limit on a plate.
+- A fight is a short bump and a number that floats up in sap green; a loss in rose.
+
 ## Motion
 
 Decorative motion (bounces, shakes, fades) shortens to 0.1 s or stops when the system asks for

@@ -1,8 +1,9 @@
 # Actual Gameplay
 
-The three games that only exist in mobile ads, built for real: save-the-character drawing puzzles,
-pin-pull liquid puzzles, and a crowd runner with gates. No ads, no purchases, no network.
-iPhone, SwiftUI shell, SpriteKit scenes.
+The games that only exist in mobile ads, built for real: save-the-character drawing puzzles,
+pin-pull liquid puzzles, a crowd runner with gates, and a number tower. No ads, no purchases.
+The game is a web app (`web/`); the first three modes also exist as an iPhone app (SwiftUI shell,
+SpriteKit scenes), which is the older build and no longer gets new levels.
 
 ## The games
 
@@ -43,10 +44,23 @@ imperfect player and prices each upgrade level at the same number of wins per po
 odds, so the shop can say "+5% odds at run 16" next to the cost. Rivals are sized to the
 base crowd of five, so extra starting runners are a real edge rather than a bigger fight.
 
+**Number Tower** (web build only). A hero with a number climbs a tower. He beats anything smaller
+and adds it to his own, and a tie is a loss. The first chapter plays as the ads show it: pick any
+floor. That version is not a puzzle. In a model of it, a player who always fought the smallest
+enemy won 96 to 100 percent of random towers, with multipliers, curses, keys and growing enemies
+all included. So from chapter 2 the tower is a building: rooms connect by doorways and he walks
+from one to the next, and some pieces punish a big number. A weak floor holds only so much, a
+mirror reverses his digits (19 becomes 91, 20 becomes 2), a saw is cheap for a small number and
+ruinous for a big one, a locked room needs a key from somewhere else, and some rivals grow each
+time he enters a room. About 18 percent of random towers of this kind beat two different
+rule-of-thumb players and still have a solution, some with exactly one winning order. Three stars
+are for ending on the best number any order can reach. There is a daily tower, the same for
+everyone on a date.
+
 ## Play in a browser
 
-The same three games run as a web app at https://baestheorem.github.io/actual-gameplay/, on a
-phone or a desktop. It installs to a home screen, and progress stays in that browser. The web
+The game runs as a web app at https://baestheorem.github.io/actual-gameplay/, on a phone or a
+desktop. It installs to a home screen, and progress stays in that browser. The web
 build is the game now: new levels and new modes are made there, and the iPhone app keeps the
 levels it shipped with.
 
@@ -59,11 +73,13 @@ Node with no simulator:
     cd web && npm install
     npm run dev                      build the art sheets and the level bundle, then serve with reload
     npm test                         unit tests
-    npm run replay -- pinPull        play every stored solution: pinPull, saveDog or runner
+    npm run replay -- pinPull        play every stored solution: pinPull, saveDog, runner or tower
     npm run audit -- pinPull         every pull order up to par; each level must report UNIQUE
     npm run stats                    measure the levels that changed: the share of random play that wins
     npm run stats -- --check         exit 1 if a level has no number, or a stale one
     npm run build                    type-check and write web/dist
+    npx tsx scripts/tower-gen.ts     write the Number Tower campaign again from its seeds and recipes
+    npx tsx scripts/film.ts pinPull <level> --solution   one picture of a run, a frame every half second
 
 ### Levels and chapters
 
@@ -98,6 +114,10 @@ estimate.
 
 For Save the Clawd the number is a sample: 48 plausible random strokes, each tried as the only
 stroke, and the share of them that survive.
+
+For Number Tower the number is exact and instant: a random player enters any room open to him,
+each as likely as the next, and the solver adds up the chance of every order that beats the
+boss.
 
 The numbers live in `web/levels/stats.json`, each stamped with the SHA-256 of the level file it
 was measured on. A level whose file has not changed is skipped, `--force` measures everything
@@ -172,6 +192,26 @@ Two things differ from SpriteKit on purpose. The physics world never sleeps a bo
 liquid here is a pile of slow circles and a sleeping pile stops spreading (Mind the hole depends
 on the last few points of that spread). And the step is a fixed 1/60 s whatever the display rate.
 `DESIGN.md` holds the look both builds share.
+
+### Number Tower's levels are generated and graded
+
+Nobody places the rooms by hand. `web/src/sim/tower/generator.ts` builds a candidate tower from a
+chapter's recipe (grid sizes, which pieces, how many walls), sizes the boss from the best number
+reachable before it, and the solver (`solver.ts`) grades it: whether it can be won, the best
+final number, how many orders win, the exact share of random play that wins, and a tier from two
+rule-of-thumb players (`bots.ts`). One always takes the smallest rival he can beat; the other
+also knows to save a potion for late and to use a weak floor while he is light. A tower is tier 0
+when the first wins, 1 when only the second does, 2 when neither does. A recipe keeps only towers
+in its band, so chapter 1 is all tier 0 and chapter 4 is all tier 2 with a random-play share of 5
+percent or less. `web/scripts/tower-gen.ts` holds the seeds, the recipes, and the names and
+hints, and writes `web/levels/tower/`; a rerun writes the same bytes. The solver is checked
+against 160 towers solved by an independent model (`web/tests/fixtures/tower-reference.json`).
+
+The daily tower is made by the same generator at the moment it is opened, from the date, and
+solved on the spot for its best number, its hint and its sticker.
+
+Each piece is explained once, on a small plate under the hint, in the first level that has it
+(`web/src/sim/tower/explain.ts`).
 
 ## Build the iPhone app
 

@@ -40,6 +40,7 @@ jobs:
       - run: npm run replay -- pinPull
       - run: npm run replay -- runner
       - run: npm run replay -- saveDog
+      - run: npm run replay -- tower
       # Every level ships with its measured difficulty: a level with no figure, or one measured
       # before the level last changed, stops the deploy until "npm run stats" has been run.
       - run: npm run stats -- --check
