@@ -24,6 +24,9 @@ const renderer = async () => {
   return app;
 };
 
+/// Make the canvas before the first game opens: on a phone the first WebGL start takes a moment.
+export const warmRenderer = () => void renderer();
+
 /// The stage was resized: keep the canvas sharp at the new scale.
 export const setStageScale = (scale: number) => {
   stageScale = scale;
@@ -64,7 +67,7 @@ export class Game {
       this.progressEl,
     );
     (this.progressEl.firstChild as HTMLElement).style.background = opts.mode.accent;
-    ui.replaceChildren(this.hud, h("div.loading", "…"));
+    ui.replaceChildren(this.hud, h("div.loading", "Loading"));
     audio.playMusic(opts.mode.track);
     void this.reset();
   }

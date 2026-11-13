@@ -6,6 +6,7 @@
 import { copyFileSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { spawnSync } from "node:child_process";
 import sharp from "sharp";
 
 const web = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -69,9 +70,16 @@ for (const [file, px] of [["icon-192.png", 192], ["icon-512.png", 512], ["apple-
   await sharp(join(painted, "icon.png")).resize(px, px).flatten({ background: "#F3EBDC" }).png().toFile(join(out, file));
 }
 
-// Audio as it is: the effects are 1 MB in total and the music is already MP3.
+// The music ships at 256 to 320 kbps, which is 4 to 8 MB a track and slow to start on a phone
+// connection. It plays quietly under the game, so 96 kbps is enough and a third of the size.
+// Without ffmpeg the files are copied as they are. The effects are 1 MB in total and stay as they are.
+const hasFfmpeg = spawnSync("ffmpeg", ["-version"]).status === 0;
+if (!hasFfmpeg) console.warn("ffmpeg not found: music copied at full size");
 for (const f of readdirSync(join(app, "Audio"))) {
-  if (f.endsWith(".mp3")) copyFileSync(join(app, "Audio", f), join(out, "audio", f.replaceAll(" ", "-")));
+  if (!f.endsWith(".mp3")) continue;
+  const from = join(app, "Audio", f), to = join(out, "audio", f.replaceAll(" ", "-"));
+  const done = hasFfmpeg && spawnSync("ffmpeg", ["-v", "error", "-y", "-i", from, "-map", "0:a", "-map_metadata", "-1", "-c:a", "libmp3lame", "-b:a", "96k", "-ac", "2", to]).status === 0;
+  if (!done) copyFileSync(from, to);
 }
 for (const f of readdirSync(join(app, "Audio/sfx"))) {
   if (/\.(wav|mp3)$/.test(f)) copyFileSync(join(app, "Audio/sfx", f), join(out, "audio/sfx", f));

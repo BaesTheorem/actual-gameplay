@@ -122,16 +122,34 @@ export const stopLoop = (name: string) => {
 
 export const stopAllLoops = () => { for (const name of [...new Set([...loops.keys(), ...wantedLoops.keys()])]) stopLoop(name); };
 
+const players = new Map<Track, HTMLAudioElement>();
+/// The element for a track. It is made once and kept, so a track that was heard before starts at once.
+const player = (name: Track) => {
+  let el = players.get(name);
+  if (!el) {
+    el = new Audio(`${base}audio/${TRACKS[name].replaceAll(" ", "-")}.mp3`);
+    el.preload = "auto";
+    el.loop = true;
+    el.volume = MUSIC_VOLUME;
+    players.set(name, el);
+  }
+  return el;
+};
+
+/// Start fetching a track before it is asked for, so it plays without a wait.
+export const preloadMusic = (name: Track) => {
+  if (settings.music) player(name).load();
+};
+
 const startMusic = () => {
   if (!track || !settings.music || !unlocked) return;
-  const src = `${base}audio/${TRACKS[track].replaceAll(" ", "-")}.mp3`;
-  if (music && music.dataset.track === track) { if (music.paused) void music.play().catch(() => {}); return; }
-  music?.pause();
-  music = new Audio(src);
-  music.dataset.track = track;
-  music.loop = true;
-  music.volume = MUSIC_VOLUME;
-  void music.play().catch(() => {});
+  const next = player(track);
+  if (music !== next) {
+    music?.pause();
+    music = next;
+    music.currentTime = 0;
+  }
+  if (music.paused) void music.play().catch(() => {});
 };
 
 /// One looping track at a time.

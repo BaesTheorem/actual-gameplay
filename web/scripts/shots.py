@@ -42,7 +42,8 @@ def main(steps):
         # The worker is blocked so every run loads the files that were just built.
         page = browser.new_context(viewport={"width": 402, "height": 874}, device_scale_factor=2, service_workers="block").new_page()
         page.on("pageerror", lambda e: print("PAGE ERROR", e))
-        page.on("console", lambda m: m.type in ("error", "warning") and print("CONSOLE", m.type, m.text[:300]))
+        # A line the page logs with a PERF prefix is a timing and is printed as it is.
+        page.on("console", lambda m: print(m.text) if m.text.startswith("PERF") else m.type in ("error", "warning") and print("CONSOLE", m.type, m.text[:300]))
         page.on("response", lambda r: r.status >= 400 and print("HTTP", r.status, r.url))
         def at(x, y):
             """Canvas points (y up) to a place in the window, wherever the stage sits and whatever its scale."""

@@ -3,8 +3,8 @@ import "./style.css";
 import * as art from "./app/art";
 import * as audio from "./app/audio";
 import { button, h, icon, iconButton, stars, swatch } from "./app/dom";
-import { Game, setStageScale } from "./app/game";
-import { MODES, levelCount, levelID, mode as findMode, type ModeInfo } from "./app/modes";
+import { Game, setStageScale, warmRenderer } from "./app/game";
+import { MODES, levelCount, levelID, mode as findMode, prefetchAll, warm, type ModeInfo } from "./app/modes";
 import { showRunnerHub } from "./app/runnerhub";
 import { record, store, type Mode } from "./app/store";
 import { W } from "./scenes/kit";
@@ -74,6 +74,8 @@ const home = () => {
 
 const levelSelect = (m: ModeInfo) => {
   audio.playMusic(m.track);
+  // The player is about to pick a level: get this mode's code and art ready now.
+  void warm(m.id);
   const count = levelCount(m.id as Mode);
   const results = store.progress[m.id as "saveDog" | "pinPull"];
   const cleared = Object.values(results).filter((r) => r.cleared).length;
@@ -108,6 +110,7 @@ const play = (m: ModeInfo, index: number) => {
 
 const runnerHub = () => {
   audio.playMusic("runner");
+  void warm("runner");
   const el = screen("paper");
   ui.replaceChildren(el);
   showRunnerHub(el, { onBack: back("/"), onRun: () => go("/runner/play") });
@@ -198,6 +201,11 @@ addEventListener("contextmenu", (e) => e.preventDefault());
 
 store.load();
 applySettings();
+audio.preloadMusic("menu");
+// Once the first screen is up and the page is idle: make the canvas, then bring the games' files
+// into the cache, so the first level of each mode does not wait on the network.
+const idle = (run: () => void) => ("requestIdleCallback" in window ? requestIdleCallback(run, { timeout: 3000 }) : setTimeout(run, 800));
+addEventListener("load", () => idle(() => { warmRenderer(); void prefetchAll(); }));
 // The menus are drawn in Permanent Marker; wait for it so the first screen does not reflow.
 void Promise.all([document.fonts.load('16px "Permanent Marker"'), document.fonts.load('24px "Material Symbols Sharp"')]).finally(route);
 

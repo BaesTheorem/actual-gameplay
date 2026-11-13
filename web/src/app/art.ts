@@ -40,6 +40,27 @@ export const load = async (names: string[]) => {
   }));
 };
 
+/// Drop sheets that are loaded but not in `keep`. A clip sheet is several megabytes once
+/// decoded, and a phone does not have room for all three games at once.
+export const release = async (keep: string[]) => {
+  const wanted = new Set(keep);
+  for (const name of [...frames.keys()]) {
+    if (wanted.has(name)) continue;
+    frames.delete(name);
+    await Assets.unload(url(name)).catch(() => {});
+  }
+};
+
+/// Bring files into the browser's cache without decoding them, a few at a time, so they are
+/// there when a scene asks. Nothing waits on this.
+export const prefetch = async (names: string[]) => {
+  const queue = [...new Set(names)].filter((n) => exists(n) && !frames.has(n));
+  const worker = async () => {
+    for (let name = queue.shift(); name; name = queue.shift()) await fetch(url(name)).then((r) => r.blob()).catch(() => {});
+  };
+  await Promise.all([worker(), worker(), worker()]);
+};
+
 let missing: Texture | null = null;
 const magenta = () => {
   if (!missing) {
