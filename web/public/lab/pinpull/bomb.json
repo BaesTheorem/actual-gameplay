@@ -1,0 +1,32 @@
+{
+  "id": "bomb",
+  "name": "Dry powder",
+  "rules": 2,
+  "hint": "Lava lights it. Water ruins it. Both are up there.",
+  "parPins": 2,
+  "winWhen": "treasureReachesHero",
+  "walls": [
+    {"x": 136, "y": 128, "w": 14, "h": 262},
+    {"x": 250, "y": 128, "w": 14, "h": 262}
+  ],
+  "cracked": [
+    {"x": 193, "y": 68, "w": 14, "h": 60},
+    {"x": 150, "y": 128, "w": 100, "h": 14}
+  ],
+  "pins": [
+    {"id": "p1", "x": 150, "y": 250, "w": 100, "side": "right"},
+    {"id": "p2", "x": 150, "y": 330, "w": 100, "side": "right"}
+  ],
+  "pools": [
+    {"liquid": "lava", "x": 152, "y": 264, "w": 96, "h": 20, "count": 14},
+    {"liquid": "water", "x": 152, "y": 344, "w": 96, "h": 40, "count": 42}
+  ],
+  "bombs": [
+    {"x": 200, "y": 154}
+  ],
+  "actors": {
+    "hero": {"x": 60, "y": 84},
+    "treasure": {"x": 340, "y": 79}
+  },
+  "solution": ["p1", "p2"]
+}

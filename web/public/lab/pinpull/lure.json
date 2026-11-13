@@ -1,0 +1,31 @@
+{
+  "id": "lure",
+  "name": "The moat",
+  "rules": 2,
+  "hint": "He will run straight at you. Give him something to run through.",
+  "parPins": 2,
+  "winWhen": "treasureReachesHero",
+  "walls": [
+    {"x": 38, "y": 68, "w": 112, "h": 32},
+    {"x": 150, "y": 68, "w": 100, "h": 24},
+    {"x": 250, "y": 68, "w": 114, "h": 32},
+    {"x": 136, "y": 220, "w": 14, "h": 60},
+    {"x": 196, "y": 220, "w": 8, "h": 60},
+    {"x": 250, "y": 220, "w": 14, "h": 60}
+  ],
+  "pins": [
+    {"id": "p1", "x": 242, "y": 114, "w": 40, "side": "right", "angle": 90},
+    {"id": "p2", "x": 150, "y": 220, "w": 46, "side": "left"},
+    {"id": "p3", "x": 204, "y": 220, "w": 46, "side": "right"}
+  ],
+  "pools": [
+    {"liquid": "water", "x": 152, "y": 234, "w": 42, "h": 40, "count": 24},
+    {"liquid": "lava", "x": 206, "y": 234, "w": 42, "h": 40, "count": 30}
+  ],
+  "actors": {
+    "hero": {"x": 70, "y": 116},
+    "treasure": {"x": 345, "y": 111},
+    "foes": [{"x": 305, "y": 116}]
+  },
+  "solution": ["p2", "p1"]
+}

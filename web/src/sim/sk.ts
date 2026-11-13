@@ -245,6 +245,48 @@ export class SKWorld {
     for (const body of this.doomed) this.world.destroyBody(body);
     this.doomed = [];
   }
+
+  /// The first live body a straight line meets on its way from one canvas point to another, among
+  /// the bodies whose category is in `mask`, and the point where it meets it. A shape that holds
+  /// the starting point is not found.
+  rayCast(from: Vec, to: Vec, mask: number): { body: planck.Body; point: Vec } | null {
+    let found: { body: planck.Body; point: Vec } | null = null;
+    this.world.rayCast(planck.Vec2(from.x / PPM, from.y / PPM), planck.Vec2(to.x / PPM, to.y / PPM), (fixture, point, _normal, fraction) => {
+      const body = fixture.getBody(), tag = tagOf(body);
+      // -1 passes over a fixture. A fraction cuts the line short there, so only nearer ones follow.
+      if (tag.removed || (tag.category & mask) === 0) return -1;
+      found = { body, point: { x: point.x * PPM, y: point.y * PPM } };
+      return fraction;
+    });
+    return found;
+  }
+
+  /// Every live body whose shape touches this one's, as of the last step. Only pairs that collide
+  /// or report are tracked, so a body the masks leave out is never found.
+  touching(body: planck.Body): planck.Body[] {
+    const found: planck.Body[] = [];
+    for (let edge = body.getContactList(); edge; edge = edge.next) {
+      const other = edge.other;
+      if (other && edge.contact.isTouching() && !tagOf(other).removed && !found.includes(other)) found.push(other);
+    }
+    return found;
+  }
+
+  /// Every live body that can move and has a shape overlapping a canvas rectangle. The engine
+  /// gives a rectangle a skin a point and a half thick, so a shape that near it counts as overlapping.
+  movingIn(rect: { x: number; y: number; w: number; h: number }): planck.Body[] {
+    const lower = planck.Vec2(rect.x / PPM, rect.y / PPM), upper = planck.Vec2((rect.x + rect.w) / PPM, (rect.y + rect.h) / PPM);
+    const box = new planck.Box(rect.w / 2 / PPM, rect.h / 2 / PPM, planck.Vec2((rect.x + rect.w / 2) / PPM, (rect.y + rect.h / 2) / PPM), 0);
+    const here = planck.Transform.identity();
+    const found: planck.Body[] = [];
+    this.world.queryAABB(new planck.AABB(lower, upper), (fixture) => {
+      const body = fixture.getBody();
+      if (body.isDynamic() && !tagOf(body).removed && !found.includes(body)
+        && planck.testOverlap(box, 0, fixture.getShape(), 0, here, body.getTransform())) found.push(body);
+      return true;
+    });
+    return found;
+  }
 }
 
 export const position = (body: planck.Body): Vec => {

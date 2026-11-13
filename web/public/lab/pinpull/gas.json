@@ -1,0 +1,27 @@
+{
+  "id": "gas",
+  "name": "Bad air",
+  "rules": 2,
+  "hint": "It goes up. So wait until it has gone.",
+  "parPins": 2,
+  "winWhen": "heroReachesFriend",
+  "walls": [
+    {"x": 250, "y": 108, "w": 14, "h": 412}
+  ],
+  "pins": [
+    {"id": "p1", "x": 264, "y": 160, "w": 100, "side": "right"},
+    {"id": "p2", "x": 264, "y": 380, "w": 100, "side": "right"}
+  ],
+  "pools": [
+    {"liquid": "gas", "x": 264, "y": 120, "w": 100, "h": 40, "count": 45}
+  ],
+  "vents": [
+    {"x": 264, "y": 300, "w": 100, "h": 14}
+  ],
+  "actors": {
+    "hero": {"x": 314, "y": 410},
+    "friend": {"x": 80, "y": 81},
+    "foes": [{"x": 314, "y": 190}]
+  },
+  "solution": ["p1", "p2"]
+}

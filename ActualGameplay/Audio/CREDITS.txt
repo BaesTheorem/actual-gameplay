@@ -71,3 +71,10 @@ MIT license:
     splash.wav            water landing
     sizzle.wav            water meeting lava
     heave.wav             the bees' shove
+    blast.wav             a bomb going off
+    fuse.wav              a lit fuse
+    boulder_land.wav      a boulder landing
+    wall_break.wav        a cracked wall coming down
+    plate_click.wav       a plate pressed or let go
+    door_slide.wav        a stone door sliding
+    gas_hiss.wav          gas reaching someone

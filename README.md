@@ -119,6 +119,45 @@ level the card also offers "Hint (no ad)": Pull the Pin rings the pins of the st
 the order to pull them, one pin more with each hint taken, and Save the Clawd shows the stored
 strokes as a dotted ghost. Both last four seconds. A level with no stored solution offers nothing.
 
+### Pull the Pin's walking rules
+
+A Pull the Pin level that says `"rules": 2` plays by the walking rules. A level without it plays
+exactly as it always did, and every newer field in it is ignored. Under the walking rules:
+
+- **Characters walk.** The hero goes for the gem, the exit, the gem and then the exit, or the
+  friend, by the level's `winWhen` (`heroReachesFriend` is new). A goblin goes for the hero or the
+  friend, the nearer one if it can reach both. The friend (`actors.friend`) never walks. A walker
+  needs a route: a probe steps along the floor six points at a time, sixty steps at most, and
+  stops at anything solid at body height, at a ceiling less than 34 points up, and at a floor
+  that rises or falls more than 8 points in one step. So a slope of up to 53 degrees is a road
+  and a ledge is not. The hero walks at 70 points a second and a goblin at 55. The hero will not
+  set out on a route with lava, gas, a lit bomb or a living goblin on it. Water does not stop
+  him, and nothing stops a goblin.
+- **Boulders** (`boulders: [{x, y, r?}]`) roll. One that meets a character at 120 points a second
+  or more, measured between the two of them, flattens him.
+- **Bombs and cracked walls** (`bombs: [{x, y}]`, `cracked: [rect]`). Lava lights a dry bomb and
+  it goes off 0.7 s later. Water on a bomb that is not lit makes it a dud for good. A blast
+  reaches 64 points: it takes out every cracked wall that near, and whatever it can see inside
+  that reach is knocked out, killed, lit or thrown.
+- **Linked pins** (`"group": "a"` on a pin) are pulled by one tap and count as one pull.
+- **Plates and doors** (`plates: [{id, x, y, w, opens}]`, `doors: [{id, x, y, w, h, slide, latch?}]`).
+  A door slides open while something solid rests on one of its plates.
+- **Gas and vents** (a pool with `"liquid": "gas"`, `vents: [rect]`). Gas rises, goes through
+  liquids and characters, and ends whoever breathes it. A vent takes it, and so does the top
+  edge of the playfield.
+
+Every number is a named constant in `web/src/sim/pinpull/level.ts` or `route.ts`, with the rule
+it belongs to written beside it. Three tools go with the rules:
+
+    npx tsx scripts/film.ts pinPull <level id | file.json> [--pins p1,p2]         a run as one picture, a frame every half second
+    npx tsx scripts/pin-suite.ts play|audit|odds <level id | file.json> [p1,p2]   one level: a pull order, the audit, the odds
+    #/pinPull/~<name>                                                             web/public/lab/pinpull/<name>.json, in the game
+
+The film needs no browser and writes `build/film/<level>-<pins>.png`. The lab route plays a level
+file that is in no chapter, with no sticker and nothing saved, under the title "Lab: <name>". It
+reads `public/lab/<mode folder>/`, so any mode with levels can be looked at the same way. Seven
+small levels are in the lab, one for each of the newer pieces.
+
 ### Checks and deploys
 
 A push to `main` runs the tests, the replays and the stats check, then deploys `web/dist` to
@@ -248,8 +287,9 @@ and in the app's settings screen. Launch with `--silent` to keep automation quie
 
 The effects in `ActualGameplay/Audio/sfx/` are Kenney's Impact, Interface, Digital and RPG audio
 packs (CC0), the organic pack of Romain Simon's [UI SFX](https://github.com/romainsimon/uisfx) for
-the menus (CC0), and six sounds generated for the game: the bee buzz, the pen scratch and the saw
-whir (loops), and the splash, the sizzle and the bees' heave. `tools/sfx/make_synth.py` rebuilds them: on
+the menus (CC0), and thirteen sounds generated for the game: the bee buzz, the pen scratch and the saw
+whir (loops), the splash, the sizzle and the bees' heave, and Pull the Pin's blast, fuse, boulder,
+breaking wall, plate, door and gas. `tools/sfx/make_synth.py` rebuilds them: on
 its own it regenerates the generated ones, and with `--fetch` it downloads the packs and redoes the
 picks. `Sources/Shared/Audio.swift` maps each `SoundEvent` to its files and volume; the files are
 matched for loudness, so those volumes are the mix. Effects have their own switch in Settings, and

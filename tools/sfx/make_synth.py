@@ -2,9 +2,10 @@
 """Make the game's sound effects.
 
 With no arguments this regenerates the synthesized set (the bee buzz, the ink scratch and the saw
-whir loops, and the splash, sizzle and heave), which needs only numpy. With --fetch it also
-downloads the Kenney packs and the UI SFX organic pack (all CC0) and rebuilds the picks taken from
-them, which needs ffmpeg. ../CREDITS.txt lists every file and where it came from.
+whir loops, the splash, sizzle and heave, and Pull the Pin's blast, fuse, boulder, wall, plate,
+door and gas), which needs only numpy. With --fetch it also downloads the Kenney packs and the UI
+SFX organic pack (all CC0) and rebuilds the picks taken from them, which needs ffmpeg.
+../CREDITS.txt lists every file and where it came from.
 
 Everything written here is 16-bit 44.1 kHz mono WAV, trimmed, faded, and matched for loudness
 (A-weighted RMS of the loudest 100 ms, under a -1 dBFS peak), so the volumes in Audio.swift are the
@@ -300,6 +301,130 @@ def heave() -> np.ndarray:
     return fade(level(air * swell), 0.03, start=0.005)
 
 
+def sweep(t: np.ndarray, start: float, end: float, over: float) -> np.ndarray:
+    """A sine whose pitch falls from `start` Hz toward `end`, most of the way in `over` seconds."""
+    freq = end + (start - end) * np.exp(-t / over)
+    return np.sin(2 * np.pi * np.cumsum(freq) / SR)
+
+
+def blast() -> np.ndarray:
+    """A crate of powder going off: a crack, a boom that drops in pitch with a second one an octave
+    up for small speakers, and a tail of grit that loses its brightness. 0.7 s."""
+    n = int(0.7 * SR)
+    t = np.arange(n) / SR
+    rng = np.random.default_rng(7)
+    crack = band(rng.standard_normal(n) * np.exp(-t / 0.012), 900, 7000)
+    boom = sweep(t, 110, 45, 0.07) * (1 - np.exp(-t / 0.003)) * np.exp(-t / 0.16)
+    body = sweep(t, 330, 140, 0.05) * (1 - np.exp(-t / 0.002)) * np.exp(-t / 0.09)
+    tail = rng.standard_normal(n) * (1 - np.exp(-t / 0.01)) * np.exp(-t / 0.2)
+    tail = moving(tail, lambda at, f: 1 / np.sqrt(1 + (f / (400 + 5000 * np.exp(-at / 0.12))) ** 4))
+    out = (0.9 * crack / np.std(crack[: int(0.03 * SR)]) + 1.3 * boom + 0.8 * body
+           + 0.8 * tail / np.std(tail[: int(0.2 * SR)]))
+    return fade(level(out), 0.15)
+
+
+def fuse() -> np.ndarray:
+    """A fuse burning down: a thin bright hiss that flutters and grows, with sparks spitting off it.
+    0.7 s, which is how long a fuse burns."""
+    n = int(0.7 * SR)
+    t = np.arange(n) / SR
+    rng = np.random.default_rng(8)
+    hiss = band(rng.standard_normal(n), 3500, 9000)
+    flutter = band(rng.standard_normal(n), None, 45)
+    flutter = 1 + 0.5 * flutter / np.max(np.abs(flutter))
+    hiss *= (1 - np.exp(-t / 0.01)) * (0.7 + 0.3 * t / 0.7) * flutter
+    spit = np.zeros(n)
+    for i in np.nonzero(rng.random(n) < 160 / SR)[0]:
+        length = int(rng.uniform(0.0005, 0.002) * SR)
+        seg = rng.standard_normal(length) * np.hanning(length) * rng.uniform(0.4, 1.0)
+        spit[i:i + length] += seg[: n - i]
+    spit = band(spit, 4000, 10000)
+    out = hiss / np.std(hiss) + 1.1 * spit / max(np.std(spit), 1e-9)
+    return fade(level(out), 0.04, start=0.005)
+
+
+def boulder_land() -> np.ndarray:
+    """A boulder landing: a dull knock, a low thud under it, and a little grit after. 0.4 s."""
+    n = int(0.4 * SR)
+    t = np.arange(n) / SR
+    rng = np.random.default_rng(9)
+    knock = band(rng.standard_normal(n) * np.exp(-t / 0.03), 150, 900)
+    thud = (sweep(t, 95, 55, 0.05) + 0.6 * sweep(t, 210, 120, 0.04)) * (1 - np.exp(-t / 0.002)) * np.exp(-t / 0.09)
+    late = np.clip(t - 0.02, 0, None)
+    grit = band(rng.standard_normal(n), 600, 2500) * (t > 0.02) * (1 - np.exp(-late / 0.01)) * np.exp(-late / 0.08)
+    out = knock / np.std(knock[: int(0.05 * SR)]) + 1.4 * thud + 0.25 * grit / np.std(grit[: int(0.15 * SR)])
+    return fade(level(out), 0.1)
+
+
+def wall_break() -> np.ndarray:
+    """A wall coming down: a crack, then a dozen lumps of stone knocking as they land, over a
+    spill of rubble. 0.65 s."""
+    n = int(0.65 * SR)
+    t = np.arange(n) / SR
+    rng = np.random.default_rng(10)
+    crack = band(rng.standard_normal(n) * np.exp(-t / 0.01), 700, 6000)
+    lumps = np.zeros(n)
+    for _ in range(12):
+        at = rng.uniform(0.02, 0.45)
+        f0 = rng.uniform(180, 700)
+        d = np.clip(t - at, 0, None)
+        knock = np.sin(2 * np.pi * f0 * d) * np.exp(-d / rng.uniform(0.012, 0.03))
+        tick = rng.standard_normal(n) * np.exp(-d / 0.004)
+        lumps += (knock + 0.5 * tick) * (t > at) * rng.uniform(0.4, 1.0) * (1 - at)
+    lumps = band(lumps, 150, 5000)
+    rubble = band(rng.standard_normal(n), 500, 4000) * (1 - np.exp(-t / 0.02)) * np.exp(-t / 0.18)
+    out = (crack / np.std(crack[: int(0.03 * SR)]) + 1.1 * lumps / np.std(lumps)
+           + 0.5 * rubble / np.std(rubble[: int(0.2 * SR)]))
+    return fade(level(out), 0.12)
+
+
+def plate_click() -> np.ndarray:
+    """A plate going down under a weight, or coming back up: one small dry click. 0.07 s."""
+    n = int(0.07 * SR)
+    t = np.arange(n) / SR
+    rng = np.random.default_rng(11)
+    tick = band(rng.standard_normal(n) * np.exp(-t / 0.004), 1200, 6000)
+    body = np.sin(2 * np.pi * 520 * t) * np.exp(-t / 0.012)
+    return fade(level(tick / np.std(tick[: int(0.01 * SR)]) + 0.7 * body), 0.02)
+
+
+def door_slide() -> np.ndarray:
+    """A stone door sliding: a low scrape made of grains, and a knock as it stops. 0.32 s."""
+    n = int(0.32 * SR)
+    t = np.arange(n) / SR
+    rng = np.random.default_rng(12)
+    grains = np.zeros(n)
+    for _ in range(70):
+        length = int(rng.uniform(0.004, 0.015) * SR)
+        at = rng.integers(0, int(0.25 * SR))
+        seg = rng.standard_normal(length) * np.hanning(length) * rng.uniform(0.3, 1.0)
+        grains[at:at + length] += seg[: n - at]
+    grains = band(grains, 250, 1800)
+    bed = band(rng.standard_normal(n), 150, 900) * (t < 0.26)
+    slide = (1 - np.exp(-t / 0.02)) * np.where(t < 0.26, 1.0, np.exp(-(t - 0.26) / 0.015))
+    stop = np.clip(t - 0.26, 0, None)
+    knock = np.sin(2 * np.pi * 150 * stop) * (t > 0.26) * np.exp(-stop / 0.03)
+    out = (grains / np.std(grains) + 0.5 * bed / np.std(bed)) * slide + 1.6 * knock
+    return fade(level(out), 0.03, start=0.004)
+
+
+def gas_hiss() -> np.ndarray:
+    """Gas reaching someone: a soft breathy hiss that swells and falls away, lower and rounder than
+    steam. 0.5 s."""
+    n = int(0.5 * SR)
+    t = np.arange(n) / SR
+    rng = np.random.default_rng(13)
+    total = 0.5
+
+    def centre(at: float) -> float:
+        return 1500 * (2600 / 1500) ** np.sin(np.pi * min(at, total) / total)
+
+    air = moving(rng.standard_normal(n),
+                 lambda at, f: np.exp(-0.5 * (np.log2(np.maximum(f, 1) / centre(at)) / 0.7) ** 2))
+    swell = np.sin(np.pi * np.clip(t / total, 0, 1)) ** 1.5
+    return fade(level(air * swell), 0.05, start=0.01)
+
+
 SYNTH = {
     "loop_buzz.wav": buzz,
     "loop_scratch.wav": scratch,
@@ -307,6 +432,13 @@ SYNTH = {
     "splash.wav": splash,
     "sizzle.wav": sizzle,
     "heave.wav": heave,
+    "blast.wav": blast,
+    "fuse.wav": fuse,
+    "boulder_land.wav": boulder_land,
+    "wall_break.wav": wall_break,
+    "plate_click.wav": plate_click,
+    "door_slide.wav": door_slide,
+    "gas_hiss.wav": gas_hiss,
 }
 
 

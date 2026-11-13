@@ -5,8 +5,17 @@
 //   odds()         the share of random pull orders that win, for the level statistics
 // The audit and the odds decide which sequences to play and ask for each through a `Play`
 // function, so the caller chooses where the simulations run: here, or in a pool of processes.
+// A move is a pin or a group of linked pins, which one tap pulls together: both count a group once.
+//
+// Run as a script, it tries one level, from the campaign by id or from any level file:
+//   npx tsx scripts/pin-suite.ts play  <level id | file.json> [p1,p2,...]   pull these in order and say how it ends
+//   npx tsx scripts/pin-suite.ts audit <level id | file.json>               the audit's line for this level
+//   npx tsx scripts/pin-suite.ts odds  <level id | file.json>               the share of random play that wins it
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { folderOf } from "../src/app/modetable";
-import { playOut, type PinLevel } from "../src/sim/pinpull";
+import { moveOf, moves, playOut, type PinLevel } from "../src/sim/pinpull";
 import { SeededRNG } from "../src/sim/runner/rng";
 import type { Outcome } from "../src/sim/sk";
 import { idNumber, load, loadLevel } from "./levels";
@@ -27,6 +36,10 @@ export const playHere: Play = async (level, pins) => endOf(playOut(level, pins).
 
 /// The same, by level id: the call a child process makes.
 export const play = (id: string, pins: string[]): End => endOf(playOut(loadLevel<PinLevel>(FOLDER, id), pins).outcome);
+
+/// A level of the campaign by its id, or any level file by its path.
+export const levelFrom = (ref: string): PinLevel =>
+  ref.endsWith(".json") ? JSON.parse(readFileSync(ref, "utf8")) as PinLevel : loadLevel<PinLevel>(FOLDER, ref);
 
 const row = (level: PinLevel) => `${level.id.padEnd(20)} ${level.name.padEnd(22)}`;
 
@@ -50,7 +63,7 @@ export const replay = (): { passed: number; total: number } => {
 /// A sequence that stalled (everything settled, nothing won) can still be extended; one that
 /// ended in a death, a melt or a drain cannot, and one that won needs no more pulls.
 const exhaustive = async (level: PinLevel, playOne: Play) => {
-  const ids = level.pins.map((p) => p.id);
+  const ids = moves(level);
   let frontier: string[][] = [[]];
   const winners: string[][] = [];
   let tried = 0;
@@ -67,7 +80,8 @@ const exhaustive = async (level: PinLevel, playOne: Play) => {
 /// Audit one level. The line is what the audit prints for it.
 export const auditLevel = async (level: PinLevel, playOne: Play = playHere): Promise<{ line: string; flagged: boolean }> => {
   const { winners, tried } = await exhaustive(level, playOne);
-  const solution = (level.solution ?? []).join("+");
+  // A stored solution may name any pin of a group. The search names a group by its first pin.
+  const solution = (level.solution ?? []).map((id) => moveOf(level, id)).join("+");
   const won = winners.map((w) => w.join("+"));
   let verdict: string;
   if (won.length === 0) verdict = "UNWINNABLE within par";
@@ -101,7 +115,7 @@ export const PLAYOUTS = 300;
 /// A level whose tree passes `limit` sequences is sampled: 300 random pull orders from a generator
 /// seeded by the level's id, each followed down the same tree, and the share of them that win.
 export const odds = async (level: PinLevel, playOne: Play = playHere, limit = TREE_LIMIT): Promise<Odds> => {
-  const ids = level.pins.map((p) => p.id);
+  const ids = moves(level);
   // Each sequence is played once, whoever asks for it and however often.
   const played = new Map<string, Promise<End>>();
   const end = (seq: string[]): Promise<End> => {
@@ -156,3 +170,28 @@ export const odds = async (level: PinLevel, playOne: Play = playHere, limit = TR
   const wins = results.filter((r) => r === "won").length;
   return { randomWin: wins / PLAYOUTS, sample: PLAYOUTS, exact: false, detail: `${wins} of ${PLAYOUTS} random pull orders won` };
 };
+
+// MARK: one level from the command line
+
+const run = async (verb: string, ref: string, pulls: string) => {
+  if (!["play", "audit", "odds"].includes(verb) || !ref) {
+    console.error("usage: npx tsx scripts/pin-suite.ts play|audit|odds <level id | file.json> [p1,p2,...]");
+    process.exitCode = 1;
+    return;
+  }
+  const level = levelFrom(ref);
+  if (verb === "play") {
+    const pins = pulls ? pulls.split(",") : [];
+    const { outcome, seconds, pulled } = playOut(level, pins);
+    const how = outcome === null ? "no result" : outcome.won ? `won, ${outcome.stars} stars` : `lost: ${outcome.reason}`;
+    console.log(`${row(level)} ${pins.join("+") || "no pulls"}  ${how}  (${pulled} pulled, ${seconds.toFixed(2)} s game, ${endOf(outcome)})`);
+  } else if (verb === "audit") {
+    console.log((await auditLevel(level)).line);
+  } else {
+    const found = await odds(level);
+    console.log(`${row(level)} ${(found.randomWin * 100).toFixed(1)}%  ${found.exact ? "exact" : "estimate"}  ${found.detail}`);
+  }
+};
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  await run(process.argv[2] ?? "", process.argv[3] ?? "", process.argv[4] ?? "");
+}

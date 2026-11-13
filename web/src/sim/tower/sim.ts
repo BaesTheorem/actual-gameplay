@@ -84,6 +84,13 @@ export class TowerSim {
   get busy() { return this.current !== null || this.timeline.length > 0; }
   get finished() { return this.outcome !== null; }
 
+  /// The beat playing now, or null between beats and between moves.
+  get beat(): Beat | null { return this.current; }
+  /// How far the beat playing now has run, from 0 to 1. It is 0 when no beat is playing.
+  get beatProgress(): number {
+    return this.current ? Math.min(1, this.beatTime / this.current.seconds) : 0;
+  }
+
   /// The best final number, from the level file or from the solver when the file has none.
   get best(): number {
     if (this.bestCache === null) this.bestCache = solve(this.level).best;

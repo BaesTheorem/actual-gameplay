@@ -30,13 +30,32 @@ const EVENTS: Record<string, SoundSpec> = {
   bossRoar: { files: ["boss.wav"], volume: 0.45, minGap: 0.25 },
   win: { files: ["win.wav"], volume: 0.3, minGap: 0.25 },
   lose: { files: ["lose.wav"], volume: 0.25, minGap: 0.25 },
+  // Number Tower's moments, on sounds the other games already use: a footfall on wood, the gate
+  // chimes for a number that goes up or down, a clink for a key, a slide for a lock, a chop for a floor.
+  step: { files: ["ink_land_1.wav", "ink_land_2.wav", "ink_land_3.wav"], volume: 0.3 },
+  gain: { files: ["gate_good.wav"], volume: 0.2 },
+  drain: { files: ["gate_bad.wav"], volume: 0.2 },
+  key: { files: ["gem_clink.wav"], volume: 0.25 },
+  unlock: { files: ["pin_slide.wav"], volume: 0.25 },
+  crack: { files: ["saw_cut.wav"], volume: 0.3 },
+  // Pull the Pin's newer pieces. A blast is the loudest thing in a level, and a fuse and gas are
+  // hisses under everything else. Gas that reaches three goblins at once is heard once.
+  blast: { files: ["blast.wav"], volume: 0.4, minGap: 0.1 },
+  fuse: { files: ["fuse.wav"], volume: 0.2 },
+  boulderLand: { files: ["boulder_land.wav"], volume: 0.35, minGap: 0.1 },
+  wallBreak: { files: ["wall_break.wav"], volume: 0.3, minGap: 0.1 },
+  plate: { files: ["plate_click.wav"], volume: 0.3 },
+  door: { files: ["door_slide.wav"], volume: 0.22 },
+  gas: { files: ["gas_hiss.wav"], volume: 0.22, minGap: 0.25 },
 };
 const LOOPS: Record<string, { file: string; volume: number }> = {
   buzz: { file: "loop_buzz.wav", volume: 0.14 },
   scratch: { file: "loop_scratch.wav", volume: 0.12 },
   saw: { file: "loop_saw.wav", volume: 0.08 },
 };
-export const TRACKS = { menu: "Wallpaper", saveDog: "Pixelland", pinPull: "Investigations", runner: "Digital Lemonade" } as const;
+export const TRACKS = {
+  menu: "Wallpaper", saveDog: "Pixelland", pinPull: "Investigations", runner: "Digital Lemonade", tower: "Marty Gots a Plan",
+} as const;
 export type Track = keyof typeof TRACKS;
 const MUSIC_VOLUME = 0.35;
 

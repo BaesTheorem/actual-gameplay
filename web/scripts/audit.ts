@@ -3,7 +3,9 @@
 //                                each level is UNIQUE or the other winning orders are listed
 //   npm run audit -- runner      greedy steering against never steering, always left, and random
 //   npm run audit -- saveDog [--random N]   the solution shifted and scaled, naive strokes, N random strokes
-// The two level modes run their simulations in a pool of processes and print in play order.
+//   npm run audit -- tower       every level solved outright and held to its chapter's recipe; a level
+//                                is flagged when it breaks the recipe or its stored best is not the best
+// The two physics modes run their simulations in a pool of processes and print in play order.
 // "--jobs N" sets how many processes, 2 at most and by default.
 import { folderOf } from "../src/app/modetable";
 import type { PinLevel } from "../src/sim/pinpull";
@@ -26,6 +28,7 @@ if (mode === "pinPull") {
   pool.close();
 }
 if (mode === "runner") flagged = (await import("./runner-suite")).audit();
+if (mode === "tower") flagged = (await import("./tower-suite")).audit();
 if (mode === "saveDog") {
   const at = process.argv.indexOf("--random"), random = at > 0 ? Number(process.argv[at + 1]) : 0;
   const pool = new Pool(), suite = moduleURL("./savedog-suite.ts", import.meta.url);

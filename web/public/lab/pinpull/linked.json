@@ -1,0 +1,34 @@
+{
+  "id": "linked",
+  "name": "Both at once",
+  "rules": 2,
+  "hint": "Two pins share a colour. They also share a moment.",
+  "parPins": 2,
+  "winWhen": "treasureReachesHero",
+  "walls": [
+    {"x": 300, "y": 68, "w": 64, "h": 30},
+    {"x": 126, "y": 220, "w": 14, "h": 170},
+    {"x": 200, "y": 220, "w": 14, "h": 170},
+    {"x": 286, "y": 250, "w": 14, "h": 50}
+  ],
+  "slabs": [
+    {"x1": 128.2, "y1": 61.1, "x2": 301.2, "y2": 91.1, "t": 14}
+  ],
+  "pins": [
+    {"id": "a1", "x": 100, "y": 82, "w": 40, "side": "right", "angle": 90, "group": "a"},
+    {"id": "a2", "x": 140, "y": 220, "w": 60, "side": "right", "group": "a"},
+    {"id": "p3", "x": 140, "y": 330, "w": 60, "side": "right"},
+    {"id": "b1", "x": 300, "y": 250, "w": 32, "side": "left", "group": "b"},
+    {"id": "b2", "x": 332, "y": 250, "w": 32, "side": "right", "group": "b"}
+  ],
+  "pools": [
+    {"liquid": "lava", "x": 142, "y": 234, "w": 56, "h": 30, "count": 30},
+    {"liquid": "water", "x": 142, "y": 344, "w": 56, "h": 40, "count": 40},
+    {"liquid": "lava", "x": 302, "y": 264, "w": 60, "h": 20, "count": 16}
+  ],
+  "actors": {
+    "hero": {"x": 70, "y": 84},
+    "treasure": {"x": 335, "y": 109}
+  },
+  "solution": ["p3", "a1"]
+}

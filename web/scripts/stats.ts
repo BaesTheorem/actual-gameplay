@@ -10,13 +10,16 @@
 // current entries to the app. What "random play" means is each mode's own model:
 //   pinPull   every pull order, played out: the chance that pulling pins at random wins (pin-suite.ts)
 //   saveDog   48 plausible random strokes, each as the only stroke: the share that survive (savedog-suite.ts)
+//   tower     every order of rooms, by the solver: the chance that entering rooms at random beats the boss (tower-suite.ts)
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { LEVEL_MODES } from "../src/app/modetable";
 import type { PinLevel } from "../src/sim/pinpull";
+import type { TowerLevel } from "../src/sim/tower";
 import { LEVELS, levelHash, load } from "./levels";
 import { Pool, inOrder, moduleURL } from "./parallel";
 import { odds as pinOdds, type End, type Odds } from "./pin-suite";
+import { stats as towerOdds } from "./tower-suite";
 
 interface Entry extends Odds { hash: string }
 
@@ -33,6 +36,8 @@ const MODELS: Record<string, (pool: Pool) => (level: { id: string }) => Promise<
     const suite = moduleURL("./savedog-suite.ts", import.meta.url);
     return (level) => pool.run<Odds>({ module: suite, name: "odds", args: [level.id] });
   },
+  // The solver's answer is exact and takes a moment, so it runs here and not in the pool.
+  tower: () => async (level) => towerOdds(level as unknown as TowerLevel),
 };
 
 const force = process.argv.includes("--force"), check = process.argv.includes("--check");

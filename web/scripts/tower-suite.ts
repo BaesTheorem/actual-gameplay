@@ -4,32 +4,29 @@
 //   audit()       measure every level and flag the ones that break their chapter's recipe
 //   stats(level)  the difficulty numbers for the shell's table
 //   show(level)   an ASCII drawing of a tower
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { folderOf } from "../src/app/modetable";
 import {
   TowerSim, checkLevel, piecesOf, playOrder, roomCount, solve, validateLevel,
   type Room, type Thing, type TowerLevel,
 } from "../src/sim/tower";
-import { CHAPTERS, SEEDS, TOWER_DIR, recipeOf } from "./tower-gen";
+import { LEVELS, loadSet, type Chapter } from "./levels";
+import { CHAPTERS, SEEDS, recipeOf } from "./tower-gen";
 
-export interface TowerChapter { id: string; title: string; blurb: string; levels: string[] }
+export const FOLDER = folderOf("tower");
 
-/// The campaign as written to disk: the chapters, and every level in play order with the chapter
-/// it belongs to.
-export const loadTower = (dir = TOWER_DIR): { chapters: TowerChapter[]; levels: { chapter: string; position: number; level: TowerLevel }[] } => {
-  const chapters = JSON.parse(readFileSync(join(dir, "chapters.json"), "utf8")) as TowerChapter[];
-  const levels = chapters.flatMap((chapter) =>
-    chapter.levels.map((id, position) => {
-      const level = JSON.parse(readFileSync(join(dir, `${id}.json`), "utf8")) as TowerLevel;
-      if (level.id !== id) throw new Error(`${id}.json says its id is "${level.id}"`);
-      return { chapter: chapter.id, position, level };
-    }));
-  return { chapters, levels };
+/// The campaign as the level loader reads it: the chapters, and every level in play order with
+/// its chapter and its place in that chapter, counted from 0.
+export const campaign = (root = LEVELS): { chapters: Chapter[]; levels: { chapter: string; position: number; level: TowerLevel }[] } => {
+  const set = loadSet<TowerLevel & { id: string }>(FOLDER, root);
+  const byId = new Map(set.levels.map((level) => [level.id, level]));
+  const levels = set.chapters.flatMap((chapter) =>
+    chapter.levels.map((id, position) => ({ chapter: chapter.id, position, level: byId.get(id) as TowerLevel })));
+  return { chapters: set.chapters, levels };
 };
 
-export const replay = (dir = TOWER_DIR): { passed: number; total: number } => {
+export const replay = (root = LEVELS): { passed: number; total: number } => {
   let passed = 0, total = 0;
-  for (const { level } of loadTower(dir).levels) {
+  for (const { level } of campaign(root).levels) {
     total += 1;
     const t0 = performance.now();
     let detail: string, ok = false;
@@ -59,8 +56,8 @@ const pad = (text: string, n: number) => text.padEnd(n);
 /// level meets, when its stored best or solution disagrees with the solver, when random-win does
 /// not fall through its chapter (ties go to the lower tier, then the smaller tower), or when it
 /// has the same grid and the same pieces as its neighbour. Returns the number of flagged levels.
-export const audit = (dir = TOWER_DIR): number => {
-  const { levels } = loadTower(dir);
+export const audit = (root = LEVELS): number => {
+  const { levels } = campaign(root);
   let flagged = 0;
   const seen: { rw: number; tier: number; size: number; level: TowerLevel }[] = [];
   levels.forEach(({ chapter, position, level }) => {

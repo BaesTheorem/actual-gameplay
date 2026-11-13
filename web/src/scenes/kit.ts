@@ -10,7 +10,7 @@ export const Y = (y: number) => H - y;
 export const Pigment = {
   paper: 0xf3ebdc, ink: 0x2b2233, clay: 0xd97757, clayDark: 0xa84d33, clayLight: 0xf2a283, cream: 0xfff5e2,
   sky: 0x8ec3e6, sap: 0x6e9f58, rose: 0xe27a92, ochre: 0xe8aa38, teal: 0x3a9c98, violet: 0x7b5ca8,
-  indigo: 0x2f3c7a, night: 0x1f2550,
+  indigo: 0x2f3c7a, night: 0x1f2550, stone: 0x88859f,
 };
 export const MARKER = "Permanent Marker";
 
@@ -270,10 +270,12 @@ interface Piece {
   /// A paper bit turns over as it falls: this is where in the turn it started.
   flutter: number;
 }
-interface Ring { g: Graphics; age: number }
+interface Ring { g: Graphics; age: number; reach: number }
 interface Label { t: Text; age: number; y: number }
 
 const RING_LIFE = 0.35, LABEL_LIFE = 0.9;
+/// How far a ring opens when it is given no reach: 24 points from its middle.
+const RING_REACH = 24;
 const CONFETTI = [Pigment.clay, Pigment.sap, Pigment.sky, Pigment.ochre, Pigment.rose, Pigment.teal, Pigment.violet];
 
 /// Small effects for the moments that matter: a burst of flat pieces, a ring, a number that
@@ -344,19 +346,21 @@ export class Fx {
     }
   }
 
-  /// A ring that opens out from a canvas point and fades.
-  ring(x: number, y: number, color: number) {
+  /// A ring that opens out from a canvas point and fades. `reach` is how far from the point it
+  /// gets, in points, for a ring that has to show a size: the edge of a blast, say.
+  ring(x: number, y: number, color: number, reach = RING_REACH) {
     if (this.liveRings === this.rings.length) {
       const g = new Graphics(ringShape());
       this.layer.addChild(g);
-      this.rings.push({ g, age: 0 });
+      this.rings.push({ g, age: 0, reach: RING_REACH });
     }
     const ring = this.rings[this.liveRings++];
     ring.age = 0;
+    ring.reach = reach > 0 ? reach : RING_REACH;
     ring.g.tint = color;
     ring.g.visible = true;
     ring.g.position.set(x, Y(y));
-    ring.g.scale.set(0.5);
+    ring.g.scale.set((0.5 * ring.reach) / RING_REACH);
     ring.g.alpha = 1;
   }
 
@@ -448,7 +452,8 @@ export class Fx {
         this.rings[this.liveRings] = ring;
         continue;
       }
-      ring.g.scale.set(0.5 + 1.9 * t);
+      // The shape is ten points in radius: it opens from half of that to 2.4 times it, which is 24 points.
+      ring.g.scale.set(((0.5 + 1.9 * t) * ring.reach) / RING_REACH);
       ring.g.alpha = 1 - t * t;
     }
     for (let i = this.liveLabels - 1; i >= 0; i--) {

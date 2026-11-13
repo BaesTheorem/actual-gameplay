@@ -7,7 +7,7 @@ import { H, W, reducedMotion, type Scene } from "../scenes/kit";
 import * as art from "./art";
 import * as audio from "./audio";
 import { button, h, iconButton, stars } from "./dom";
-import { levelStat, makeScene, type ModeInfo } from "./modes";
+import { isLab, labName, levelStat, makeScene, type ModeInfo } from "./modes";
 import { oddsText, type OddsText } from "./odds";
 
 let app: Application | null = null;
@@ -119,9 +119,11 @@ export class Game {
     this.reported = false;
     this.acc = 0;
     this.last = 0;
-    if (!next) { this.titleEl.textContent = "Coming soon"; return; }
+    // A level from the lab is titled by its file, which is what whoever opened it typed.
+    const lab = isLab(this.opts.level) ? `Lab: ${labName(this.opts.level)}` : null;
+    if (!next) { this.titleEl.textContent = lab ? `${lab} (no such file)` : "Coming soon"; return; }
     pixi.stage.addChild(next.root);
-    this.titleEl.textContent = next.title;
+    this.titleEl.textContent = lab ?? next.title;
     if (hintStep !== undefined) next.hint?.(hintStep);
     pixi.canvas.onpointerdown = (e) => { audio.unlock(); pixi.canvas.setPointerCapture(e.pointerId); this.pointer("down", e); };
     pixi.canvas.onpointermove = (e) => this.pointer("move", e);

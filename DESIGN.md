@@ -34,7 +34,7 @@ Five tokens carry the interface. The names are the kit's pigment names.
 Scene colours come from the same kit and are used only for things in the games: `sky #8EC3E6`
 (Save the Clawd's accent, water rim), `teal #3A9C98` (water), `ochre #E8AA38` (gold, lava rim),
 `rose #E27A92` (danger, the destructive button), `violet #7B5CA8` (rivals), `night #1F2550`
-(drains). Muted text is `ink` at 65%.
+(drains), `stone #88859F` (rubble, the grey of the stone walls). Muted text is `ink` at 65%.
 
 ## Layout
 
@@ -106,6 +106,27 @@ taken, a win. They come from one kit (`Fx` in `web/src/scenes/kit.ts`) and follo
 
 Colour follows meaning. A liquid throws drops the colour of its own rim (sky for water, ochre for
 lava), the gem throws ochre sparks, steam is cream, ink is ink, a gain is sap and a loss is rose.
+
+## Pull the Pin's pieces
+
+What the walking rules added is drawn with what was already here.
+
+- Pins that are pulled together share a colour: a disc of it on the knob and a 6 pt band of it
+  across the bar at the knob's end, both with an ink line. The first group in a level is ochre,
+  the second teal, then rose, then violet. A hint rings every pin of a group, all with the same
+  number.
+- Gas is a third liquid surface, sap with a cream rim, drawn over water and lava. A vent is a
+  grate over sap at 30%, where a grate is over night.
+- A cracked wall is the stone of the other walls with cracks inked across it, 1.4 pt, inside the
+  2 pt outline. A door is the same stone with the outline and two cream bands, and it lies under
+  the walls, so a door that slides into the stone beside it goes out of sight.
+- A boulder is the painted rock and turns as it rolls. A bomb flickers between its two lit
+  pictures twelve times a second, and holds the first under reduced motion.
+- The hero runs while he walks and faces the way he goes, and so do goblins. The friend is four
+  fifths of the hero's size.
+- A blast is two bursts (ochre shards and clay embers), an ochre ring that opens to the edge of
+  the blast's reach, 64 pt, and a 5 pt shake. A broken wall throws six stone shards for every
+  20 pt of its length. Gas on someone is sap dots that rise and a sap ring.
 
 ## Motion
 

@@ -4,19 +4,23 @@ import * as art from "./app/art";
 import * as audio from "./app/audio";
 import { button, h, icon, iconButton, stars, swatch } from "./app/dom";
 import { Game, setStageScale, warmRenderer } from "./app/game";
+import { dateWords, localDate, streakWords } from "./app/daily";
 import {
-  MODES, chapters, levelIDs, levelLabel, levelName, levelStat, mode as findMode, nextLevel, prefetchAll, warm,
+  MODES, chapters, dailyLevel, isLab, levelIDs, levelLabel, levelName, levelStat, mode as findMode, nextLevel, prefetchAll, warm,
   type LevelMode, type ModeInfo,
 } from "./app/modes";
 import { oddsText } from "./app/odds";
 import { showRunnerHub } from "./app/runnerhub";
-import { record, results, store, takeHint } from "./app/store";
+import { dailyResult, dailyStreak, record, recordDaily, results, store, takeHint } from "./app/store";
 import { W } from "./scenes/kit";
 
 const VERSION = "0.1.0";
 const stage = document.getElementById("stage")!;
 const ui = document.getElementById("ui")!;
 let game: Game | null = null;
+/// How many screens have been shown. A screen that takes a moment to get ready checks it, so it
+/// does not appear after the player has already moved on.
+let visits = 0;
 
 // The stage keeps its shape and scales to fit the frame, which is the window minus the phone's
 // safe areas. The frame is measured, not the window: a phone browser changes the window's height
@@ -95,6 +99,18 @@ const tile = (m: LevelMode, id: string, place: number, bestStars: number) => {
   }, h("div.n", String(place)), stars(bestStars, 15), tag && h("div.tag", tag)));
 };
 
+/// The level that is new each day, as a wide tile above the chapters: what it is and the date,
+/// the stars earned on it today, and the run of days it has been cleared.
+const dailyTile = (m: LevelMode, words: { tile: string }) => {
+  const date = localDate(new Date()), earned = dailyResult(store.progress, m.id, date)?.stars ?? 0;
+  const streak = streakWords(dailyStreak(store.progress, m.id, date));
+  return art.frame(h<"button">("button.daily", {
+    "aria-label": `${words.tile}, ${dateWords(date)}, ${earned} of 3 stars, ${streak}`,
+    onclick: () => { audio.play("select"); go(`/${m.id}/daily`); },
+  }, h("div.grow", h("h2", words.tile), h("p.muted", dateWords(date))),
+  h("div.side", stars(earned, 20), h("div.mono.streak", streak))));
+};
+
 const levelSelect = (m: LevelMode) => {
   audio.playMusic(m.track);
   // The player is about to pick a level: get this mode's code and art ready now.
@@ -117,6 +133,7 @@ const levelSelect = (m: LevelMode) => {
     h("div.row", iconButton("arrowBack", "Back", back("/")),
       h("div.grow.marker", { style: { fontSize: "24px", lineHeight: "1.1" } }, m.title.toUpperCase()),
       total),
+    ...(m.daily ? [dailyTile(m, m.daily)] : []),
     ...(sections.length === 0 ? [h("p.muted", "No levels yet.")] : sections)));
 };
 
@@ -129,13 +146,53 @@ const play = (m: LevelMode, level: string) => {
     onExit: back(`/${m.id}`),
     onNext: () => { if (next) go(`/${m.id}/${next}`); },
     onResult: (outcome) => {
-      if (outcome.won) store.update((p) => record(p, m.id, level, outcome.stars, outcome.score));
+      if (outcome.won) store.update((p) => record(p, m.id, level, outcome.stars, outcome.score, m.higherIsBetter));
     },
     onHint: () => {
       let step = 1;
       store.update((p) => { step = takeHint(p, m.id, level); });
       return step;
     },
+  });
+};
+
+/// A level from the lab, #/<mode>/~<name>: a level file that is in no chapter, played as it is.
+/// It has no sticker and no level after it, and nothing about it is saved. Its hints count from
+/// one on every visit, because nothing is kept.
+const playLab = (m: LevelMode, level: string) => {
+  stage.style.backgroundImage = `url(${art.url(m.paper)})`;
+  setPaper(m.paper);
+  let hints = 0;
+  game = new Game(ui, {
+    mode: m, level, hasNext: false, exitLabel: "Back to levels",
+    onExit: back(`/${m.id}`),
+    onNext: () => {},
+    onResult: () => {},
+    onHint: () => ++hints,
+  });
+};
+
+/// The level a mode makes new each day. It is made and solved when it is opened, and what the
+/// player does with it is kept under the date.
+const playDaily = async (m: LevelMode) => {
+  const date = localDate(new Date()), visit = visits;
+  stage.style.backgroundImage = `url(${art.url(m.paper)})`;
+  setPaper(m.paper);
+  ui.replaceChildren(h("div.loading", "Loading"));
+  const level = await dailyLevel(m.id, date).catch(() => null);
+  // The player may have left while it was being made.
+  if (visit !== visits) return;
+  if (level === null) { go(`/${m.id}`); return; }
+  // Hints on a daily level are counted for the visit and not saved: tomorrow has another level.
+  let hints = 0;
+  game = new Game(ui, {
+    mode: m, level, hasNext: false, exitLabel: "Back to levels",
+    onExit: back(`/${m.id}`),
+    onNext: () => {},
+    onResult: (outcome) => {
+      if (outcome.won) store.update((p) => recordDaily(p, m.id, date, outcome.stars, outcome.score));
+    },
+    onHint: () => (hints += 1),
   });
 };
 
@@ -211,14 +268,18 @@ const settings = () => {
 };
 
 const route = () => {
+  visits += 1;
   game?.close();
   game = null;
   stage.style.backgroundImage = "";
-  // #/<mode> is a mode's level list (or the runner's hub) and #/<mode>/<level id> is one level.
+  // #/<mode> is a mode's level list (or the runner's hub), #/<mode>/<level id> is one level, and
+  // #/<mode>/daily is today's level in a mode that makes one each day.
   const [, first, second] = location.hash.replace(/^#/, "").split("/");
   const m = findMode(first ?? "");
   if (first === "settings") settings();
   else if (m?.kind === "levels" && second && levelIDs(m.id).includes(second)) play(m, second);
+  else if (m?.kind === "levels" && second && isLab(second)) playLab(m, second);
+  else if (m?.kind === "levels" && m.daily && second === "daily") void playDaily(m);
   else if (m?.kind === "levels") levelSelect(m);
   else if (m && second === "play") playRun(m);
   else if (m) runnerHub(m);

@@ -24,6 +24,11 @@ export interface LevelMode extends ModeBase {
   folder: string;
   /// How the measured share of random play is worded: "random pulls win", "random doodles survive".
   random: { tries: string; win: string };
+  /// Set where a bigger score is the better one. The other modes count ink and pulls, where less is better.
+  higherIsBetter?: boolean;
+  /// A level made new each day, for a mode that has one: the words on its tile in the level
+  /// list, and the start of its title in the level ("Daily tower, 13 November").
+  daily?: { tile: string; title: string };
 }
 
 /// The endless mode: its runs are generated, so it has no level files.
@@ -45,6 +50,11 @@ export const MODES: ModeInfo[] = [
   { id: "runner", kind: "runner", title: "Crowd Run", blurb: "Pick gates, grow the crowd, storm the finish.", accent: "var(--sap)",
     preview: ["clawd_run", 3], figure: { won: "clawd_excited", lost: "clawd_ko" },
     swatch: "ui_button_sap", track: "runner", paper: "paper", scoreLabel: "survivors" },
+  { id: "tower", kind: "levels", folder: "tower", title: "Number Tower", blurb: "The bigger number wins. The stairs are the hard part.", accent: "var(--ochre)",
+    preview: ["clawd_band_idle", 4], figure: { won: "clawd_band_excited", lost: "clawd_band_ko" },
+    swatch: "ui_button_ochre", track: "tower", paper: "paper", scoreLabel: "final number",
+    random: { tries: "climbs", win: "win" }, higherIsBetter: true,
+    daily: { tile: "Today's tower", title: "Daily tower" } },
 ];
 
 export const mode = (id: string): ModeInfo | undefined => MODES.find((m) => m.id === id);

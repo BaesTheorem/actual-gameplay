@@ -6,9 +6,9 @@ import {
   checkLevel, piecesOf, playThrough, solve, validateLevel, type TowerLevel,
 } from "../src/sim/tower";
 import { CHAPTERS, SEEDS, TOWER_DIR, campaignFiles, recipeOf, writeCampaign } from "../scripts/tower-gen";
-import { audit, loadTower, replay, show, stats } from "../scripts/tower-suite";
+import { audit, campaign as loadCampaign, replay, show, stats } from "../scripts/tower-suite";
 
-const campaign = loadTower();
+const campaign = loadCampaign();
 
 describe("the campaign files", () => {
   it("are four chapters of eight levels, named by slug", () => {

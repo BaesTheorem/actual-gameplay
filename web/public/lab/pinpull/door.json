@@ -1,0 +1,36 @@
+{
+  "id": "door",
+  "name": "Dead weight",
+  "rules": 2,
+  "hint": "The door opens for anything heavy. The goblin is behind it.",
+  "parPins": 2,
+  "winWhen": "treasureReachesHero",
+  "walls": [
+    {"x": 190, "y": 128, "w": 14, "h": 200},
+    {"x": 110, "y": 200, "w": 14, "h": 80},
+    {"x": 226, "y": 220, "w": 14, "h": 60},
+    {"x": 300, "y": 220, "w": 14, "h": 60}
+  ],
+  "doors": [
+    {"id": "d", "x": 190, "y": 68, "w": 14, "h": 60, "slide": "up"}
+  ],
+  "plates": [
+    {"id": "a", "x": 50, "y": 68, "w": 48, "opens": ["d"]}
+  ],
+  "pins": [
+    {"id": "p1", "x": 38, "y": 200, "w": 72, "side": "left"},
+    {"id": "p2", "x": 240, "y": 220, "w": 60, "side": "right"}
+  ],
+  "boulders": [
+    {"x": 74, "y": 232}
+  ],
+  "pools": [
+    {"liquid": "water", "x": 242, "y": 234, "w": 56, "h": 30, "count": 20}
+  ],
+  "actors": {
+    "hero": {"x": 150, "y": 84},
+    "treasure": {"x": 340, "y": 79},
+    "foes": [{"x": 270, "y": 84}]
+  },
+  "solution": ["p2", "p1"]
+}
