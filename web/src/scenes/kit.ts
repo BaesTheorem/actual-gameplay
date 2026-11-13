@@ -107,7 +107,7 @@ export const paper = (name: string): Sprite => {
   return s;
 };
 
-const SKINS = ["grass", "stone", "dirt", "purple"];
+const SKINS = ["grass", "stone", "dirt", "purple", "ice"];
 /// Terrain out of tiles: a one-tile strip for thin platforms, a block grid for anything thicker,
 /// cropped to the exact rectangle so level geometry stays the authority. `rect` is in canvas points, y up.
 export const terrain = (rect: { x: number; y: number; w: number; h: number }, skinName?: string): Container => {

@@ -47,11 +47,16 @@ const EVENTS: Record<string, SoundSpec> = {
   plate: { files: ["plate_click.wav"], volume: 0.3 },
   door: { files: ["door_slide.wav"], volume: 0.22 },
   gas: { files: ["gas_hiss.wav"], volume: 0.22, minGap: 0.25 },
+  // Save the Clawd's hazards. Ink that keeps falling into a flame catches once. A boulder let
+  // go is a latch clicking open. Its landing, the fuse, the blast and the sizzle are the sounds above.
+  burn: { files: ["burn.wav"], volume: 0.3, minGap: 0.15 },
+  rockLoose: { files: ["plate_click.wav"], volume: 0.35 },
 };
 const LOOPS: Record<string, { file: string; volume: number }> = {
   buzz: { file: "loop_buzz.wav", volume: 0.14 },
   scratch: { file: "loop_scratch.wav", volume: 0.12 },
   saw: { file: "loop_saw.wav", volume: 0.08 },
+  fire: { file: "loop_fire.wav", volume: 0.16 },
 };
 export const TRACKS = {
   menu: "Wallpaper", saveDog: "Pixelland", pinPull: "Investigations", runner: "Digital Lemonade", tower: "Marty Gots a Plan",

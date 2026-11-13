@@ -68,9 +68,11 @@ MIT license:
     loop_buzz.wav         the swarm
     loop_scratch.wav      the pen while ink flows
     loop_saw.wav          a spinning saw
+    loop_fire.wav         a flame
     splash.wav            water landing
     sizzle.wav            water meeting lava
     heave.wav             the bees' shove
+    burn.wav              ink catching fire
     blast.wav             a bomb going off
     fuse.wav              a lit fuse
     boulder_land.wav      a boulder landing

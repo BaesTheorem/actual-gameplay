@@ -1,0 +1,25 @@
+{
+  "id": "bomb",
+  "name": "Lit fuse",
+  "hint": "Lava on his left and a bomb on his right. A blast goes through air, not through ink.",
+  "inkBudget": 260,
+  "stars": [200, 230],
+  "statics": [
+    { "type": "rect", "x": 140, "y": 34, "w": 262, "h": 40, "skin": "grass" }
+  ],
+  "killers": [
+    { "x": 0, "y": 34, "w": 140, "h": 26, "kind": "lava" }
+  ],
+  "bombs": [{ "x": 262, "y": 86, "at": 1 }],
+  "dogs": [{ "id": "clawd", "x": 201, "y": 92 }],
+  "hives": [
+    { "x": 60, "y": 700, "count": 6 },
+    { "x": 342, "y": 700, "count": 6 }
+  ],
+  "solution": {
+    "strokes": [
+      { "points": [[168, 78], [170, 116], [182, 138], [200, 146], [218, 138], [230, 116], [232, 78]] }
+    ],
+    "waitSeconds": 14
+  }
+}

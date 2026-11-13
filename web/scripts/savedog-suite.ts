@@ -3,6 +3,14 @@
 //   auditLevel()   the stored solution shifted and scaled eight ways, five naive strokes, and
 //                  (with `random`) that many plausible random strokes for a difficulty number
 //   odds()         the share of 48 plausible random strokes that survive, for the level statistics
+//
+// Run as a script, it tries one level, from the campaign by id or from any level file:
+//   npx tsx scripts/savedog-suite.ts play  <level id | file.json>               the stored solution, and how it ends
+//   npx tsx scripts/savedog-suite.ts audit <level id | file.json> [--random N]  the audit's lines for this level
+//   npx tsx scripts/savedog-suite.ts odds  <level id | file.json>               the share of random strokes that survive
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { folderOf } from "../src/app/modetable";
 import { playOut, type Attempt, type DogLevel } from "../src/sim/savedog";
 import { baseTransform } from "../src/sim/savedog/level";
@@ -14,6 +22,10 @@ import { idNumber, load, loadLevel } from "./levels";
 export { WEB_SOLUTIONS, baseTransform } from "../src/sim/savedog/level";
 
 export const FOLDER = folderOf("saveDog");
+
+/// A level of the campaign by its id, or any level file by its path.
+export const levelFrom = (ref: string): DogLevel =>
+  ref.endsWith(".json") ? JSON.parse(readFileSync(ref, "utf8")) as DogLevel : loadLevel<DogLevel>(FOLDER, ref);
 
 const signed = (n: number) => (n < 0 ? `${n}` : `+${n}`);
 
@@ -122,9 +134,10 @@ const round1 = (x: number): number => {
 ///
 /// The generator is seeded with `seed` times a thousand plus a number for the level. That number
 /// was the level's place in the list; it is now three digits of a hash of the level's id, so a
-/// level keeps its strokes when the chapters are rearranged.
-export const randomStrokes = (level: DogLevel, n: number, seed = 7): number[][][] => {
-  const rng = new PyRandom(seed * 1000 + (idNumber(level.id) % 1000));
+/// level keeps its strokes when the chapters are rearranged. `number` puts the old number back,
+/// for the strokes the iPhone build was measured with: 1 for its level 01, and so on.
+export const randomStrokes = (level: DogLevel, n: number, seed = 7, number = idNumber(level.id) % 1000): number[][][] => {
+  const rng = new PyRandom(seed * 1000 + number);
   if (level.dogs.length === 0) return [];
   const { x, y } = level.dogs[0];
   const budget = level.inkBudget ?? 200;
@@ -217,9 +230,8 @@ export const verdict = (names: string[], won: Set<string>): string => {
   return flags.length > 0 ? `ok; ${flags.join("; ")}` : "ok";
 };
 
-/// Stress one level by id. The line is what the audit prints for it.
-export const auditLevel = (id: string, random = 0): { line: string; flagged: boolean } => {
-  const level = loadLevel<DogLevel>(FOLDER, id);
+/// Stress one level. The line is what the audit prints for it.
+export const auditOf = (level: DogLevel, random = 0): { line: string; flagged: boolean } => {
   const plan = trials(level, random);
   const won = new Set<string>();
   for (const [name, attempt] of plan) {
@@ -231,6 +243,9 @@ export const auditLevel = (id: string, random = 0): { line: string; flagged: boo
   return { line: `${level.id}  ${status}\n      ${detail}`, flagged: !status.startsWith("ok") };
 };
 
+/// The same, by level id: the call a child process makes.
+export const auditLevel = (id: string, random = 0): { line: string; flagged: boolean } => auditOf(loadLevel<DogLevel>(FOLDER, id), random);
+
 // MARK: the odds
 
 /// How many random strokes the statistics try on each level.
@@ -238,8 +253,7 @@ const DOODLES = 48;
 
 /// The share of random play that survives a level: 48 plausible random strokes from the
 /// generator above, each played as the only stroke of an attempt.
-export const odds = (id: string): { randomWin: number; sample: number; exact: boolean; detail: string } => {
-  const level = loadLevel<DogLevel>(FOLDER, id);
+export const oddsOf = (level: DogLevel): { randomWin: number; sample: number; exact: boolean; detail: string } => {
   const strokes = randomStrokes(level, DOODLES);
   const survived = strokes.filter((stroke) => playOut(level, { strokes: [toVec(stroke)] }).outcome?.won === true).length;
   return {
@@ -249,3 +263,29 @@ export const odds = (id: string): { randomWin: number; sample: number; exact: bo
     detail: `${survived} of ${strokes.length} random strokes survived`,
   };
 };
+
+/// The same, by level id: the call a child process makes.
+export const odds = (id: string) => oddsOf(loadLevel<DogLevel>(FOLDER, id));
+
+// MARK: one level from the command line
+
+const run = (verb: string, ref: string) => {
+  if (!["play", "audit", "odds"].includes(verb) || !ref) {
+    console.error("usage: npx tsx scripts/savedog-suite.ts play|audit|odds <level id | file.json> [--random N]");
+    process.exitCode = 1;
+    return;
+  }
+  const level = levelFrom(ref);
+  if (verb === "play") {
+    const { outcome, seconds, ink } = playOut(level, { transform: baseTransform(level) });
+    const how = outcome === null ? "no result" : outcome.won ? `won, ${outcome.stars} stars, ink ${Math.round(ink)}` : `lost: ${outcome.reason}`;
+    console.log(`${level.id.padEnd(20)} ${level.name.padEnd(22)} ${how}  (${seconds.toFixed(1)} s game)`);
+  } else if (verb === "audit") {
+    const at = process.argv.indexOf("--random");
+    console.log(auditOf(level, at > 0 ? Number(process.argv[at + 1]) : 0).line);
+  } else {
+    const found = oddsOf(level);
+    console.log(`${level.id.padEnd(20)} ${(found.randomWin * 100).toFixed(1)}%  ${found.detail}`);
+  }
+};
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) run(process.argv[2] ?? "", process.argv[3] ?? "");

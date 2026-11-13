@@ -25,6 +25,9 @@ export interface Tag {
   /// Anything the owning simulation wants to find again from a contact.
   ref?: unknown;
   removed?: boolean;
+  /// The friction of every contact with this body, whatever touches it, in place of the mix of
+  /// the two surfaces. Ice has one.
+  surface?: number;
 }
 
 export interface BodySpec {
@@ -45,6 +48,8 @@ export interface BodySpec {
   /// 0 for a body that flies. SpriteKit's affectedByGravity = false.
   gravityScale?: number;
   ref?: unknown;
+  /// One friction for everything that touches this body. See `Tag.surface`.
+  surface?: number;
 }
 
 export interface ContactEvent {
@@ -118,6 +123,8 @@ export class SKWorld {
     this.world.on("pre-solve", (contact) => {
       const ta = tagOf(contact.getFixtureA().getBody()), tb = tagOf(contact.getFixtureB().getBody());
       if (ta.removed || tb.removed || !responds(ta, tb)) contact.setEnabled(false);
+      // A body with a surface of its own sets the friction of the pair. Of two, the slicker one does.
+      else if (ta.surface !== undefined || tb.surface !== undefined) contact.setFriction(Math.min(ta.surface ?? Infinity, tb.surface ?? Infinity));
     });
   }
 
@@ -139,6 +146,7 @@ export class SKWorld {
       contactTest: spec.contactTest ?? 0,
       ref: spec.ref,
     };
+    if (spec.surface !== undefined) tag.surface = spec.surface;
     body.setUserData(tag);
     this.ids.set(body, this.nextId++);
     return body;
@@ -320,6 +328,11 @@ export const setMass = (body: planck.Body, mass: number) => {
 /// the scenes wrote their forces in, so an acceleration in pt/s^2 times `body.getMass()` times dt works.
 export const applyImpulse = (body: planck.Body, impulse: Vec) => {
   body.applyLinearImpulse(planck.Vec2(impulse.x / PPM, impulse.y / PPM), body.getWorldCenter(), true);
+};
+
+/// An impulse at a canvas point, so it turns the body as well as pushing it. Same scale as `applyImpulse`.
+export const applyImpulseAt = (body: planck.Body, impulse: Vec, point: Vec) => {
+  body.applyLinearImpulse(planck.Vec2(impulse.x / PPM, impulse.y / PPM), planck.Vec2(point.x / PPM, point.y / PPM), true);
 };
 
 /// Radians per second, counterclockwise positive.

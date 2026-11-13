@@ -1,0 +1,107 @@
+{
+  "id": "ice",
+  "name": "Black ice",
+  "hint": "Nothing grips ice, him least of all. Take the post in with him.",
+  "inkBudget": 300,
+  "stars": [
+    265,
+    285
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 176,
+      "w": 40,
+      "h": 20,
+      "skin": "ice"
+    },
+    {
+      "type": "chain",
+      "points": [
+        [
+          40.0,
+          196.0
+        ],
+        [
+          310.0,
+          150.0
+        ]
+      ],
+      "skin": "ice"
+    },
+    {
+      "type": "rect",
+      "x": 104.0,
+      "y": 168,
+      "w": 8,
+      "h": 46,
+      "skin": "stone"
+    }
+  ],
+  "killers": [
+    {
+      "x": 0,
+      "y": 34,
+      "w": 402,
+      "h": 30,
+      "kind": "water"
+    }
+  ],
+  "dogs": [
+    {
+      "id": "clawd",
+      "x": 201.0,
+      "y": 187.0
+    }
+  ],
+  "hives": [
+    {
+      "x": 60,
+      "y": 700,
+      "count": 6
+    },
+    {
+      "x": 342,
+      "y": 700,
+      "count": 6
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            86,
+            206.2
+          ],
+          [
+            88,
+            247.8
+          ],
+          [
+            110,
+            268.1
+          ],
+          [
+            164,
+            266.9
+          ],
+          [
+            214,
+            250.4
+          ],
+          [
+            236,
+            222.6
+          ],
+          [
+            240,
+            179.9
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 14
+  }
+}

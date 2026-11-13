@@ -1,0 +1,26 @@
+{
+  "id": "rock",
+  "name": "Hanging rock",
+  "hint": "The boulder comes down when its ring runs out. Put the roof under it, not through it.",
+  "inkBudget": 300,
+  "stars": [180, 240],
+  "statics": [
+    { "type": "rect", "x": 126, "y": 34, "w": 150, "h": 40, "skin": "stone" }
+  ],
+  "killers": [
+    { "x": 0, "y": 34, "w": 126, "h": 26, "kind": "water" },
+    { "x": 276, "y": 34, "w": 126, "h": 26, "kind": "water" }
+  ],
+  "rocks": [{ "x": 201, "y": 174, "r": 36, "at": 1.5 }],
+  "dogs": [{ "id": "clawd", "x": 201, "y": 92 }],
+  "hives": [
+    { "x": 60, "y": 700, "count": 6 },
+    { "x": 342, "y": 700, "count": 6 }
+  ],
+  "solution": {
+    "strokes": [
+      { "points": [[150, 78], [156, 104], [172, 120], [201, 126], [230, 120], [246, 104], [252, 78]] }
+    ],
+    "waitSeconds": 14
+  }
+}

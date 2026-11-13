@@ -24,6 +24,16 @@ export interface SawSpec { x: number; y: number; r: number }
 /// Scenery with no physics: a bush, a torch, a sign.
 export interface Decor { sprite: string; x: number; y: number; w: number; h: number }
 
+/// A flame, by the middle of its base. Ink that touches it burns, he does not survive it, and
+/// bees keep out of it.
+export interface FireSpec { x: number; y: number }
+
+/// A boulder held still at its point until `at` seconds after the bees are out, then let go.
+export interface RockSpec { x: number; y: number; r?: number; at: number }
+
+/// A bomb lying where it is put. Its fuse is lit when the bees come out and it goes off `at` seconds later.
+export interface BombSpec { x: number; y: number; at: number }
+
 /// Static geometry. Rects give their bottom-left corner.
 export interface LevelStatic {
   type: string;
@@ -35,7 +45,7 @@ export interface LevelStatic {
   points?: number[][];
   /// False for scenery with no physics body.
   solid?: boolean;
-  /// Terrain look: grass (default), stone, dirt, purple.
+  /// Terrain look: grass (default), stone, dirt, purple, ice. Ice is also slippery.
   skin?: string;
 }
 
@@ -66,10 +76,42 @@ export interface DogLevel {
   props?: PropSpec[];
   decor?: Decor[];
   forbidden?: LevelRect[];
+  fires?: FireSpec[];
+  rocks?: RockSpec[];
+  bombs?: BombSpec[];
   dogs: DogSpot[];
   hives: Hive[];
   solution?: StrokeSolution;
 }
+
+// The numbers of the hazards. Every time is in seconds after the bees are released, which is the
+// clock that counts the ten seconds, and every length is in canvas points.
+
+/// A flame is this wide and this tall, standing on its point.
+export const FLAME_WIDTH = 24, FLAME_HEIGHT = 32;
+/// A burn runs along the ink this fast, in points per second, both ways from where it caught.
+export const BURN_SPEED = 40;
+/// A bee flying by itself comes no nearer to a flame than this, measured from its edge to the flame's.
+export const FLAME_BERTH = 4;
+/// A boulder with no radius of its own. Boulders are twice as dense as the level's other props.
+export const ROCK_RADIUS = 16, ROCK_DENSITY = 4;
+/// A boulder, a bomb or a prop that meets him at this speed or more, measured between the two in
+/// the frame before they touch, flattens him. Slower than this it only pushes.
+export const CRUSH_SPEED = 120;
+/// A boulder that lands at this speed or more is heard and felt.
+export const THUD_SPEED = 150;
+/// A bomb is a ball this big, as dense as the other props.
+export const BOMB_RADIUS = 12, BOMB_DENSITY = 2;
+/// A blast reaches this far from the middle of its bomb.
+export const BLAST_RADIUS = 70;
+/// The push a blast gives a loose body at its centre, as an impulse (mass times points per
+/// second). It falls in a straight line to nothing at the edge of the blast, and it is the same
+/// push whatever the body weighs, so a light bar flies and a heavy dome shuffles. At this figure a
+/// 150 point bar lying on grass with the bomb at its end is pushed 40 points, about the width of
+/// Clawd. A 60 point bar is thrown across the level and a 300 point dome moves 5 points.
+export const BLAST_IMPULSE = 36;
+/// The friction of everything that touches ice.
+export const ICE_FRICTION = 0.02;
 
 export const surviveSeconds = (level: DogLevel): number => level.duration ?? 10;
 export const swarmDelay = (level: DogLevel): number => level.beeDelay ?? 1.5;

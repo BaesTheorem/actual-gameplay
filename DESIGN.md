@@ -128,6 +128,25 @@ What the walking rules added is drawn with what was already here.
   the blast's reach, 64 pt, and a 5 pt shake. A broken wall throws six stone shards for every
   20 pt of its length. Gas on someone is sap dots that rise and a sap ring.
 
+## Save the Clawd's hazards
+
+- A flame is painted, and cycles through its three pictures ten times a second. Two flames side
+  by side are a step apart in the cycle. Under reduced motion it holds the first.
+- Ink that is burning is drawn only where it is left. Each burning end carries an ember: an
+  ochre dot 3.4 pt in radius with a 1 pt ink line and a cream heart, which swells a little eight
+  times a second. An end throws two ochre sparks eight times a second, the catch is ochre shards
+  and an ochre ring, and what is left when a piece burns out is five flecks of ink that fall.
+- A boulder is the painted rock and turns with its body. While it is held it sits in a bracket,
+  two arms and a bar under it in a 2.5 pt ink line, and a ring 7 pt outside it shows its wait:
+  ochre on an ink line, starting at the top and running clockwise, as much of the circle as
+  there is wait left. A bomb has the same ring, and flickers between its two lit pictures twelve
+  times a second.
+- A blast is the one Pull the Pin has: ochre shards, clay embers, an ochre ring that opens to
+  the edge of its reach, 70 pt here, and a 5 pt shake. A boulder that lands hard throws cream
+  dust and shakes the level 3 pt.
+- Ice is the terrain skin `ice`. A branch of ice is the pale blue of those tiles, `#BBD7E4`, on
+  the branch's ink line.
+
 ## Number Tower's pieces
 
 - The tower is a building in cutaway: stone walls with an ink outline, a flat wash inside each

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Make the game's sound effects.
 
-With no arguments this regenerates the synthesized set (the bee buzz, the ink scratch and the saw
-whir loops, the splash, sizzle and heave, and Pull the Pin's blast, fuse, boulder, wall, plate,
-door and gas), which needs only numpy. With --fetch it also downloads the Kenney packs and the UI
+With no arguments this regenerates the synthesized set (the bee buzz, the ink scratch, the saw
+whir and the fire crackle loops, the splash, sizzle and heave, ink catching fire, and Pull the
+Pin's blast, fuse, boulder, wall, plate, door and gas), which needs only numpy. With --fetch it also downloads the Kenney packs and the UI
 SFX organic pack (all CC0) and rebuilds the picks taken from them, which needs ffmpeg.
 ../CREDITS.txt lists every file and where it came from.
 
@@ -425,6 +425,58 @@ def gas_hiss() -> np.ndarray:
     return fade(level(air * swell), 0.05, start=0.01)
 
 
+def burn() -> np.ndarray:
+    """Ink catching fire: a soft whoomp as the flame takes, a breath of air that brightens and
+    falls away, and a few snaps of paper. 0.4 s."""
+    n = int(0.4 * SR)
+    t = np.arange(n) / SR
+    rng = np.random.default_rng(14)
+    whoomp = sweep(t, 180, 70, 0.05) * (1 - np.exp(-t / 0.004)) * np.exp(-t / 0.07)
+
+    def centre(at: float) -> float:
+        return 500 * (2600 / 500) ** np.sin(np.pi * min(at, 0.4) / 0.4)
+
+    air = moving(rng.standard_normal(n),
+                 lambda at, f: np.exp(-0.5 * (np.log2(np.maximum(f, 1) / centre(at)) / 0.8) ** 2))
+    air *= (1 - np.exp(-t / 0.02)) * np.exp(-t / 0.14)
+    snaps = np.zeros(n)
+    for _ in range(7):
+        at = rng.integers(int(0.03 * SR), int(0.3 * SR))
+        length = int(rng.uniform(0.001, 0.004) * SR)
+        seg = rng.standard_normal(length) * np.hanning(length) * rng.uniform(0.4, 1.0)
+        snaps[at:at + length] += seg[: n - at]
+    snaps = band(snaps, 1800, 7000)
+    out = 0.9 * whoomp + air / np.std(air[: int(0.15 * SR)]) + 0.8 * snaps / max(np.std(snaps), 1e-9) * 0.25
+    return fade(level(out), 0.1, start=0.003)
+
+
+def fire_crackle() -> np.ndarray:
+    """A small fire: a low flutter of flame, a thin hiss, and snaps of two sizes on top. 2 s loop:
+    the flutter runs whole cycles, the noise is filtered on a ring, and the snaps wrap around the end."""
+    n = 2 * SR
+    t = np.arange(n) / SR
+    rng = np.random.default_rng(15)
+    flame = band(rng.standard_normal(n), 120, 700, ring=True)
+    flutter = (1 + 0.30 * np.sin(2 * np.pi * 1.5 * t + 0.4) + 0.20 * np.sin(2 * np.pi * 4.0 * t + 1.9)
+               + 0.12 * np.sin(2 * np.pi * 9.5 * t + 0.7))
+    hiss = band(rng.standard_normal(n), 2500, 7000, ring=True)
+
+    def snaps(count: int, shortest: float, longest: float) -> np.ndarray:
+        out = np.zeros(n)
+        for _ in range(count):
+            length = int(rng.uniform(shortest, longest) * SR)
+            idx = (rng.integers(0, n) + np.arange(length)) % n
+            out[idx] += rng.standard_normal(length) * np.exp(-np.arange(length) / (length / 4)) * rng.uniform(0.3, 1.0)
+        return out
+
+    small = band(snaps(38, 0.002, 0.006), 2000, 8000, ring=True)
+    large = band(snaps(9, 0.006, 0.016), 700, 4000, ring=True)
+    out = (flame / np.std(flame) * flutter + 0.18 * hiss / np.std(hiss) * (0.8 + 0.2 * flutter)
+           + 0.55 * small / np.std(small) + 0.7 * large / np.std(large))
+    # A phone speaker loses the bottom of the flame; lean on what it does play.
+    return level(band(out, 220, None, ring=True))
+
+
 SYNTH = {
     "loop_buzz.wav": buzz,
     "loop_scratch.wav": scratch,
@@ -439,6 +491,8 @@ SYNTH = {
     "plate_click.wav": plate_click,
     "door_slide.wav": door_slide,
     "gas_hiss.wav": gas_hiss,
+    "burn.wav": burn,
+    "loop_fire.wav": fire_crackle,
 }
 
 

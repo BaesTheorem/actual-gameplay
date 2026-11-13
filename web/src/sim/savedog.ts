@@ -3,18 +3,21 @@
 import type * as planck from "planck";
 import { Clock, type Emit } from "./clock";
 import {
-  PLAYFIELD, STEP, SKWorld, angularVelocity, position, speed, tagOf,
+  PLAYFIELD, PPM, STEP, SKWorld, angularVelocity, applyImpulseAt, position, setVelocity, speed, tagOf, velocity,
   type ContactEvent, type Outcome, type Vec,
 } from "./sk";
 import { Bee, BeeSwarm } from "./savedog/bee";
 import { BEE_RADIUS, DOG_RADIUS, type CrewBody } from "./savedog/beecrew";
 import { FlowField, circle, rect, segment, type Solid } from "./savedog/flowfield";
-import { contains, polylineLength, resample, rotated, type Rect } from "./savedog/geometry";
 import {
-  IDENTITY, applyTransform, isLiquid, stars, strokePoints, surviveSeconds, swarmDelay,
+  contains, distance, distanceToRect, inset, nearestOnPolyline, polylineLength, resample, rotated, slice, sub, type Rect,
+} from "./savedog/geometry";
+import {
+  BLAST_IMPULSE, BLAST_RADIUS, BOMB_DENSITY, BOMB_RADIUS, BURN_SPEED, CRUSH_SPEED, FLAME_BERTH, FLAME_HEIGHT, FLAME_WIDTH,
+  ICE_FRICTION, IDENTITY, ROCK_DENSITY, ROCK_RADIUS, THUD_SPEED, applyTransform, isLiquid, stars, strokePoints, surviveSeconds, swarmDelay,
   type Decor, type DogLevel, type Hive, type StrokeSolution, type StrokeTransform,
 } from "./savedog/level";
-import { Cat, MIN_LENGTH, Stroke, StrokeCapture, WIDTH, inkCost, prepare } from "./savedog/stroke";
+import { Cat, MIN_LENGTH, STUB, Stroke, StrokeCapture, WIDTH, inkCost, prepare } from "./savedog/stroke";
 
 export type { DogLevel } from "./savedog/level";
 export { Cat } from "./savedog/stroke";
@@ -23,9 +26,17 @@ export { Cat } from "./savedog/stroke";
 export const DRAW_AREA: Rect = { x: 0, y: 34, w: 402, h: 720 };
 
 /// What a falling stroke can land on. Strokes report these as contacts, for the landing sound only.
-const LANDING = Cat.wall | Cat.drawn | Cat.prop | Cat.actor | Cat.killer;
+const LANDING = Cat.wall | Cat.drawn | Cat.prop | Cat.actor | Cat.killer | Cat.rock;
 /// What ink cannot be drawn through.
-const SOLID = Cat.wall | Cat.actor | Cat.drawn | Cat.killer | Cat.prop;
+const SOLID = Cat.wall | Cat.actor | Cat.drawn | Cat.killer | Cat.prop | Cat.rock;
+/// What stands between him and a blast.
+const COVER = Cat.wall | Cat.drawn;
+/// How far apart the points are at which ink is tested against a flame.
+const BURN_SAMPLE = 2;
+/// Seconds between the sparks a burning end throws.
+const EMBER_GAP = 0.12;
+/// A bomb's fuse is heard for this long before it goes off.
+const FUSE_HISS = 0.7;
 
 export type DogMood = "nervous" | "scared" | "excited" | "ko";
 
@@ -35,8 +46,8 @@ export interface Dog { id: string; body: planck.Body; mood: DogMood; readonly po
 /// Static ground as the level file gives it, with the skin the renderer paints it in.
 export type Terrain =
   | { type: "rect"; rect: Rect; skin: string; solid: boolean }
-  | { type: "circle"; center: Vec; radius: number; solid: boolean }
-  | { type: "chain"; points: Vec[]; halfWidth: number; solid: boolean };
+  | { type: "circle"; center: Vec; radius: number; skin: string; solid: boolean }
+  | { type: "chain"; points: Vec[]; halfWidth: number; skin: string; solid: boolean };
 
 export interface Saw { x: number; y: number; r: number; body: planck.Body }
 export interface Liquid { rect: Rect; kind: "water" | "lava" }
@@ -70,6 +81,28 @@ export class Prop {
   sinkBy(dy: number) { this.rest = { x: this.rest.x, y: this.rest.y - dy }; }
 }
 
+/// A boulder that is held still at its point until its time and then let go. It pushes ink like
+/// any heavy body and flattens him if it meets him fast. Bees fly through it.
+export class Rock extends Prop {
+  held = true;
+
+  /// `releaseAt` is in seconds after the bees are out.
+  constructor(id: string, radius: number, at: Vec, readonly releaseAt: number) {
+    super(id, "ball", radius, { w: 2 * radius, h: 2 * radius }, at);
+  }
+}
+
+/// A bomb: a ball that lies where it is put, and can be rolled, until it goes off.
+export class Bomb extends Prop {
+  /// Its fuse has been heard hissing down its last stretch.
+  hissed = false;
+
+  /// `blastAt` is in seconds after the bees are out.
+  constructor(id: string, at: Vec, readonly blastAt: number) {
+    super(id, "ball", BOMB_RADIUS, { w: 2 * BOMB_RADIUS, h: 2 * BOMB_RADIUS }, at);
+  }
+}
+
 /// Something brief for the renderer to draw: ink that was refused, the parts of a stroke that
 /// were trimmed away, sawdust where a blade took a stroke. `at` is the level time it happened.
 export type Effect =
@@ -101,6 +134,10 @@ export class DogSim {
   readonly spikes: Rect[] = [];
   readonly liquids: Liquid[] = [];
   readonly saws: Saw[] = [];
+  /// Each flame as the rectangle it stands in.
+  readonly flames: Rect[] = [];
+  rocks: Rock[] = [];
+  bombs: Bomb[] = [];
   readonly decor: Decor[];
   readonly forbidden: Rect[];
   readonly hives: Hive[];
@@ -125,6 +162,9 @@ export class DogSim {
   routeOpen = false;
 
   private fieldCountdown = 0;
+  /// How fast each body that can flatten him was going before the last step, and how fast he was.
+  private before = new Map<planck.Body, Vec>();
+  private emberCountdown = 0;
   private wasShoving = false;
   private nextStroke = 1;
   private touching = false;
@@ -141,6 +181,7 @@ export class DogSim {
     this.hives = level.hives;
     this.build();
     this.swarm = new BeeSwarm(this.sk, level.hives);
+    this.swarm.flames = this.flames;
   }
 
   get finished() { return this.outcome !== null; }
@@ -161,6 +202,21 @@ export class DogSim {
   get timeLeft(): number {
     const total = surviveSeconds(this.level);
     return this.launchedAt === null ? total : Math.max(0, total - (this.elapsed - this.launchedAt));
+  }
+  /// Seconds since the bees came out, or 0 before they have.
+  get beeClock(): number { return this.launchedAt === null ? 0 : this.elapsed - this.launchedAt; }
+  /// The share of a timed hazard's wait that is left, from 1 down to 0. `at` is its time on the bees' clock.
+  waitLeft(at: number): number { return at <= 0 ? 0 : Math.min(1, Math.max(0, 1 - this.beeClock / at)); }
+  /// Where ink is burning right now: the canvas point of every burning end.
+  get embers(): Vec[] {
+    const out: Vec[] = [];
+    for (const stroke of this.strokes) {
+      if (!stroke.body || !stroke.alight) continue;
+      const { from, to } = stroke.span;
+      if (stroke.burning.start) out.push(stroke.worldAt(from));
+      if (stroke.burning.end) out.push(stroke.worldAt(to));
+    }
+    return out;
   }
   /// The saws swap between their two pictures every 0.06 s.
   get sawFrame(): number { return Math.floor(this.elapsed / 0.06) % 2; }
@@ -200,21 +256,23 @@ export class DogSim {
     sk.edgeChain({ kind: "bounds", friction: 0.6, restitution: 0.1, category: Cat.wall }, [
       { x: f.x, y: -300 }, { x: f.x, y: f.y + f.h }, { x: f.x + f.w, y: f.y + f.h }, { x: f.x + f.w, y: -300 },
     ]);
-    const ground = { kind: "wall", dynamic: false, friction: 0.7, restitution: 0.05, category: Cat.wall };
+    const earth = { kind: "wall", dynamic: false, friction: 0.7, restitution: 0.05, category: Cat.wall };
     for (const item of level.statics ?? []) {
-      const solid = item.solid ?? true;
+      const solid = item.solid ?? true, skin = item.skin ?? "grass";
+      // Ice is ground like any other, except that nothing grips it.
+      const ground = skin === "ice" ? { ...earth, surface: ICE_FRICTION } : earth;
       if (item.type === "rect") {
         const r = { x: item.x ?? 0, y: item.y ?? 0, w: item.w ?? 10, h: item.h ?? 10 };
-        this.terrain.push({ type: "rect", rect: r, skin: item.skin ?? "grass", solid });
+        this.terrain.push({ type: "rect", rect: r, skin, solid });
         if (solid) sk.box(ground, r.w, r.h, { x: r.x + r.w / 2, y: r.y + r.h / 2 });
       } else if (item.type === "circle") {
         const radius = item.r ?? 10, center = { x: item.x ?? 0, y: item.y ?? 0 };
-        this.terrain.push({ type: "circle", center, radius, solid });
+        this.terrain.push({ type: "circle", center, radius, skin, solid });
         if (solid) sk.circle({ ...ground, position: center }, radius);
       } else if (item.type === "chain") {
         const points = (item.points ?? []).map(([x, y]) => ({ x, y }));
         if (points.length < 2) continue;
-        this.terrain.push({ type: "chain", points, halfWidth: 3, solid });
+        this.terrain.push({ type: "chain", points, halfWidth: 3, skin, solid });
         if (solid) sk.edgeChain(ground, points);
       }
     }
@@ -226,7 +284,7 @@ export class DogSim {
         // be footing, and he does not survive touching it. Bees are not fooled: it is not solid to them.
         const kind = r.kind === "lava" ? "lava" : "water";
         this.liquids.push({ rect: box, kind });
-        sk.box({ kind, dynamic: false, category: Cat.liquid, collision: 0, contactTest: Cat.actor | Cat.drawn | Cat.prop }, r.w, r.h, center);
+        sk.box({ kind, dynamic: false, category: Cat.liquid, collision: 0, contactTest: Cat.actor | Cat.drawn | Cat.prop | Cat.rock }, r.w, r.h, center);
       } else {
         this.spikes.push(box);
         sk.box({ kind: "spikes", dynamic: false, friction: 0.8, category: Cat.killer }, r.w, r.h, center);
@@ -246,17 +304,41 @@ export class DogSim {
       const body = {
         kind: "prop", position: { x: spec.x, y: spec.y }, friction: ball ? 0.4 : 0.6, restitution: 0, density: spec.density ?? 2,
         linearDamping: 0.1, angularDamping: 0.2, bullet: true, category: Cat.prop,
-        collision: Cat.wall | Cat.drawn | Cat.actor | Cat.prop | Cat.killer, contactTest: Cat.killer, ref: prop,
+        collision: Cat.wall | Cat.drawn | Cat.actor | Cat.prop | Cat.killer | Cat.rock, contactTest: Cat.killer, ref: prop,
       };
       prop.body = ball ? sk.circle(body, prop.radius) : sk.box(body, prop.size.w, prop.size.h);
       this.props.push(prop);
     }
+    for (const fire of level.fires ?? []) {
+      // A flame has no body: ink falls through it, burning. What it does is worked out from where things are.
+      this.flames.push({ x: fire.x - FLAME_WIDTH / 2, y: fire.y, w: FLAME_WIDTH, h: FLAME_HEIGHT });
+    }
+    (level.rocks ?? []).forEach((spec, i) => {
+      // Held still until its time: it is part of the ground until then, and a boulder after.
+      const rock = new Rock(`rock${i + 1}`, spec.r ?? ROCK_RADIUS, { x: spec.x, y: spec.y }, spec.at);
+      rock.body = sk.circle({
+        kind: "rock", dynamic: false, position: { x: spec.x, y: spec.y }, friction: 0.4, restitution: 0, density: ROCK_DENSITY,
+        linearDamping: 0.1, angularDamping: 0.2, bullet: true, category: Cat.rock,
+        collision: Cat.wall | Cat.drawn | Cat.actor | Cat.prop | Cat.killer | Cat.rock,
+        contactTest: Cat.wall | Cat.drawn | Cat.prop | Cat.killer, ref: rock,
+      }, rock.radius);
+      this.rocks.push(rock);
+    });
+    (level.bombs ?? []).forEach((spec, i) => {
+      const bomb = new Bomb(`bomb${i + 1}`, { x: spec.x, y: spec.y }, spec.at);
+      bomb.body = sk.circle({
+        kind: "bomb", position: { x: spec.x, y: spec.y }, friction: 0.4, restitution: 0, density: BOMB_DENSITY,
+        linearDamping: 0.1, angularDamping: 0.2, bullet: true, category: Cat.prop,
+        collision: Cat.wall | Cat.drawn | Cat.actor | Cat.prop | Cat.killer | Cat.rock, contactTest: Cat.killer, ref: bomb,
+      }, bomb.radius);
+      this.bombs.push(bomb);
+    });
     for (const spot of level.dogs) {
       const body = sk.circle({
         kind: "dog", position: { x: spot.x, y: spot.y }, density: 3, friction: 0.9, restitution: 0, linearDamping: 0.3,
         fixedRotation: true, category: Cat.actor,
-        collision: Cat.wall | Cat.drawn | Cat.killer | Cat.actor | Cat.prop,
-        contactTest: Cat.bee | Cat.killer | Cat.liquid,
+        collision: Cat.wall | Cat.drawn | Cat.killer | Cat.actor | Cat.prop | Cat.rock,
+        contactTest: Cat.bee | Cat.killer | Cat.liquid | Cat.prop | Cat.rock,
       }, DOG_RADIUS);
       const dog: Dog = { id: spot.id, body, mood: "nervous", get position() { return position(body); } };
       tagOf(body).ref = dog;
@@ -431,12 +513,21 @@ export class DogSim {
   frame(dt = STEP) {
     this.tick(dt);
     this.clock.advance(dt);
-    for (const piece of [...this.strokes, ...this.props]) {
+    for (const piece of [...this.strokes, ...this.props, ...this.rocks, ...this.bombs]) {
       if (piece.state === "sunk" && piece.attached) piece.sinkBy((14 * dt) / 0.35);
     }
     if (this.frozen) return;
+    this.before.clear();
+    for (const body of this.heavyBodies()) this.before.set(body, velocity(body));
     const events = this.sk.step(dt);
     if (events.length > 0) this.handle(events);
+  }
+
+  /// He, and every body that can flatten him: the props, the bombs and the boulders that have been let go.
+  private heavyBodies(): planck.Body[] {
+    const out = this.dogs.map((dog) => dog.body);
+    for (const piece of [...this.props, ...this.bombs, ...this.rocks]) if (piece.body) out.push(piece.body);
+    return out;
   }
 
   private tick(dt: number) {
@@ -453,6 +544,8 @@ export class DogSim {
       this.calmFrames = fastest < 6 ? this.calmFrames + 1 : 0;
     }
     if (this.saws.length > 0) this.loop("saw", 1);
+    // The flames crackle, and louder while ink is burning.
+    if (this.flames.length > 0) this.loop("fire", this.strokes.some((stroke) => stroke.alight) ? 1 : 0.45);
     if (this.launchAt !== null && this.launchedAt === null && this.elapsed >= this.launchAt) this.release();
     if (this.launchedAt !== null) {
       const now = this.elapsed - this.launchedAt;
@@ -464,10 +557,16 @@ export class DogSim {
       }
       this.swarm.update(dt, now, targets, this.field);
       this.updateSwarmSound();
+      this.onTheClock(now);
+      if (this.finished) return;
       if (now >= surviveSeconds(this.level)) {
         this.win();
         return;
       }
+    }
+    if (!this.frozen && this.flames.length > 0) {
+      this.fire(dt);
+      if (this.finished) return;
     }
     for (const dog of this.dogs) {
       if (dog.position.y < -60) {
@@ -482,6 +581,8 @@ export class DogSim {
     const out: planck.Body[] = [];
     for (const stroke of this.strokes) if (stroke.body && stroke.dynamic) out.push(stroke.body);
     for (const prop of this.props) if (prop.body) out.push(prop.body);
+    for (const bomb of this.bombs) if (bomb.body) out.push(bomb.body);
+    for (const rock of this.rocks) if (rock.body && !rock.held) out.push(rock.body);
     for (const dog of this.dogs) out.push(dog.body);
     return out;
   }
@@ -497,6 +598,10 @@ export class DogSim {
     }
     for (const r of this.spikes) out.push(rect(r));
     for (const saw of this.saws) out.push(circle({ x: saw.x, y: saw.y }, saw.r));
+    // A flame is a wall to a bee, and a little more: the bee keeps a berth from it. Boulders are
+    // not here at all, because bees fly through them.
+    for (const flame of this.flames) out.push(rect(inset(flame, -FLAME_BERTH, -FLAME_BERTH)));
+    for (const bomb of this.bombs) if (bomb.body) out.push(circle(bomb.position, bomb.radius));
     for (const prop of this.props) {
       if (!prop.body) continue;
       if (prop.shape === "ball") {
@@ -576,6 +681,8 @@ export class DogSim {
     this.fieldCountdown = 0.4;
     for (const dog of this.dogs) this.setMood(dog, "scared");
     this.emit({ type: "haptic", name: "slam" });
+    // Every bomb's fuse is lit as the bees come out.
+    for (const bomb of this.bombs) if (bomb.body) this.emit({ type: "fx", name: "lit", ...bomb.position });
   }
 
   private setMood(dog: Dog, mood: DogMood) {
@@ -606,9 +713,28 @@ export class DogSim {
         this.cut(tagOf(hit[0]).ref as Stroke, event.point);
         continue;
       }
-      if ((hit = match(event, Cat.drawn | Cat.prop, Cat.liquid))) {
+      if ((hit = match(event, Cat.drawn | Cat.prop | Cat.rock, Cat.liquid))) {
         this.sink(tagOf(hit[0]).ref as Stroke | Prop, event.point);
         continue;
+      }
+      if ((hit = match(event, Cat.rock, Cat.wall | Cat.drawn | Cat.prop | Cat.killer))) {
+        // A boulder coming down hard is heard and felt. A slow roll onto something is not.
+        const fall = this.before.get(hit[0]);
+        if (fall && Math.hypot(fall.x, fall.y) >= THUD_SPEED) {
+          const at = event.point ?? position(hit[0]);
+          this.emit({ type: "sound", name: "boulderLand" });
+          this.emit({ type: "haptic", name: "thud" });
+          this.emit({ type: "fx", name: "thud", x: at.x, y: at.y });
+        }
+        continue;
+      }
+      if ((hit = match(event, Cat.actor, Cat.prop | Cat.rock))) {
+        if (!this.crushes(hit[1], hit[0])) continue;
+        const dog = tagOf(hit[0]).ref as Dog;
+        this.emit({ type: "sound", name: "boulderLand" });
+        this.emit({ type: "fx", name: "flattened", ...dog.position });
+        this.lose("Flattened.");
+        return;
       }
       if ((hit = match(event, Cat.actor, Cat.liquid))) {
         const dog = tagOf(hit[0]).ref as Dog;
@@ -632,6 +758,215 @@ export class DogSim {
         return;
       }
     }
+  }
+
+  /// Whether something heavy met him hard enough to flatten him: 120 points a second or more
+  /// between the two, by the speeds they had before the step in which they touched.
+  private crushes(heavy: planck.Body, dog: planck.Body): boolean {
+    const a = this.before.get(heavy), b = this.before.get(dog);
+    return a !== undefined && b !== undefined && Math.hypot(a.x - b.x, a.y - b.y) >= CRUSH_SPEED;
+  }
+
+  // MARK: hazards
+
+  /// What happens at a set time on the bees' clock: a boulder is let go, a bomb goes off.
+  private onTheClock(now: number) {
+    for (const rock of this.rocks) {
+      if (!rock.held || !rock.body || now < rock.releaseAt) continue;
+      rock.held = false;
+      rock.body.setDynamic();
+      rock.body.setAwake(true);
+      this.emit({ type: "sound", name: "rockLoose" });
+      this.emit({ type: "haptic", name: "tap" });
+      // The moment is where it leaves its bracket: under it.
+      this.emit({ type: "fx", name: "loose", x: rock.position.x, y: rock.position.y - rock.radius });
+    }
+    for (const bomb of [...this.bombs]) {
+      if (!bomb.body) continue;
+      if (!bomb.hissed && now >= bomb.blastAt - FUSE_HISS) {
+        // The hiss is as long as the last of the fuse, so it runs into the blast.
+        bomb.hissed = true;
+        this.emit({ type: "sound", name: "fuse" });
+        this.emit({ type: "fx", name: "fuse", ...bomb.position });
+      }
+      if (now >= bomb.blastAt) this.blast(bomb);
+      if (this.finished) return;
+    }
+  }
+
+  /// A bomb goes off. Every loose stroke and every loose prop with a part inside its reach is
+  /// thrown straight away from it, harder the nearer that part is. The bees inside its reach
+  /// are gone. He does not survive it within its reach unless ink or ground stands on the
+  /// straight line between its middle and his. Nothing catches fire.
+  private blast(bomb: Bomb) {
+    const at = bomb.position;
+    bomb.release(this.sk, this.elapsed);
+    bomb.attached = false;
+    this.bombs = this.bombs.filter((b) => b !== bomb);
+    this.emit({ type: "haptic", name: "slam" });
+    this.emit({ type: "sound", name: "blast" });
+    this.emit({ type: "fx", name: "blast", x: at.x, y: at.y, n: BLAST_RADIUS });
+    /// Throw a body by the point of it nearest the bomb, `gap` away.
+    const fling = (body: planck.Body, point: Vec, gap: number) => {
+      if (gap > BLAST_RADIUS) return;
+      const push = BLAST_IMPULSE * (1 - gap / BLAST_RADIUS), away = sub(point, at), far = Math.hypot(away.x, away.y);
+      // Something lying right on the bomb goes up.
+      const way = far > 0.01 ? { x: away.x / far, y: away.y / far } : { x: 0, y: 1 };
+      applyImpulseAt(body, { x: way.x * push, y: way.y * push }, point);
+    };
+    for (const stroke of this.strokes) {
+      if (!stroke.body || !stroke.dynamic) continue;
+      const near = nearestOnPolyline(stroke.world, at);
+      fling(stroke.body, near.point, near.distance);
+    }
+    for (const piece of [...this.props, ...this.bombs, ...this.rocks]) {
+      if (!piece.body || !piece.body.isDynamic()) continue;
+      const centre = piece.position, far = distance(centre, at);
+      // A ball is thrown through its middle, by how near its skin is. A crate is close enough to one.
+      fling(piece.body, centre, Math.max(0, far - (piece.shape === "ball" ? piece.radius : Math.min(piece.size.w, piece.size.h) / 2)));
+    }
+    for (const bee of [...this.swarm.bees]) {
+      if (distance(bee.position, at) > BLAST_RADIUS) continue;
+      this.emit({ type: "fx", name: "beeGone", ...bee.position });
+      this.swarm.remove(bee);
+    }
+    this.fieldCountdown = 0;
+    for (const dog of this.dogs) {
+      if (distance(dog.position, at) > BLAST_RADIUS || this.sk.rayCast(at, dog.position, COVER)) continue;
+      this.emit({ type: "fx", name: "blasted", ...dog.position });
+      this.lose("Too close to the blast.");
+      return;
+    }
+  }
+
+  /// One frame of the flames. He does not survive touching one, a bee that is pushed into one
+  /// is gone, and ink that touches one catches there: that part is gone at once, and the burn
+  /// runs along what is left in both directions. Burning ink lights nothing else.
+  private fire(dt: number) {
+    for (const dog of this.dogs) {
+      if (!this.flames.some((flame) => distanceToRect(dog.position, flame) <= DOG_RADIUS)) continue;
+      this.emit({ type: "sound", name: "sizzle" });
+      this.emit({ type: "fx", name: "burned", ...dog.position });
+      this.lose(`${capitalized(dog.id)} got burned.`);
+      return;
+    }
+    for (const bee of [...this.swarm.bees]) {
+      const at = bee.position;
+      if (!this.flames.some((flame) => distanceToRect(at, flame) <= BEE_RADIUS)) continue;
+      this.emit({ type: "sound", name: "sizzle" });
+      this.emit({ type: "haptic", name: "tap" });
+      this.emit({ type: "fx", name: "singe", x: at.x, y: at.y });
+      this.swarm.remove(bee);
+    }
+    // The ends already burning lose their ink first, then whatever touches a flame now catches.
+    const burnt = BURN_SPEED * dt;
+    this.emberCountdown -= dt;
+    const spark = this.emberCountdown <= 0;
+    if (spark) this.emberCountdown = EMBER_GAP;
+    for (const stroke of [...this.strokes]) {
+      if (!stroke.body || !stroke.alight) continue;
+      const { from, to } = stroke.span;
+      this.keepInk(stroke, from + (stroke.burning.start ? burnt : 0), to - (stroke.burning.end ? burnt : 0));
+      if (!stroke.body || !spark) continue;
+      const left = stroke.span;
+      if (stroke.burning.start) this.emit({ type: "fx", name: "ember", ...stroke.worldAt(left.from) });
+      if (stroke.burning.end) this.emit({ type: "fx", name: "ember", ...stroke.worldAt(left.to) });
+    }
+    for (const stroke of [...this.strokes]) if (stroke.body) this.catchFire(stroke);
+  }
+
+  /// Cut a stroke down to the ink between two distances along it, or take it out of the level
+  /// when what is left is too short to be anything.
+  private keepInk(stroke: Stroke, from: number, to: number) {
+    if (to - from >= STUB) {
+      stroke.keep(this.sk, from, to);
+      return;
+    }
+    const at = stroke.worldAt((stroke.span.from + stroke.span.to) / 2);
+    stroke.release(this.sk, "burnt", this.elapsed);
+    this.detach(stroke);
+    this.emit({ type: "haptic", name: "tap" });
+    this.emit({ type: "fx", name: "ash", x: at.x, y: at.y });
+    this.fieldCountdown = 0;
+  }
+
+  /// Light a stroke wherever it touches a flame. A touch at an end sets that end burning. A
+  /// touch in the middle makes two pieces of it, each burning at the end the flame made.
+  private catchFire(stroke: Stroke) {
+    const { from, to } = stroke.span, lit: [number, number][] = [];
+    if (stroke.local.length === 1) {
+      if (this.flames.some((flame) => distanceToRect(stroke.position, flame) <= WIDTH / 2)) lit.push([from, to]);
+    } else {
+      // Walk the ink a little at a time and gather the runs of it that reach a flame.
+      let run: [number, number] | null = null;
+      for (let along = from; ; along = Math.min(to, along + BURN_SAMPLE)) {
+        const point = stroke.worldAt(along);
+        if (this.flames.some((flame) => distanceToRect(point, flame) <= WIDTH / 2)) {
+          if (run) run[1] = along;
+          else run = [along, along];
+        } else if (run) {
+          lit.push(run);
+          run = null;
+        }
+        if (along >= to) break;
+      }
+      if (run) lit.push(run);
+    }
+    if (lit.length === 0) return;
+    const middle = stroke.worldAt((lit[0][0] + lit[0][1]) / 2);
+    // An end that is already burning and falls further into the flame is the same fire, not a new one.
+    let fresh = false;
+    // From the far end back, so the distances of the runs not yet handled stay true.
+    for (const [a, b] of lit.reverse()) {
+      if (!stroke.body) break;
+      const span = stroke.span, low = a - BURN_SAMPLE / 2, high = b + BURN_SAMPLE / 2;
+      const atStart = low <= span.from + STUB, atEnd = high >= span.to - STUB;
+      if (atStart && atEnd) {
+        fresh = true;
+        this.keepInk(stroke, 0, 0);
+      } else if (atStart) {
+        fresh ||= !stroke.burning.start;
+        stroke.burning.start = true;
+        this.keepInk(stroke, high, span.to);
+      } else if (atEnd) {
+        fresh ||= !stroke.burning.end;
+        stroke.burning.end = true;
+        this.keepInk(stroke, span.from, low);
+      } else {
+        fresh = true;
+        this.split(stroke, low, high);
+      }
+    }
+    if (!fresh) return;
+    this.emit({ type: "sound", name: "burn" });
+    this.emit({ type: "haptic", name: "tap" });
+    this.emit({ type: "fx", name: "catch", x: middle.x, y: middle.y });
+    this.fieldCountdown = 0;
+  }
+
+  /// Burn a hole in the middle of a stroke: the ink before `low` stays this stroke, and the ink
+  /// after `high` becomes a new piece that moves as this one was moving. Both burn at the hole.
+  private split(stroke: Stroke, low: number, high: number) {
+    const body = stroke.body!, span = stroke.span;
+    if (span.to - high >= STUB) {
+      // The far piece keeps the corners the stroke was drawn with.
+      const piece = new Stroke(this.nextStroke++, slice(stroke.world, high - span.from, span.to - span.from), stroke.dynamic, this.sk);
+      if (piece.body) {
+        if (stroke.dynamic) {
+          this.sk.remask(piece.body, { contactTest: Cat.killer | LANDING });
+          // It goes on as that part of the stroke was going: the same turn, and the speed of that point.
+          const at = piece.position, v = body.getLinearVelocityFromWorldPoint({ x: at.x / PPM, y: at.y / PPM });
+          setVelocity(piece.body, { x: v.x * PPM, y: v.y * PPM });
+          piece.body.setAngularVelocity(angularVelocity(body));
+        }
+        piece.landed = true;
+        piece.burning.start = true;
+        piece.burning.end = stroke.burning.end;
+        this.strokes.push(piece);
+      }
+    }
+    stroke.burning.end = true;
+    this.keepInk(stroke, span.from, low);
   }
 
   /// Ink or a prop went into a pit. It sinks out of the puzzle: no footing, no plug, gone.
@@ -663,6 +998,8 @@ export class DogSim {
   private detach(piece: Stroke | Prop) {
     piece.attached = false;
     if (piece instanceof Stroke) this.strokes = this.strokes.filter((s) => s !== piece);
+    else if (piece instanceof Rock) this.rocks = this.rocks.filter((r) => r !== piece);
+    else if (piece instanceof Bomb) this.bombs = this.bombs.filter((b) => b !== piece);
     else this.props = this.props.filter((p) => p !== piece);
   }
 

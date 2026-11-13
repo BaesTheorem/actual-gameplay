@@ -1,10 +1,10 @@
 // The swarm: bees leave the hives on a schedule and are steered every frame.
 import type * as planck from "planck";
-import { SKWorld, applyImpulse, clampSpeed, position, speed, velocity, type Vec } from "../sk";
+import { SKWorld, applyImpulse, clampSpeed, position, setVelocity, speed, velocity, type Vec } from "../sk";
 import { BEE_RADIUS, BeeCrew, Swarm, type CrewBody } from "./beecrew";
 import type { FlowField, Solid } from "./flowfield";
-import { add, distance, minBy, normalized, perpendicular, scale, sub } from "./geometry";
-import type { Hive } from "./level";
+import { add, distance, dot, minBy, normalized, perpendicular, scale, sub, type Rect } from "./geometry";
+import { FLAME_BERTH, type Hive } from "./level";
 import { Cat } from "./stroke";
 
 /// The generator the hives draw their jitter from (SplitMix64). The same seed gives the same swarm.
@@ -59,6 +59,8 @@ export class BeeSwarm {
   bees: Bee[] = [];
   spawned = 0;
   shoving = false;
+  /// The flames of the level. A bee does not fly into one.
+  flames: Rect[] = [];
   readonly total: number;
   private schedule: { time: number; at: Vec }[];
   private rng = new SeededRNG(99);
@@ -75,6 +77,26 @@ export class BeeSwarm {
   }
 
   get alive(): number { return this.bees.length; }
+
+  /// A bee is gone: a fire or a blast took it.
+  remove(bee: Bee) {
+    this.sk.remove(bee.body);
+    this.bees = this.bees.filter((other) => other !== bee);
+  }
+
+  /// A bee keeps clear of a flame it has come up to: whatever part of its speed points into the
+  /// flame is taken away, so by its own flying it slides along the flame and never into it.
+  /// Only something that pushes it can put it in.
+  private shy(body: planck.Body) {
+    const at = position(body);
+    for (const flame of this.flames) {
+      const near = { x: Math.min(Math.max(at.x, flame.x), flame.x + flame.w), y: Math.min(Math.max(at.y, flame.y), flame.y + flame.h) };
+      const gap = distance(at, near);
+      if (gap === 0 || gap >= BEE_RADIUS + FLAME_BERTH) continue;
+      const out = scale(sub(at, near), 1 / gap), v = velocity(body), into = dot(v, out);
+      if (into < 0) setVelocity(body, sub(v, scale(out, into)));
+    }
+  }
 
   /// With every flow field rebuild: who is stuck outside, and what they could shift.
   survey(bodies: CrewBody[], anchors: Solid[], dogs: Vec[], field: FlowField) {
@@ -143,6 +165,7 @@ export class BeeSwarm {
         applyImpulse(body, scale(normalized(add(desired, wobble)), strength * body.getMass() * dt));
       }
       clampSpeed(body, Swarm.topSpeed);
+      if (this.flames.length > 0) this.shy(body);
       const vx = bee.velocity.x;
       if (Math.abs(vx) > 10) bee.facing = vx < 0 ? -1 : 1;
     }

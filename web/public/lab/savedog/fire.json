@@ -1,0 +1,29 @@
+{
+  "id": "fire",
+  "name": "Between the fires",
+  "hint": "A fire at each end of the rock, and lava past them. Ink that touches a flame burns.",
+  "inkBudget": 380,
+  "stars": [220, 300],
+  "statics": [
+    { "type": "rect", "x": 119, "y": 34, "w": 164, "h": 40, "skin": "stone" }
+  ],
+  "killers": [
+    { "x": 0, "y": 34, "w": 119, "h": 26, "kind": "lava" },
+    { "x": 283, "y": 34, "w": 119, "h": 26, "kind": "lava" }
+  ],
+  "fires": [
+    { "x": 131, "y": 74 },
+    { "x": 271, "y": 74 }
+  ],
+  "dogs": [{ "id": "clawd", "x": 201, "y": 92 }],
+  "hives": [
+    { "x": 60, "y": 700, "count": 6 },
+    { "x": 342, "y": 700, "count": 6 }
+  ],
+  "solution": {
+    "strokes": [
+      { "points": [[161, 78], [163, 118], [175, 142], [201, 152], [227, 142], [239, 118], [241, 78]] }
+    ],
+    "waitSeconds": 14
+  }
+}

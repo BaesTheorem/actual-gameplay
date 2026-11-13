@@ -175,3 +175,44 @@ export const maxBy = <T>(items: readonly T[], key: (item: T) => number): T | und
   }
   return best;
 };
+
+/// How far a point is from a rectangle. 0 inside it or on its edge.
+export const distanceToRect = (p: Vec, r: Rect): number =>
+  Math.hypot(Math.max(r.x - p.x, 0, p.x - (r.x + r.w)), Math.max(r.y - p.y, 0, p.y - (r.y + r.h)));
+
+/// The point a given distance along a polyline, held to its two ends.
+export const pointAlong = (points: Vec[], along: number): Vec => {
+  let left = along;
+  for (let i = 1; i < points.length; i++) {
+    const a = points[i - 1], b = points[i], segment = distance(a, b);
+    if (left <= segment && segment > 0) return add(a, scale(sub(b, a), Math.max(0, left) / segment));
+    left -= segment;
+  }
+  return points[points.length - 1];
+};
+
+/// The part of a polyline between two distances along it, both ends included.
+export const slice = (points: Vec[], from: number, to: number): Vec[] => {
+  if (points.length < 2 || to <= from) return [pointAlong(points, from)];
+  const out = [pointAlong(points, from)];
+  let walked = 0;
+  for (let i = 1; i < points.length; i++) {
+    walked += distance(points[i - 1], points[i]);
+    if (walked > from && walked < to) out.push(points[i]);
+  }
+  out.push(pointAlong(points, to));
+  return out;
+};
+
+/// The point of a polyline nearest to `p`, how far from `p` it is, and how far along the polyline.
+export const nearestOnPolyline = (points: Vec[], p: Vec): { point: Vec; distance: number; along: number } => {
+  let best = { point: points[0], distance: distance(points[0], p), along: 0 }, walked = 0;
+  for (let i = 1; i < points.length; i++) {
+    const a = points[i - 1], b = points[i], ab = sub(b, a), len2 = ab.x * ab.x + ab.y * ab.y;
+    const t = len2 === 0 ? 0 : Math.max(0, Math.min(1, ((p.x - a.x) * ab.x + (p.y - a.y) * ab.y) / len2));
+    const point = add(a, scale(ab, t)), gap = distance(point, p), segment = Math.sqrt(len2);
+    if (gap < best.distance) best = { point, distance: gap, along: walked + t * segment };
+    walked += segment;
+  }
+  return best;
+};

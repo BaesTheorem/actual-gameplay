@@ -2,7 +2,7 @@
 import { Container, Graphics, Sprite, Text } from "pixi.js";
 import * as art from "../app/art";
 import type { Cue } from "../sim/clock";
-import { DogSim, type Dog, type DogLevel, type Effect, type Prop } from "../sim/savedog";
+import { DogSim, type Bomb, type Dog, type DogLevel, type Effect, type Prop, type Rock } from "../sim/savedog";
 import type { Bee } from "../sim/savedog/bee";
 import { DOG_RADIUS } from "../sim/savedog/beecrew";
 import { resample } from "../sim/savedog/geometry";
@@ -21,9 +21,27 @@ export const DOG_ART = [
   "spikes", "rock", "block_planks", "clawd_nervous", "clawd_scared", "clawd_excited", "clawd_ko",
   ...["grass", "stone", "dirt", "purple"].flatMap((skin) => TILES.map((part) => `terrain_${skin}_${part}`)),
 ];
+/// The art one level needs on top of the mode's: the pictures of the hazards it has.
+export const dogArt = (level: DogLevel): string[] => {
+  const names: string[] = [];
+  if ((level.fires ?? []).length > 0) names.push(...FLAMES);
+  if ((level.rocks ?? []).length > 0) names.push("rock_big");
+  if ((level.bombs ?? []).length > 0) names.push("bomb_lit_a", "bomb_lit_b");
+  if ((level.statics ?? []).some((item) => item.skin === "ice")) names.push(...TILES.map((part) => `terrain_ice_${part}`));
+  return names;
+};
+
+/// A flame's three pictures, in the order it cycles through them, ten to the second.
+const FLAMES = ["fire_a", "fire_b", "fire_c"];
+/// A flame's picture is drawn at this size, in points. Its tongue fills the 24 by 32 the flame burns in.
+const FLAME_ART = { w: 32, h: 128 / 3 };
+/// How far outside a boulder or a bomb its ring is drawn, and how far the boulder's bracket stands off it.
+const RING_GAP = 7, BRACKET_GAP = 4;
 
 /// The dark wood of the painted planks and posts.
 const WOOD = 0x7a4b31;
+/// The pale blue of the painted ice.
+const ICE = 0xbbd7e4;
 /// A dog's clip frame leaves room above him for emotes, so a 58 pt frame makes his body as wide as his 36 pt circle.
 const DOG_HEIGHT = 58;
 
@@ -40,6 +58,17 @@ const SPIT: BurstOptions = { count: 8, color: Pigment.ochre, shape: "drop", spee
 const STING: BurstOptions = { count: 8, color: Pigment.ochre, shape: "shard", speed: 150, life: 0.4, size: 2.8 };
 const HURT: BurstOptions = { count: 8, color: Pigment.rose, shape: "shard", speed: 150, life: 0.4, size: 2.8, gravity: 300, angle: UP, spread: 2.6 };
 const CHEER: BurstOptions = { count: 6, color: Pigment.ochre, shape: "star", speed: 110, life: 0.5, size: 3.4, gravity: 140, angle: UP, spread: 2.2 };
+// Fire is ochre and clay, as lava is. Ash is ink, and falls.
+const CATCH: BurstOptions = { count: 7, color: Pigment.ochre, shape: "shard", speed: 110, life: 0.4, size: 2.8, gravity: -60, angle: UP, spread: 2.4 };
+const SPARK: BurstOptions = { count: 2, color: Pigment.ochre, shape: "dot", speed: 55, life: 0.35, size: 1.6, gravity: -120, angle: UP, spread: 1.6 };
+const ASH: BurstOptions = { count: 5, color: Pigment.ink, shape: "dot", speed: 40, life: 0.45, size: 1.5, gravity: 260, outline: false };
+const SINGE: BurstOptions = { count: 5, color: Pigment.ochre, shape: "shard", speed: 90, life: 0.35, size: 2.2, gravity: 200 };
+const EMBERS: BurstOptions = { count: 9, color: Pigment.clay, shape: "shard", speed: 150, life: 0.45, size: 3, gravity: 380, angle: UP, spread: 2.6 };
+const BLAST: BurstOptions = { count: 10, color: Pigment.ochre, shape: "shard", speed: 230, life: 0.4, size: 3.6, gravity: 240 };
+const FUSE: BurstOptions = { count: 5, color: Pigment.ochre, shape: "star", speed: 70, life: 0.35, size: 2.6, gravity: 120, angle: UP, spread: 1.8 };
+const DUST: BurstOptions = { count: 7, color: Pigment.cream, shape: "dot", speed: 80, life: 0.4, size: 3, gravity: -30, angle: UP, spread: 2.8 };
+const SWAT: BurstOptions = { count: 3, color: Pigment.ochre, shape: "dot", speed: 70, life: 0.3, size: 2 };
+const STARS: BurstOptions = { count: 5, color: Pigment.cream, shape: "star", speed: 90, life: 0.4, size: 3, gravity: 120, angle: UP, spread: 2.2 };
 
 /// Decorative motion runs full length normally and near-instant under reduced motion.
 const decorative = (full: number) => (reducedMotion() ? Math.min(full, 0.1) : full);
@@ -90,7 +119,11 @@ export class DogScene implements Scene {
   private hiveAlpha = 1;
   private saws: Sprite[] = [];
   private props = new Map<Prop, Sprite>();
-  private strokes = new Map<Stroke, Graphics>();
+  private flames: Sprite[] = [];
+  /// A boulder or a bomb, with the ring that shows its wait and, for a held boulder, its bracket.
+  private timed = new Map<Rock | Bomb, { node: Sprite; ring: Graphics; bracket: Graphics | null }>();
+  private strokes = new Map<Stroke, { g: Graphics; revision: number }>();
+  private embers = new Graphics();
   private live = new Graphics();
   private dogs = new Map<Dog, DogNode>();
   private bees = new Map<Bee, Sprite>();
@@ -141,9 +174,10 @@ export class DogScene implements Scene {
         root.addChild(sprite("rock", item.center.x, item.center.y, item.radius * 2.1, item.radius * 2.1, 2));
       } else {
         // A branch: wood over a slightly wider ink line, which gives it the painted props' outline.
+        // An icy one is the pale blue of the ice tiles.
         const g = new Graphics();
         inkLine(g, item.points, Pigment.ink, 9);
-        inkLine(g, item.points, WOOD, 6);
+        inkLine(g, item.points, item.skin === "ice" ? ICE : WOOD, 6);
         g.position.set(0, Y(0));
         g.zIndex = 2;
         root.addChild(g);
@@ -163,6 +197,20 @@ export class DogScene implements Scene {
       this.props.set(prop, node);
       root.addChild(node);
     }
+    for (const flame of sim.flames) {
+      const node = new Sprite(art.texture(FLAMES[0]));
+      // The picture's foot is a sixth of the way up it, and that is the point the flame stands on.
+      node.anchor.set(0.5, 1 - (art.entry(FLAMES[0])?.anchor[1] ?? 0.15625));
+      node.position.set(flame.x + flame.w / 2, Y(flame.y));
+      node.width = FLAME_ART.w;
+      node.height = FLAME_ART.h;
+      node.zIndex = 11;
+      this.flames.push(node);
+      root.addChild(node);
+    }
+    for (const rock of sim.rocks) this.addTimed(rock, sprite("rock_big", 0, 0, rock.radius * 2.2, rock.radius * 2.2, 6), true);
+    // The painted bomb is a ball with a fuse standing off it, so its picture is a third larger than the ball.
+    for (const bomb of sim.bombs) this.addTimed(bomb, sprite("bomb_lit_a", 0, 0, bomb.radius * 8 / 3, bomb.radius * 8 / 3, 6), false);
     for (const r of sim.forbidden) root.addChild(this.noInk(r));
     for (const hive of sim.hives) {
       const marker = sprite("ui_hive", hive.x, hive.y, 30, 30, 4);
@@ -184,11 +232,30 @@ export class DogScene implements Scene {
       root.addChild(holder);
     }
     this.beeLayer.zIndex = 12;
+    this.embers.zIndex = 11;
     this.live.zIndex = 50;
-    root.addChild(this.beeLayer, this.live, this.fx.layer);
+    root.addChild(this.beeLayer, this.embers, this.live, this.fx.layer);
     const hint = hintLabel(this.level.hint);
     if (hint) root.addChild(hint);
     this.draw(0);
+  }
+
+  /// A boulder or a bomb: its picture, a ring around it that empties as its time comes, and for
+  /// a boulder the ink bracket that holds it until then.
+  private addTimed(piece: Rock | Bomb, node: Sprite, held: boolean) {
+    const ring = new Graphics();
+    ring.zIndex = 7;
+    let bracket: Graphics | null = null;
+    if (held) {
+      // Two arms and a bar under it, drawn about the boulder's middle.
+      const reach = piece.radius + BRACKET_GAP;
+      bracket = new Graphics().moveTo(-reach, -4).lineTo(-reach, reach).lineTo(reach, reach).lineTo(reach, -4)
+        .stroke({ color: Pigment.ink, width: 2.5, cap: "round", join: "round" });
+      bracket.zIndex = 5;
+      this.root.addChild(bracket);
+    }
+    this.timed.set(piece, { node, ring, bracket });
+    this.root.addChild(node, ring);
   }
 
   /// A pit of water or lava: a flat wash with a wavy line along the top.
@@ -258,14 +325,14 @@ export class DogScene implements Scene {
     this.sim.frame();
     // Moods are read from the dogs when drawing, and a cut has its own effect.
     for (const cue of this.cues) {
-      if (cue.type === "fx") this.effect(cue.name, cue.x, cue.y);
+      if (cue.type === "fx") this.effect(cue.name, cue.x, cue.y, cue.n);
       else if (cue.type !== "puff" && cue.type !== "mood") this.onCue(cue);
     }
     this.cues.length = 0;
   }
 
-  /// What the player sees for each moment the simulation reports.
-  private effect(name: string, x: number, y: number) {
+  /// What the player sees for each moment the simulation reports. `n` is the reach of a blast.
+  private effect(name: string, x: number, y: number, n = 0) {
     const fx = this.fx;
     if (name === "land") fx.burst(x, y, FLECKS);
     else if (name === "cut") fx.burst(x, y, CHIPS);
@@ -273,6 +340,19 @@ export class DogScene implements Scene {
     else if (name === "drown") { fx.burst(x, y, this.lavaAt(x) ? SPIT : SPLASH); fx.shake(5, 0.3); }
     else if (name === "sting") { fx.burst(x, y, STING); fx.ring(x, y, Pigment.rose); fx.shake(5, 0.3); }
     else if (name === "hurt") { fx.burst(x, y, HURT); fx.shake(5, 0.3); }
+    else if (name === "catch") { fx.burst(x, y, CATCH); fx.ring(x, y, Pigment.ochre); }
+    else if (name === "ember") fx.burst(x, y, SPARK);
+    else if (name === "ash") fx.burst(x, y, ASH);
+    else if (name === "singe") fx.burst(x, y, SINGE);
+    else if (name === "burned") { fx.burst(x, y, EMBERS); fx.shake(5, 0.3); }
+    else if (name === "loose") fx.burst(x, y, DUST);
+    else if (name === "thud") { fx.burst(x, y, DUST); fx.shake(3, 0.2); }
+    else if (name === "flattened") { fx.burst(x, y + 6, STARS); fx.shake(5, 0.3); }
+    else if (name === "lit" || name === "fuse") fx.burst(x + 5, y + 14, FUSE);
+    // A blast: pieces thrown out, a ring that opens to the edge of its reach, and a shake.
+    else if (name === "blast") { fx.burst(x, y, BLAST); fx.burst(x, y, EMBERS); fx.ring(x, y, Pigment.ochre, n); fx.shake(5, 0.3); }
+    else if (name === "beeGone") fx.burst(x, y, SWAT);
+    else if (name === "blasted") { fx.burst(x, y, EMBERS); fx.shake(5, 0.3); }
     else if (name === "win") {
       fx.confetti();
       for (const dog of this.sim.dogs) fx.burst(dog.position.x, dog.position.y + 22, CHEER);
@@ -315,13 +395,17 @@ export class DogScene implements Scene {
       }
       const picture = sim.sawFrame === 0 ? "saw_a" : "saw_b";
       for (const saw of this.saws) saw.texture = art.texture(picture);
+      // Each flame is a step along the cycle from the one before, so two side by side do not move as one.
+      this.flames.forEach((flame, i) => { flame.texture = art.texture(FLAMES[(Math.floor(this.time / 0.1) + i) % FLAMES.length]); });
     }
     if (sim.released && this.hiveAlpha > 0.35) {
       this.hiveAlpha = Math.max(0.35, this.hiveAlpha - (0.65 * dt) / 0.3);
       this.hiveNodes.forEach((node, i) => { node.alpha = this.hiveAlpha * (i % 2 === 0 ? 0.9 : 1); });
     }
     this.drawProps();
+    this.drawTimed(still);
     this.drawStrokes();
+    this.drawEmbers(still);
     this.drawLive();
     this.drawDogs(dt, still);
     this.drawBees(still);
@@ -350,17 +434,23 @@ export class DogScene implements Scene {
   private drawStrokes() {
     const sim = this.sim;
     for (const stroke of sim.strokes) {
-      if (this.strokes.has(stroke)) continue;
+      let entry = this.strokes.get(stroke);
+      if (!entry) {
+        entry = { g: new Graphics(), revision: -1 };
+        entry.g.zIndex = 10;
+        this.strokes.set(stroke, entry);
+        this.root.addChild(entry.g);
+      }
+      // Ink that is burning gets shorter, so it is drawn again each time its shape changes.
+      if (entry.revision === stroke.revision) continue;
+      entry.revision = stroke.revision;
       // Pinned ink is indigo, so a stroke that will not fall reads as a different ink.
       const color = stroke.dynamic ? Pigment.ink : Pigment.indigo;
-      const g = new Graphics();
-      if (stroke.local.length === 1) g.circle(0, 0, WIDTH / 2).fill(color);
-      else inkLine(g, stroke.local, color, WIDTH);
-      g.zIndex = 10;
-      this.strokes.set(stroke, g);
-      this.root.addChild(g);
+      entry.g.clear();
+      if (stroke.local.length === 1) entry.g.circle(stroke.local[0].x, -stroke.local[0].y, WIDTH / 2).fill(color);
+      else inkLine(entry.g, stroke.local, color, WIDTH);
     }
-    for (const [stroke, g] of this.strokes) {
+    for (const [stroke, { g }] of this.strokes) {
       if (!stroke.attached) { g.destroy(); this.strokes.delete(stroke); continue; }
       const at = stroke.position;
       g.position.set(at.x, Y(at.y));
@@ -420,6 +510,62 @@ export class DogScene implements Scene {
       node.position.set(at.x, Y(at.y));
       node.scale.x = Math.abs(node.scale.x) * bee.facing;
     }
+    // A bee a fire or a blast took is gone from the swarm, and so from the screen.
+    if (this.bees.size > sim.bees.length) {
+      const flying = new Set(sim.bees);
+      for (const [bee, node] of this.bees) {
+        if (flying.has(bee)) continue;
+        node.destroy();
+        this.bees.delete(bee);
+      }
+    }
+  }
+
+  /// Boulders and bombs: each turns with its body, and its ring empties as its time comes. A
+  /// boulder's bracket lets go of it when the ring is empty. A bomb flickers between its two
+  /// pictures twelve times a second, and holds the first under reduced motion.
+  private drawTimed(still: boolean) {
+    const sim = this.sim;
+    for (const [piece, { node, ring, bracket }] of this.timed) {
+      if (!piece.attached) {
+        node.destroy();
+        ring.destroy();
+        bracket?.destroy();
+        this.timed.delete(piece);
+        continue;
+      }
+      const at = piece.position, bomb = !("held" in piece);
+      node.position.set(at.x, Y(at.y));
+      node.rotation = -piece.angle;
+      if (bomb) node.texture = art.texture(still || Math.floor(this.time * 12) % 2 === 0 ? "bomb_lit_a" : "bomb_lit_b");
+      const sunk = piece.state === "sunk";
+      if (sunk) node.alpha = 1 - Math.min(1, (sim.elapsed - piece.since) / decorative(0.35));
+      const left = sim.waitLeft(bomb ? (piece as Bomb).blastAt : (piece as Rock).releaseAt);
+      const waiting = !sunk && left > 0 && (bomb || (piece as Rock).held);
+      ring.visible = waiting;
+      if (bracket) bracket.visible = !sunk && (piece as Rock).held;
+      if (bracket) bracket.position.set(at.x, Y(at.y));
+      if (!waiting) continue;
+      // From the top, clockwise, as much of the circle as there is wait left: ochre on an ink line.
+      const radius = piece.radius + RING_GAP, from = -Math.PI / 2, to = from + 2 * Math.PI * left;
+      ring.clear();
+      ring.arc(0, 0, radius, from, to).stroke({ color: Pigment.ink, width: 5, cap: "round" });
+      ring.arc(0, 0, radius, from, to).stroke({ color: Pigment.ochre, width: 2.6, cap: "round" });
+      ring.position.set(at.x, Y(at.y));
+    }
+  }
+
+  /// A small ember at every burning end of the ink: ochre with an ink line and a cream heart.
+  private drawEmbers(still: boolean) {
+    const embers = this.sim.embers;
+    this.embers.clear();
+    if (embers.length === 0) return;
+    // It breathes a little, eight times a second.
+    const swell = still ? 1 : 1 + 0.15 * Math.sin(this.time * 2 * Math.PI * 8);
+    for (const p of embers) this.embers.circle(p.x, Y(p.y), 3.4 * swell);
+    this.embers.fill(Pigment.ochre).stroke({ color: Pigment.ink, width: 1 });
+    for (const p of embers) this.embers.circle(p.x, Y(p.y), 1.3);
+    this.embers.fill(Pigment.cream);
   }
 
   private drawEffects() {

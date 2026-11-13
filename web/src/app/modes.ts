@@ -96,7 +96,7 @@ const sceneCode = async (id: string): Promise<SceneCode> => {
   }
   if (id === "saveDog") {
     const m = await import("../scenes/dog");
-    return { art: m.DOG_ART, make: (level, label, onCue) => new m.DogScene(level as DogLevel, label, onCue) };
+    return { art: m.DOG_ART, artFor: (level) => m.dogArt(level as DogLevel), make: (level, label, onCue) => new m.DogScene(level as DogLevel, label, onCue) };
   }
   if (id === "runner") {
     const m = await import("../scenes/runner");

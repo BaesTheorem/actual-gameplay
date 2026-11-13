@@ -80,6 +80,7 @@ Node with no simulator:
     npm run build                    type-check and write web/dist
     npx tsx scripts/tower-gen.ts     write the Number Tower campaign again from its seeds and recipes
     npx tsx scripts/film.ts pinPull <level> --solution   one picture of a run, a frame every half second
+    npx tsx scripts/film.ts saveDog <level> --solution   the same for Save the Clawd, with every bee in it
 
 ### Levels and chapters
 
@@ -177,6 +178,80 @@ The film needs no browser and writes `build/film/<level>-<pins>.png`. The lab ro
 file that is in no chapter, with no sticker and nothing saved, under the title "Lab: <name>". It
 reads `public/lab/<mode folder>/`, so any mode with levels can be looked at the same way. Seven
 small levels are in the lab, one for each of the newer pieces.
+
+### Save the Clawd's hazards
+
+Four things a level can carry besides bees. Every time is in seconds after the bees come out,
+which is the clock that counts the ten seconds, and every number is a named constant in
+`web/src/sim/savedog/level.ts`.
+
+- **Fire** (`fires: [{x, y}]`). A flame stands on its point, 24 points wide and 32 tall. Ink that
+  touches it catches: the part in the flame is gone at once, and the burn runs along what is left
+  at 40 points a second, both ways from the touch. A stroke lit in the middle becomes two pieces,
+  each burning at the end the flame made. Burning ink lights no other ink. He dies if he touches
+  a flame. Bees keep 4 points clear of one and have no route through it, and a bee that is pushed
+  into one is gone. A flame does nothing to props and nothing puts it out.
+- **Rockfall** (`rocks: [{x, y, r?, at}]`). A boulder (radius 16 unless `r` says otherwise, twice
+  as dense as a prop) is held still at its point until its time and then let go. Until then it is
+  part of the ground: ink rests on it and cannot be drawn through it. It pushes ink as any heavy
+  body does. Bees fly through it, so it is never a wall to them. A boulder, a bomb or a prop that
+  meets him at 120 points a second or more, measured between the two in the frame before they
+  touch, flattens him.
+- **Bombs** (`bombs: [{x, y, at}]`). A ball of radius 12 that lies where it is put, can be rolled,
+  and goes off at its time. Its blast reaches 70 points from its middle. He dies inside that reach
+  unless ink or ground stands on the straight line between its middle and his. Every loose stroke
+  and loose prop with a part inside the reach is thrown straight away from the bomb by its nearest
+  point, with the same push whatever it weighs, falling in a straight line to nothing at the edge
+  (`BLAST_IMPULSE`: a 150 point bar with the bomb at its end goes 40 points, a 60 point bar goes
+  across the level, a 300 point dome moves 5). Pinned ink does not move. Bees inside the reach are
+  gone. A blast burns nothing and sets off no other bomb, and a bomb a pit has taken never goes off.
+- **Ice** (a static with `"skin": "ice"`). Everything that touches it has a friction of 0.02
+  against it. Nothing else about it is special.
+
+The tools are the ones Pull the Pin has:
+
+    npx tsx scripts/film.ts saveDog <level id | file.json> [--solution | --stroke "x,y;x,y" | --random N | --dumb name]
+    npx tsx scripts/savedog-suite.ts play|audit|odds <level id | file.json> [--random N]
+    #/saveDog/~<name>                                    web/public/lab/savedog/<name>.json, in the game
+
+Four small levels are in the lab, one for each hazard: `fire`, `rock`, `bomb` and `ice`. Each is
+won by its stored stroke, by at least seven of that stroke's eight shifted and scaled copies, by
+no naive stroke, and by 0 to 2 of 48 random strokes. With its hazard taken out each is won by 7 to
+29 of the same 48.
+
+The bees are as strong here as in the iPhone build, and `web/tests/dog-v2-bees.test.ts` holds
+them there three ways. Bees pushing a bar along grass speed it up by what the constants give by
+hand, to within a twentieth. The old Holes below, where the iPhone build tuned its heave, holds
+and loses its bars at the same strengths it did there. And the iPhone build's first audit with
+random strokes, played here with its own seeds on the levels that have not changed since, counts
+10 of 16 on First shield, where the iPhone counted 10, and is within two of its count on the others.
+
+What the levels of this mode have taught, for whoever writes the next ones:
+
+- A dome is the scribble that wins anything. A level with flat footing on both sides of him
+  within a dome's reach is beaten by a dome, so take a footing away (water, a gap, a socket) or
+  cut the shape at ground level. A stroke must hold the level up: one that is won by something
+  that would have happened anyway is not a level.
+- Strokes are trimmed where they cross a body or a no-ink zone, never refused. A shape whose leg
+  clips his head, or whose top passes through a held boulder, comes out as loose pieces. On flat
+  ground two such pieces fall against him from both sides and make a tent that holds. Over water
+  they sink.
+- The crew pushes with 3.1 for each bee (its mass times the heave) against a stroke's weight of
+  0.52 for each point of ink. Twelve bees slide nothing heavier than 90 points of ink along
+  grass, and lift nothing heavier than 71. So the crew wins by tipping what is balanced and by
+  getting under what is light, and never by moving a dome that stands on its feet. It slides a
+  light dome off a narrow plinth, and two small studs on the rim turn that into a fitting puzzle.
+- The crew lines up above the end of a bar that lies on the ground, not behind it, so it cannot
+  push such a bar along.
+- The audit draws its random strokes around the first character only, so two characters defeat
+  every one of them. Its walls and L shapes are at most 140 and 120 points tall, its tents at
+  most 120 points in half-width and its arcs 140 in radius: an opening just past those sizes
+  defeats that kind of stroke by construction. Its strokes use 45 to 95 hundredths of the ink,
+  so a large budget makes them too big for a small footing.
+- A boulder that lands on a dome, a lid or a plug does nothing to it: the ink is rigid and carries
+  it. A boulder matters where it can reach him, where a stroke would have to pass through it, and
+  as a weight on whatever it comes to rest on. A blast kills through air and only nudges a dome,
+  which takes him along. On ice a dome that has nothing to catch on slides off with him inside it.
 
 ### Checks and deploys
 
@@ -327,9 +402,9 @@ and in the app's settings screen. Launch with `--silent` to keep automation quie
 
 The effects in `ActualGameplay/Audio/sfx/` are Kenney's Impact, Interface, Digital and RPG audio
 packs (CC0), the organic pack of Romain Simon's [UI SFX](https://github.com/romainsimon/uisfx) for
-the menus (CC0), and thirteen sounds generated for the game: the bee buzz, the pen scratch and the saw
-whir (loops), the splash, the sizzle and the bees' heave, and Pull the Pin's blast, fuse, boulder,
-breaking wall, plate, door and gas. `tools/sfx/make_synth.py` rebuilds them: on
+the menus (CC0), and fifteen sounds generated for the game: the bee buzz, the pen scratch, the saw
+whir and the fire's crackle (loops), the splash, the sizzle, the bees' heave and ink catching fire,
+and Pull the Pin's blast, fuse, boulder, breaking wall, plate, door and gas. `tools/sfx/make_synth.py` rebuilds them: on
 its own it regenerates the generated ones, and with `--fetch` it downloads the packs and redoes the
 picks. `Sources/Shared/Audio.swift` maps each `SoundEvent` to its files and volume; the files are
 matched for loudness, so those volumes are the mix. Effects have their own switch in Settings, and
