@@ -97,17 +97,19 @@ const marker = (text: string, size: number): Text => {
   return label;
 };
 
-/// A number on a small cream plate with an ink edge. The plate fits its number. With `arrow` it
-/// is a grower's badge: an arrow pointing up, drawn in ink, and what the grower gains each move.
+/// A number on a small plate with an ink edge. The plate fits its number. With `tail` it has a
+/// small point under it, or over it for "up", so it reads as belonging to the thing it points at. Its colours can
+/// change: cream with ink for most numbers, rose for one that beats the hero now.
 class Plate extends Container {
   readonly tall: number;
   wide = 0;
   private readonly back = new Graphics();
   private readonly words: Text;
   private shown: string | null = null;
+  private fill: number = Pigment.cream;
 
   /// `edge` is the width of the ink line round the plate.
-  constructor(text: string, private readonly size: number, private readonly arrow = false, private readonly edge = 1.5) {
+  constructor(text: string, private readonly size: number, private readonly edge = 1.5, private readonly tail: boolean | "up" = false) {
     super();
     this.tall = Math.round(size * 1.3);
     this.words = marker("", size);
@@ -119,16 +121,24 @@ class Plate extends Container {
     if (text === this.shown) return;
     this.shown = text;
     this.words.text = text;
-    const s = this.size, shaft = this.arrow ? s * 0.62 : 0;
-    this.wide = Math.max(this.tall, Math.ceil(this.words.width + s * 0.6 + shaft));
-    this.words.x = shaft / 2;
-    const g = this.back.clear().roundRect(-this.wide / 2, -this.tall / 2, this.wide, this.tall, 6)
-      .fill(Pigment.cream).stroke({ color: Pigment.ink, width: this.edge });
-    if (this.arrow) {
-      const x = -this.wide / 2 + s * 0.3 + shaft / 2;
-      g.moveTo(x, s * 0.34).lineTo(x, -s * 0.34).moveTo(x - s * 0.24, -s * 0.08).lineTo(x, -s * 0.36).lineTo(x + s * 0.24, -s * 0.08)
-        .stroke({ color: Pigment.ink, width: 2, cap: "round", join: "round" });
-    }
+    this.wide = Math.max(this.tall, Math.ceil(this.words.width + this.size * 0.6));
+    this.paint();
+  }
+
+  /// Paint the plate and its number in other colours.
+  tone(fill: number, ink: number = Pigment.ink) {
+    if (fill === this.fill && this.words.style.fill === ink) return;
+    this.fill = fill;
+    this.words.style.fill = ink;
+    this.paint();
+  }
+
+  private paint() {
+    const g = this.back.clear(), low = this.tall / 2, way = this.tail === "up" ? -1 : 1;
+    if (this.tail) g.poly([-5, way * (low - 1), 5, way * (low - 1), 0, way * (low + 5)]).fill(this.fill).stroke({ color: Pigment.ink, width: this.edge, join: "round" });
+    g.roundRect(-this.wide / 2, -low, this.wide, this.tall, 6).fill(this.fill).stroke({ color: Pigment.ink, width: this.edge });
+    // The point joins the plate: the ink line between them is painted over.
+    if (this.tail) g.rect(-3.5, way * (low - this.edge / 2) - (this.edge + 1) / 2, 7, this.edge + 1).fill(this.fill);
   }
 }
 
@@ -192,6 +202,8 @@ interface RoomView {
   lockY: number;
   /// A weak floor is two halves of planking that swing down when it gives way.
   floor: Container[];
+  /// The sign under a weak floor that says what it holds.
+  limit: Plate | null;
   /// How lit the room is as an option, and how washed out as a cleared one, each 0 to 1.
   glow: number;
   fade: number;
@@ -408,7 +420,7 @@ export class TowerScene implements Scene {
       outline.stroke({ color: Pigment.ochre, width: 3, cap: "round" });
       washes.addChild(wash);
       outlines.addChild(outline);
-      this.views.push({ index: i, room, inside, wash, outline, things: [], lock: null, lockY: 0, floor: [], glow: 0, fade: 0 });
+      this.views.push({ index: i, room, inside, wash, outline, things: [], lock: null, lockY: 0, floor: [], limit: null, glow: 0, fade: 0 });
     }
 
     // Walls stand on the lines between columns. Where two rooms share a doorway the wall starts
@@ -488,6 +500,13 @@ export class TowerScene implements Scene {
       const highest = Math.max(...level.entries.filter((e) => e % level.w === column).map((e) => Math.floor(e / level.w)));
       const x = side === "left" ? L.left - half - LADDER / 2 : L.left + level.w * L.cellW + half + LADDER / 2;
       ladder(back, x, GROUND, L.base + highest * L.cellH + half + this.doorHeight, LADDER - 12);
+      // A landing from the ladder to each door it serves, so the way in is drawn and not guessed.
+      const wall = side === "left" ? L.left - half : L.left + level.w * L.cellW + half, out = side === "left" ? -1 : 1;
+      for (const entry of level.entries) {
+        if (entry % level.w !== column || this.wayIn(entry) !== side) continue;
+        const sill = Y(L.base + Math.floor(entry / level.w) * L.cellH + half);
+        back.rect(Math.min(wall, wall + out * (LADDER + 2)), sill - 1, LADDER + 2, 4);
+      }
     }
     back.stroke({ color: Pigment.ink, width: 2, cap: "round" });
     // The ladders inside are part of the back wall: thinner in tone, so what stands in front reads first.
@@ -514,7 +533,8 @@ export class TowerScene implements Scene {
     this.hero = new ClipSprite("clawd_band_idle", this.figure);
     this.hero.zIndex = 8;
     // His own number is the one everything is measured against: a size up, with a heavier edge.
-    this.heroPlate = new Plate(String(level.start), L.numberSize + 3, false, 2.5);
+    this.heroPlate = new Plate(String(level.start), L.numberSize + 3, 2.5, true);
+    this.heroPlate.tone(Pigment.ink, Pigment.cream);
     this.heroTag.addChild(this.heroPlate);
     this.heroTag.zIndex = 9;
     this.clips.push(this.hero);
@@ -544,7 +564,6 @@ export class TowerScene implements Scene {
     const shares = slotShares(things.length);
     // The boss is wide. When it shares a room, both stand a little to the left to make space.
     if (things.length === 2 && things[1].kind === "boss") { shares[0] = 0.34; shares[1] = 0.72; }
-    const slotWidth = things.length === 1 ? inside.w - 8 : (shares[1] - shares[0]) * inside.w;
     things.forEach((thing, index) => {
       const node = new Container(), labels = new Container();
       const home = { x: inside.x + shares[index] * inside.w, y: inside.y };
@@ -566,7 +585,7 @@ export class TowerScene implements Scene {
         head = item.top * f;
         if (thing.kind === "halve") this.saws.push(body);
       }
-      const plate = text === null ? null : new Plate(text, L.numberSize);
+      const plate = text === null ? null : new Plate(text, L.numberSize, 1.5, true);
       if (plate) {
         labels.addChild(plate);
         plate.y = -plate.tall / 2;
@@ -579,16 +598,16 @@ export class TowerScene implements Scene {
             .y = -plate.tall + 1;
         }
         if (thing.kind === "grower") {
-          // The badge sits beside the number where the room has the width, and above it where not.
-          const badge = new Plate(`+${thing.grow}`, L.numberSize, true);
-          labels.addChild(badge);
-          if (plate.wide + badge.wide + 2 <= slotWidth) {
-            plate.x = -(badge.wide + 2) / 2;
-            badge.position.set(plate.x + plate.wide / 2 + 2 + badge.wide / 2, plate.y);
-          } else badge.y = plate.y - plate.tall - 2;
+          // What it gains each move, on a green badge that sits on top of its number and touches
+          // it, so the two read as one label however many growers share a room.
+          const badge = new Plate(`+${thing.grow}`, Math.max(11, Math.round(L.numberSize * 0.8)));
+          badge.tone(Pigment.sap, Pigment.cream);
+          labels.addChildAt(badge, 0);
+          badge.y = plate.y - plate.tall / 2 - badge.tall / 2 + 2;
         }
       }
-      labels.y = -(head + 2);
+      // The plate's point stops just over the head.
+      labels.y = -(head + 7);
       node.addChild(body, labels);
       node.position.set(home.x, Y(home.y));
       node.zIndex = 6;
@@ -596,24 +615,16 @@ export class TowerScene implements Scene {
       view.things.push({ thing, index, room: view.index, home, node, body, plate, labels, scale: body.scale.y, value: "n" in thing ? thing.n : 0, sinceChange: 9 });
     });
 
-    // Along the top of the room: what the floor holds on the left, the padlock on the right.
+    // A weak floor's limit sits under the planks it is about and points up at them, so nobody
+    // takes it for a label on something in the room. The padlock is at the top right of its room.
     const flags = new Container();
     flags.zIndex = 7;
     if (room.max !== undefined) {
-      const tall = Math.round(L.numberSize * 1.3), icon = new Sprite(art.texture("item_weight"));
-      const word = marker("max", Math.max(11, Math.round(L.numberSize * 0.72))), number = marker(String(room.max), L.numberSize);
-      icon.anchor.set(0, 0.5);
-      icon.width = icon.height = tall - 4;
-      icon.x = 4;
-      word.anchor.set(0, 0.5);
-      word.x = icon.x + icon.width + 3;
-      number.anchor.set(0, 0.5);
-      number.x = word.x + word.width + 3;
-      const wide = number.x + number.width + 5;
-      const tag = new Container();
-      tag.addChild(new Graphics().roundRect(0, -tall / 2, wide, tall, 6).fill(Pigment.cream).stroke({ color: Pigment.ink, width: 1.5 }), icon, word, number);
-      tag.position.set(inside.x + 3, Y(inside.y + inside.h - 3 - tall / 2));
-      flags.addChild(tag);
+      const sign = new Plate(`max ${room.max}`, Math.max(12, Math.round(L.numberSize * 0.9)), 1.5, "up");
+      const x = inside.x + Math.max(sign.wide / 2 + 2, inside.w * 0.27), top = Y(inside.y - WALL);
+      sign.position.set(x, top + 6 + sign.tall / 2);
+      flags.addChild(sign);
+      view.limit = sign;
     }
     if (room.locked) {
       const size = 28 * f, lock = new Sprite(art.texture("item_lock"));
@@ -629,7 +640,10 @@ export class TowerScene implements Scene {
 
   // MARK: the scene contract
 
-  readout() { return this.sim.readout; }
+  readout() {
+    const keys = this.level.rooms.some((room) => room && (room.locked || room.things.some((thing) => thing.kind === "key")));
+    return `3 stars at ${this.sim.best}` + (keys ? `   keys ${this.sim.shownKeys}` : "");
+  }
   progress() { return null; }
   outcome() { return this.sim.outcome; }
 
@@ -867,6 +881,8 @@ export class TowerScene implements Scene {
       turn = still ? 1 : Math.max(0.05, Math.abs(Math.cos(Math.PI * cursor.t)));
     }
     this.heroPlate.set(String(shown));
+    // A floor he is too heavy for right now says so in rose.
+    for (const view of this.views) if (view?.limit) view.limit.tone(shown > view.room.max! ? Pigment.rose : Pigment.cream);
     this.heroPlate.scale.x = turn;
     const keySize = Math.round(15 * this.layout.figure);
     while (this.heroKeys.length < sim.shownKeys) {
@@ -922,6 +938,10 @@ export class TowerScene implements Scene {
     if (thing.kind === "grower") value = move ? move.values[view.index] : sim.growerValue(view.room, view.index);
     if (value !== view.value) { view.value = value; view.sinceChange = 0; view.plate?.set(String(value)); }
     view.sinceChange += dt;
+    // A rival he cannot beat at this moment shows its number on rose: a tie is a loss too.
+    if (view.plate && (thing.kind === "enemy" || thing.kind === "grower" || thing.kind === "boss")) {
+      view.plate.tone(value >= sim.shownPower ? Pigment.rose : Pigment.cream);
+    }
     // A grower's plate jumps when its number goes up.
     labels.scale.set(still || view.sinceChange > 0.25 ? 1 : 1 + 0.25 * (1 - view.sinceChange / 0.25));
 

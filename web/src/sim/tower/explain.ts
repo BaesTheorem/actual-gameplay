@@ -15,7 +15,7 @@ export const EXPLAINED: readonly Explained[] = [
 
 export const EXPLAINERS: Record<Explained, string> = {
   entry: "Tap a room with a dashed outline to walk in.",
-  enemy: "A smaller rival adds its number to yours. A tie is a loss.",
+  enemy: "A smaller rival adds its number to yours. A tie is a loss. A rose plate beats you right now.",
   boss: "Beat the boss to clear the tower.",
   plus: "A sword adds its number.",
   times: "A potion multiplies your number.",
@@ -25,7 +25,7 @@ export const EXPLAINERS: Record<Explained, string> = {
   key: "A key opens one locked room.",
   lock: "A locked room needs a key.",
   limit: "A weak floor holds its number. Anything bigger falls through.",
-  grower: "A green rival grows by its badge each time you enter a room.",
+  grower: "A green rival grows by its green badge each time you enter any room.",
   wall: "A wall with no gap is solid. Find another way round.",
 };
 
