@@ -3,7 +3,7 @@
 //
 //   ASSETS[name] = { box: [x, y, w, h] (canvas px to crop), frames, len (seconds the frames span), fps (playback),
 //                    anchor: [ax, ay] (SpriteKit anchor point, y up), paper: true to keep the paper and grain,
-//                    draw(t) }
+//                    noBleed: true to cut watercolour that bleeds past the flat paint (see the render hook), draw(t) }
 //
 // Characters share one frame size (400 x 360 px at u = 20, ground 40 px above the bottom edge), so every
 // animation of a character lines up on the same anchor. The boss is bigger and gets its own box.
@@ -182,12 +182,13 @@
     for (let i = 0; i < 9; i++) { const x = -560 + i * 140 + 30 * hash(i), y = 420 - 60 * hash(i + 3); inkLine([[x, y], [x + 24, y - 6 + jit(2)]], 0.7, mixCol(PAL.sap, PAL.ink, 0.5), 'inkfine', 0.4); }
   });
 
-  // ---------- terrain tiles: 9 parts x 4 skins, 96 px, painted oversize so grids never show a gap ----------
+  // ---------- terrain tiles: 9 parts x 5 skins, 96 px, painted oversize so grids never show a gap ----------
   const SKINS = {
     grass: { top: PAL.sap, topDk: '#4E7A3C', body: DIRT, bodyDk: DIRT_DK },
     dirt: { top: DIRT, topDk: DIRT_DK, body: DIRT, bodyDk: DIRT_DK },
     stone: { top: STONE, topDk: STONE_DK, body: STONE, bodyDk: STONE_DK },
     purple: { top: PURPLE, topDk: PURPLE_DK, body: PURPLE, bodyDk: PURPLE_DK },
+    ice: { top: PAL.cream, topDk: PAL.sky, body: mixCol(PAL.sky, PAL.cream, 0.4), bodyDk: mixCol(PAL.sky, PAL.indigo, 0.3) },   // version 2, for Save the Clawd
   };
   const PARTS = {   // which edges are outside edges: [top, left, right, bottom]
     block_center: [0, 0, 0, 0], block_top: [1, 0, 0, 0], block_top_left: [1, 1, 0, 0], block_top_right: [1, 0, 1, 0],
@@ -202,6 +203,7 @@
       else paint(rectPts(-h - 6, -h - 6, 2 * h + 12, 2 * h + 12), { fill: c.bodyDk, fillOp: 40, tex: 0.7, bleed: 0.02, ink: null });
       if (top) {   // a band of the top colour with a cream lip and the ink line
         if (skin === 'grass') paint([[-h - 6, -h - 6], [h + 6, -h - 6], [h + 6, -h + 22], [h - 10, -h + 30], [h - 30, -h + 24], [-h + 20, -h + 32], [-h - 6, -h + 24]], { wash: c.top, fill: c.topDk, fillOp: 60, tex: 0.6, ink: null, curv: 0.3 });
+        if (skin === 'ice') paint([[-h - 6, -h - 6], [h + 6, -h - 6], [h + 6, -h + 15], [h, -h + 15], [h - 14, -h + 19], [h - 34, -h + 13], [-h + 36, -h + 18], [-h + 14, -h + 12], [-h, -h + 15], [-h - 6, -h + 15]], { wash: c.top, ink: null, curv: 0.3 });   // frost, at one height on both edges so it joins
         inkLine([[-h - 6, -h + 1 + jit(0.8)], [0, -h + jit(1)], [h + 6, -h + 1 + jit(0.8)]], 2.2, PAL.ink, 'ink', 0.2);
         inkLine([[-h - 6, -h + 5], [h + 6, -h + 5]], 1.2, PAL.cream, 'inkfine', 0);
       }
@@ -212,6 +214,23 @@
       if (!top && !bottom && !left && !right && (skin === 'stone' || skin === 'purple')) {   // mortar lines inside a wall
         inkLine([[-h - 6, 0 + jit(1)], [h + 6, 0 + jit(1)]], 0.7, c.bodyDk, 'inkfine', 0.2);
         inkLine([[-14 + jit(1), -h - 6], [-14 + jit(1), 0]], 0.7, c.bodyDk, 'inkfine', 0); inkLine([[18 + jit(1), 0], [18 + jit(1), h + 6]], 0.7, c.bodyDk, 'inkfine', 0);
+      }
+      if (skin === 'ice') {   // cream glints on the parts a grid repeats, thin ink cracks on the corners and ends, which it does not
+        const bar = (x0, y0, x1, y1, w) => { const d = Math.hypot(x1 - x0, y1 - y0), nx = (y0 - y1) / d * w / 2, ny = (x1 - x0) / d * w / 2; return [[x0 + nx, y0 + ny], [x1 + nx, y1 + ny], [x1 - nx, y1 - ny], [x0 - nx, y0 - ny]]; };
+        const GLINT = { block_center: [-14, -8, 1], block_top: [12, 16, -1], block_left: [8, 10, -1], block_right: [-10, -12, 1], horizontal_middle: [2, 8, 1] };   // [x, y, lean]
+        const CRACK = {   // [mirror, lines...]. Every cracked part has a frost band, so the lines go 7 px lower than written.
+          block_top_left: [1, [[-14, -14], [-5, -4], [-9, 8], [2, 18], [-1, 30]], [[-5, -4], [8, -7], [14, -2]], [[2, 18], [8, 19], [13, 23]]],
+          block_top_right: [-1, [[12, -16], [6, -3], [14, 6], [5, 17], [9, 28]], [[14, 6], [20, 3], [25, 5]]],
+          horizontal_left: [1, [[-18, 2], [-6, 8], [-1, -2], [11, 4], [22, -4]], [[-1, -2], [-2, -9], [-6, -14]]],
+          horizontal_right: [-1, [[-14, -14], [-5, -4], [-9, 8], [2, 18], [-1, 30]], [[-5, -4], [8, -7], [14, -2]]],
+        };
+        if (GLINT[part]) {
+          const [x, y, m] = GLINT[part];
+          paint(bar(x - 10 * m, y + 9, x + 4 * m, y - 9, 5), { wash: PAL.cream, ink: null }); paint(bar(x + 2 * m, y + 10, x + 9 * m, y + 1, 3.5), { wash: PAL.cream, ink: null });
+        } else {
+          const [m, ...lines] = CRACK[part];
+          for (const line of lines) inkLine(line.map(([x, y]) => [m * x, y + 7]), 0.6, PAL.ink, 'inkfine', 0.1);
+        }
       }
     });
   }
@@ -239,6 +258,202 @@
     paint(ellPts(0, 14, 9, 9, 12), { wash: PAL.ink, ink: null });
   });
 
+  // ---------- version 2, Pull the Pin: the miner walks, a friend to rescue, bombs, a boulder, a floor plate ----------
+  // version 2 sprites keep no watercolour outside their flat paint (`noBleed`, see the render hook)
+  const clean = spec => ({ ...spec, noBleed: true });
+  const CLEAN = clean(CHAR);
+  character('clawd_hard_run', 12, 0.5, 24, run(0.5, { hat: 'hard' }), 20, CLEAN);
+  // the friend wears a bow, which tells it from the miner's hard hat and from the violet crowd
+  character('clawd_friend_idle', 12, BAR, 12 / BAR, t => ({ ...feel('nervous', t), hat: 'bow' }), 20, CLEAN);
+  character('clawd_friend_happy', 16, BAR, 16 / BAR, t => ({ ...feel('happy', t), hat: 'bow' }), 20, CLEAN);
+  character('clawd_friend_ko', 8, BAR, 8 / BAR, t => ({ ...feel('ko', t), hat: 'bow' }), 20, CLEAN);
+  // the bomb again, lit and soaked. The body and neck are painted as `bomb` paints them, from the same seed and in
+  // the same box, so the pieces swap in place.
+  const bombBody = (wash, neck) => {
+    boilSeed('bomb');
+    paint(ellPts(0, 6, 32, 32, 22, 0.8), { wash, fill: PAL.ink, fillOp: 90, ink: PAL.ink, sw: 1.2 });
+    paint(rectPts(-8, -34, 16, 12, 0.6), { wash: neck, ink: PAL.ink, sw: 0.8 });
+  };
+  const bombLit = k => t => {   // two frames to flicker between: the spark turns, changes size and throws off bits
+    bombBody('#3A3247', STONE_DK);
+    inkLine([[0, -34], [6, -41.5], [15, -41.5], [24, -34.5], [28, -30]], 1.4, DIRT_DK, 'ink', 0.5);
+    paint(ellPts(-12, -8, 7, 5, 10, 0, -0.7), { wash: PAL.cream, washOp: 120, ink: null });
+    const r = k < 0 ? 12 : 10, rot = -Math.PI / 2 + 0.2 + (k < 0 ? 0 : Math.PI / 4);
+    paint(starPts(29, -28, r, 0.42, 4, rot), { wash: PAL.ochre, ink: PAL.ink, sw: 0.9, br: 'inkfine' });
+    paint(starPts(29, -28, r * 0.5, 0.5, 4, rot + Math.PI / 4), { wash: PAL.cream, ink: null });
+    for (const [a, d] of k < 0 ? [[-0.62, 15], [0.98, 13.5]] : [[-1.37, 13.5], [0.2, 13], [-0.585, 15]]) paint(starPts(29 + Math.cos(a) * d, -28 + Math.sin(a) * d, 3, 0.45, 4, a), { wash: PAL.ochre, ink: null });
+  };
+  still('bomb_lit_a', clean(CENTRE(96, 96)), bombLit(-1));
+  still('bomb_lit_b', clean(CENTRE(96, 96)), bombLit(1));
+  still('bomb_wet', clean(CENTRE(96, 96)), t => {   // a darker wash, the fuse hanging limp, and water beading on it
+    bombBody(mixCol('#3A3247', PAL.ink, 0.5), mixCol(STONE_DK, PAL.ink, 0.3));
+    inkLine([[0, -34], [5, -41.5], [13, -40.5], [17, -31], [16, -21]], 1.4, mixCol(DIRT_DK, PAL.ink, 0.35), 'ink', 0.5);
+    const drop = (x, y, r) => paint([[x, y - 1.7 * r], [x + 0.9 * r, y + 0.2 * r], [x, y + r], [x - 0.9 * r, y + 0.2 * r]], { wash: PAL.sky, ink: PAL.ink, sw: 0.5, curv: 0.7 });
+    drop(16, -12, 4.5); drop(-13, 17, 6);
+    paint(ellPts(-12, -8, 7, 5, 10, 0, -0.7), { wash: PAL.sky, washOp: 150, ink: null });
+  });
+  // a boulder for a body 36 points across: rounder and darker than `rock`, with a ridge and a chipped side
+  still('rock_big', clean(CENTRE(128, 128)), t => {
+    boilSeed('rock_big');
+    const dk = mixCol(STONE_DK, PAL.ink, 0.35);
+    const rim = P([[-55, 4], [-50, -24], [-32, -46], [-6, -55], [22, -51], [44, -34], [55, -8], [53, 20], [40, 42], [14, 54], [-16, 53], [-42, 36]], 0.96);
+    paint(rim, { wash: mixCol(STONE, STONE_DK, 0.6), fill: dk, fillOp: 80, tex: 0.7, bleed: 0.05, ink: null, curv: 0.3,
+      hatch: { d: 9, a: 0.6, o: { rand: 0.3, gradient: 0.6 }, b: 'charcoal', c: dk, w: 0.5 } });
+    paint(P([[50, -18], [27, -4], [23, 24], [29, 46], [39, 41], [52, 20], [54, -8]], 0.96), { wash: dk, washOp: 110, ink: null });
+    paint(rim, { ink: PAL.ink, sw: 1.4, curv: 0.3 });
+    inkLine(P([[51, -19], [27, -4], [23, 24], [29, 48]], 0.96), 0.9, PAL.ink, 'inkfine', 0.2);
+    inkLine(P([[-31, -45], [-10, -16], [-21, 14]], 0.96), 0.9, PAL.ink, 'inkfine', 0.3);
+  });
+  // a floor pressure plate, 40 x 8 points when it is up. The anchor is the floor line.
+  const PLATE = clean({ box: [CX - 72, 540 - 40, 144, 48], anchor: [0.5, 8 / 48] });
+  const plate = down => t => {
+    boilSeed('plate');
+    const top = down ? -15 : -25;
+    paint(rectPts(-60, -9, 120, 9, 0.5), { wash: PAL.clayDk, ink: null });
+    paint([[-50, -9], [-47, top], [47, top], [50, -9]], { wash: down ? mixCol(PAL.clay, PAL.clayDk, 0.4) : PAL.clay, ink: null });
+    paint([[-60, 0], [-60, -9], [-50, -9], [-47, top], [47, top], [50, -9], [60, -9], [60, 0]], { ink: PAL.ink, sw: 1 });
+    if (!down) inkLine([[-41, -19.5], [0, -19.5], [41, -19.5]], 1.2, PAL.cream, 'inkfine', 0);
+  };
+  still('plate_up', PLATE, plate(false));
+  still('plate_down', PLATE, plate(true));
+
+  // ---------- version 2, Number Tower: the climber, the rival that grows, pickups, the pointing hand ----------
+  // the climber is Clawd in a headband, at the plain clips' lengths and frame counts
+  character('clawd_band_idle', 16, BAR, 16 / BAR, t => ({ ...feel('neutral', t), hat: 'band' }), 20, CLEAN);
+  // In the 3/4 view the kit sets a hat forward of the head. That suits a brim but not a band, so the run paints its
+  // own band across the whole head, darker where it rounds the side.
+  const BAND = '#D8394E';
+  const bandQ = (u, sw) => {
+    paint(rectPts(-5.1 * u, -8.2 * u, 10.3 * u, 0.95 * u), { wash: BAND, ink: null });
+    paint(rectPts(-5.1 * u, -8.2 * u, 2.8 * u, 0.95 * u), { wash: mixCol(BAND, PAL.ink, 0.3), ink: null });
+    paint(rectPts(-5.1 * u, -8.2 * u, 10.3 * u, 0.95 * u), { ink: PAL.ink, sw: sw * 0.5 });
+  };
+  character('clawd_band_run', 12, 0.5, 24, run(0.5, { draw: bandQ }), 20, CLEAN);
+  character('clawd_band_excited', 12, 2 * BEAT, 12 / (2 * BEAT), t => ({ ...feel('excited', t), hat: 'band' }), 20, CLEAN);
+  character('clawd_band_ko', 8, BAR, 8 / BAR, t => ({ ...feel('ko', t), hat: 'band' }), 20, CLEAN);
+  character('clawd_band_determined', 8, BAR, 8 / BAR, t => ({ ...feel('determined', t), hat: 'band' }), 20, CLEAN);
+  // The rival that grows: sap green and smug, where the violet goblin is angry. A tint mixes about half and half
+  // with Clawd's clay, and PAL.sap itself comes out khaki, so the tint is a stronger green that lands on sap.
+  const GROWER = { tint: '#16C059', tintK: 0.85 };
+  character('clawd_grower_idle', 12, BAR, 12 / BAR, t => ({ ...feel('smug', t), ...GROWER }), 20, CLEAN);
+  character('clawd_grower_ko', 8, BAR, 8 / BAR, t => ({ ...feel('ko', t), ...GROWER }), 20, CLEAN);
+
+  // pickups and room pieces, each drawn to read at 28 to 36 points
+  const arc = (cx, cy, r, a0, a1, n) => Array.from({ length: n + 1 }, (_, i) => { const a = a0 + (a1 - a0) * i / n; return [cx + Math.cos(a) * r, cy + Math.sin(a) * r]; });
+  still('item_sword', clean(CENTRE(96, 96)), t => {   // the plus: a short sword, point up
+    boilSeed('sword');
+    paint(rectPts(-7, 13, 14, 18, 0.5), { wash: DIRT_DK, ink: PAL.ink, sw: 1 });
+    paint(ellPts(0, 34, 7.5, 7, 12, 0.4), { wash: PAL.ochre, ink: PAL.ink, sw: 1 });
+    paint([[0, -41], [12, -27], [12, 8], [-12, 8], [-12, -27]], { wash: '#D9D4E4', fill: STONE_DK, fillOp: 60, tex: 0.5, bleed: 0.03, ink: PAL.ink, sw: 1.2 });
+    inkLine([[0, -33], [0, -14], [0, 4]], 0.7, STONE_DK, 'inkfine', 0);
+    paint([[-7.5, -24], [-4.5, -27.5], [-4.5, -6], [-7.5, -6]], { wash: PAL.cream, washOp: 220, ink: null });
+    paint(rrPts(-25, 5, 50, 11, 4, 0.5), { wash: PAL.ochre, fill: '#C88A1E', fillOp: 70, tex: 0.5, bleed: 0.03, ink: PAL.ink, sw: 1.1 });
+  });
+  still('item_potion', clean(CENTRE(96, 96)), t => {   // the times: a round flask, corked
+    boilSeed('potion');
+    const glass = [[-8, -28], [8, -28], ...arc(0, 14, 27, -1.27, Math.PI + 1.27, 22)];
+    const level = [[-23.6, 6], [-12, 4.5], [0, 6.5], [12, 4.5], [23.6, 6]];
+    paint([[-7, -31], [-8.5, -42], [8.5, -42], [7, -31]], { wash: DIRT, ink: PAL.ink, sw: 0.9 });
+    paint(glass, { wash: PAL.cream, ink: null });
+    paint([...level, ...arc(0, 14, 25, -0.326, Math.PI + 0.326, 18)], { wash: PAL.violet, fill: PURPLE_DK, fillOp: 60, tex: 0.5, bleed: 0.02, ink: null });
+    inkLine(level, 0.6, PURPLE_DK, 'inkfine', 0.4);
+    paint(glass, { ink: PAL.ink, sw: 1.2 });
+    paint(rrPts(-11, -33, 22, 6.5, 2.5, 0.4), { wash: PAL.cream, ink: PAL.ink, sw: 0.9 });
+    paint(ellPts(-13, 18, 3.5, 8, 10, 0, 0.45), { wash: PAL.cream, washOp: 220, ink: null });
+    for (const [x, y, r] of [[9, 22, 3], [15, 13, 2]]) paint(ellPts(x, y, r, r, 8), { wash: PAL.cream, washOp: 220, ink: null });
+  });
+  still('item_mirror', clean(CENTRE(96, 96)), t => {   // turns a number around: a mirror on a stand
+    boilSeed('mirror');
+    paint(rectPts(-4.5, 20, 9, 16, 0.5), { wash: '#C88A1E', ink: PAL.ink, sw: 0.9 });
+    paint(rrPts(-19, 33, 38, 8, 3.5, 0.5), { wash: PAL.ochre, ink: PAL.ink, sw: 1 });
+    paint(ellPts(0, -9, 27, 32, 26, 0.8), { wash: PAL.ochre, fill: '#C88A1E', fillOp: 70, tex: 0.5, bleed: 0.03, ink: PAL.ink, sw: 1.3 });
+    paint(ellPts(0, -9, 18.5, 23.5, 22, 0.5), { wash: mixCol(PAL.sky, PAL.cream, 0.45), ink: PAL.ink, sw: 0.8 });
+    paint([[-11, -1], [1, -27], [7, -25], [-6, 2]], { wash: PAL.cream, washOp: 235, ink: null });
+  });
+  still('item_key', clean(CENTRE(96, 96)), t => {
+    boilSeed('key');
+    push(); translate(1.5, -4.5); rotate(0.72); scale(1.15);
+    const bow = arc(-22, 0, 17, 0.36, TAU - 0.36, 22);                       // the ring's outer edge, open where the shaft joins
+    const hole = arc(-22, 0, 6.5, Math.PI, -Math.PI, 14);                    // drawn the other way round, so the wash leaves it open
+    const bit = [[36, -6], [36, 21], [29, 21], [29, 15], [22, 15], [22, 6]];
+    // one wash for the whole key: round the ring to its far side, in and around the hole, back out, then the shaft and bit
+    paint([...bow.slice(0, 12), ...hole, ...bow.slice(11), ...bit], { wash: PAL.ochre, ink: null });
+    paint([...bow, ...bit], { ink: PAL.ink, sw: 1.1 });
+    paint(hole, { ink: PAL.ink, sw: 0.8 });
+    paint(ellPts(-30, -9, 4, 2.5, 8, 0, -0.8), { wash: PAL.cream, washOp: 200, ink: null });
+    pop();
+  });
+  still('item_lock', clean(CENTRE(96, 96)), t => {
+    boilSeed('lock');
+    paint(ribbon([[-15, 2], [-15, -18], [-10, -30], [0, -34], [10, -30], [15, -18], [15, 2]], 9), { wash: '#3A3247', ink: PAL.ink, sw: 1.1 });
+    inkLine([[-14.5, -14], [-11, -25], [-3, -31.5]], 0.7, STONE, 'inkfine', 0.5);
+    paint(rrPts(-26, -6, 52, 42, 8, 0.8), { wash: PAL.ochre, fill: '#C88A1E', fillOp: 70, tex: 0.5, bleed: 0.03, ink: PAL.ink, sw: 1.3 });
+    paint(ellPts(0, 10, 5.5, 5.5, 12), { wash: PAL.ink, ink: null });
+    paint([[-2.8, 11], [2.8, 11], [4.5, 25], [-4.5, 25]], { wash: PAL.ink, ink: null });
+    paint(ellPts(-16, 2, 5, 3, 10, 0, -0.6), { wash: PAL.cream, washOp: 200, ink: null });
+  });
+  still('item_weight', clean(CENTRE(96, 96)), t => {   // this floor is weak: a split plank sagging from one nail on two ropes
+    boilSeed('weight');
+    push(); translate(0, 2); scale(0.9);
+    const rope = mixCol(PAL.ochre, DIRT_DK, 0.7), wood = { wash: DIRT, fill: DIRT_DK, fillOp: 55, tex: 0.6, bleed: 0.03, ink: PAL.ink, sw: 1 };
+    inkLine([[0, -36], [-17, -22], [-35, -8]], 1.2, rope, 'ink', 0);
+    inkLine([[0, -36], [17, -23], [34, -10]], 1.2, rope, 'ink', 0);
+    paint(ellPts(0, -36, 4.5, 4.5, 10), { wash: PAL.ink, ink: null });
+    paint([[-37.2, -14.7], [-0.8, 3.5], [-7, 7.5], [-2.5, 11], [-9, 14], [-5.5, 17.5], [-9.3, 20.5], [-45.7, 2.3]], wood);
+    paint([[33, -16.3], [46.2, -2.7], [15.6, 26.8], [9.5, 24.5], [11.5, 21], [5, 19.5], [8.5, 15], [2.4, 13.2]], wood);
+    inkLine([[-36, -3], [-24, 3], [-12, 9]], 0.7, DIRT_DK, 'inkfine', 0.2);
+    inkLine([[35, -6], [26, 3], [16, 12.5]], 0.7, DIRT_DK, 'inkfine', 0.2);
+    for (const [x, y] of [[-36.5, -7.5], [35.5, -9.5]]) paint(ellPts(x, y, 2.8, 2.8, 8), { wash: PAL.ink, ink: null });
+    for (const [x, y, r] of [[1, 30, 2.8], [5, 37, 2.2]]) paint(starPts(x, y, r, 0.6, 2, 0.4), { wash: DIRT_DK, ink: null });
+    pop();
+  });
+  // the tutorial's pointing hand: index finger up and to the left, and the same hand pressing. The anchor is the fingertip.
+  const HAND = clean({ box: [CX - 32, 540 - 28, 128, 128], anchor: [32 / 128, 100 / 128] });
+  const hand = press => t => {
+    boilSeed('hand');
+    push(); rotate(-0.5);
+    if (press) {   // three short strokes around the tip, then the hand a little smaller, as if it went into the screen
+      for (const a of [-2.5, -Math.PI / 2, -0.64]) inkLine([8, 12.5, 17].map(d => [Math.cos(a) * d, Math.sin(a) * d]), 0.8, PAL.ink, 'ink', 0);
+      scale(0.9);
+    }
+    paint([[-9.5, 13], [-8.5, 5], [-4.5, 0.8], [0, 0], [4.5, 0.8], [8.5, 5], [9.5, 13], [10, 28], [10, 40],
+      [11.5, 36.5], [17, 35], [22, 36.5], [23.5, 40], [25.5, 39], [30, 38], [35, 39.5], [36.5, 43], [38.5, 42.5], [42.5, 42.5], [46.5, 45.5],
+      [48.5, 51], [49, 62], [47.5, 76], [43, 88], [38, 95], [37, 103], [33, 106], [10, 106], [6, 103], [5, 95],
+      [-4, 91], [-13, 85], [-21, 76], [-27.5, 65], [-30, 54], [-28, 47], [-23, 45], [-18.5, 49], [-15.5, 56], [-12, 62],
+      [-10.3, 52], [-10, 40], [-10, 28]], { wash: PAL.cream, ink: PAL.ink, sw: 1.3, curv: 0.3 });
+    for (const [x0, y0, x1, y1] of [[10, 40, 10.5, 56], [23.5, 40, 23, 56], [36.5, 43, 35.5, 57]]) inkLine([[x0, y0], [(x0 + x1) / 2, (y0 + y1) / 2], [x1, y1]], 1, PAL.ink, 'inkfine', 0);
+    inkLine([[10.5, 57], [24, 59.5], [36, 60], [47, 58]], 1, PAL.ink, 'inkfine', 0.4);
+    inkLine([[5.5, 96], [21, 98], [37.5, 96]], 1, PAL.ink, 'inkfine', 0.3);
+    pop();
+  };
+  still('hand_point', HAND, hand(false));
+  still('hand_press', HAND, hand(true));
+
+  // ---------- version 2, Save the Clawd: fire (the ice skin is in the terrain table above) ----------
+  // a small flame in three frames to cycle. The base stays put and the tongues change, so it flickers in place.
+  const FIRE = [
+    { out: [[-17, 0], [-28, -10], [-32, -26], [-30, -42], [-27, -56], [-24, -72], [-12, -94], [-6, -78], [0, -64], [6, -54], [11, -48], [22, -58], [27, -42], [30, -26], [27, -10], [17, 0]],
+      mid: [[-11, -2], [-19, -12], [-21, -28], [-18, -44], [-15, -58], [-9, -72], [-3, -56], [4, -42], [12, -38], [18, -26], [19, -12], [11, -2]],
+      core: [[-6, -3], [-10, -13], [-10, -26], [-6, -42], [0, -28], [7, -22], [9, -12], [6, -3]] },
+    { out: [[-17, 0], [-27, -10], [-31, -26], [-28, -42], [-21, -56], [-15, -70], [-8, -86], [0, -100], [7, -84], [10, -70], [13, -58], [25, -68], [29, -50], [31, -30], [27, -10], [17, 0]],
+      mid: [[-11, -2], [-19, -12], [-20, -28], [-14, -44], [-8, -60], [0, -76], [6, -60], [11, -44], [18, -30], [19, -12], [11, -2]],
+      core: [[-6, -3], [-10, -13], [-8, -26], [0, -46], [6, -28], [9, -14], [6, -3]] },
+    { out: [[-17, 0], [-28, -10], [-32, -26], [-29, -44], [-24, -62], [-12, -50], [-6, -54], [0, -62], [6, -76], [13, -92], [22, -76], [26, -60], [30, -44], [31, -26], [28, -10], [17, 0]],
+      mid: [[-11, -2], [-19, -12], [-19, -28], [-12, -40], [-4, -44], [3, -56], [10, -70], [15, -56], [18, -42], [20, -26], [19, -12], [11, -2]],
+      core: [[-6, -3], [-9, -12], [-7, -22], [0, -28], [6, -42], [9, -26], [10, -13], [6, -3]] },
+  ];
+  FIRE.forEach((f, i) => still('fire_' + 'abc'[i], clean(FOOT(96, 128)), t => {
+    boilSeed('fire');
+    paint(f.out, { wash: PAL.clay, ink: PAL.ink, sw: 1, curv: 0.5 });
+    paint(f.mid, { wash: PAL.ochre, ink: null, curv: 0.5 });
+    paint(f.core, { wash: PAL.cream, ink: null, curv: 0.5 });
+  }));
+
+  // ---------- version 2, menus: two more button pieces, for the new modes' cards ----------
+  frame9('ui_button_ochre', 192, 96, PAL.ochre, PAL.ink, '#C88A1E', 60);
+  frame9('ui_button_violet', 192, 96, PAL.violet, PAL.ink, PURPLE_DK, 60);
+  for (const name of ['ui_button_ochre', 'ui_button_violet']) window.ASSETS[name].noBleed = true;   // no pale specks on the edges a 9-slice stretches
+
   // ---------- paper (kept in paper mode: these ARE the background) ----------
   add('paper', { box: [0, 0, 1920, 1080], anchor: [0.5, 0.5], frames: 1, len: 1, fps: 1, paper: true, draw: t => {} });
   add('paper_cave', { box: [0, 0, 1920, 1080], anchor: [0.5, 0.5], frames: 1, len: 1, fps: 1, paper: true, draw: t => {
@@ -257,10 +472,25 @@
   } });
 
   // ---------- the render hook ----------
+  // A watercolour fill can bleed past its outline. On paper that is the look, but on a transparent sprite the bleed
+  // shows as a pale wedge beside the shape, most often under Clawd's body. An asset with `noBleed: true` is rendered
+  // twice, the second time with the fills switched off, and the first render is kept only where the second one has
+  // paint. The second render is stacked four times, so a thin wash in it still counts as paint.
+  const withoutBleed = async (t, x, y, w, h) => {
+    const shot = async () => { const im = new Image(); im.src = await window.renderCrop(t, x, y, w, h, w, h, true); await im.decode(); return im; };
+    const full = await shot(), fill = brush.fill;
+    brush.fill = () => brush.noFill();
+    let flat; try { flat = await shot(); } finally { brush.fill = fill; }
+    const cv = document.createElement('canvas'); cv.width = w; cv.height = h; const c = cv.getContext('2d');
+    for (let k = 0; k < 4; k++) c.drawImage(flat, 0, 0);
+    c.globalCompositeOperation = 'source-in'; c.drawImage(full, 0, 0);
+    return cv.toDataURL('image/png');
+  };
   window.renderAsset = async (name, i) => {
     const a = window.ASSETS[name], t = a.frames > 1 ? (i / a.frames) * a.len : 0.35;
     window.LOOP = a.draw; window.LOOP.len = a.len;
     const [x, y, w, h] = a.box;
+    if (a.noBleed) return withoutBleed(t, x, y, w, h);
     return window.renderCrop(t, x, y, w, h, w, h, !a.paper);
   };
 })();
