@@ -1,6 +1,8 @@
 // Stress the levels with no browser.
 //   npm run audit -- pinPull     every pull sequence up to par, pruned at wins and deaths;
 //                                each level is UNIQUE or the other winning orders are listed
+//   npm run audit -- runner      greedy steering against never steering, always left, and random
+//   npm run audit -- saveDog [--random N]   the solution shifted and scaled, naive strokes, N random strokes
 import { playOut, type PinLevel } from "../src/sim/pinpull";
 import { load } from "./levels";
 
@@ -46,6 +48,11 @@ if (mode === "pinPull") {
     if (verdict !== "UNIQUE") flagged += 1;
     console.log(`${level.id}  ${level.name.padEnd(22)} par ${level.parPins}  ${String(tried).padStart(3)} sequences  ${verdict}`);
   }
+}
+if (mode === "runner") flagged = (await import("./runner-suite")).audit();
+if (mode === "saveDog") {
+  const random = process.argv.indexOf("--random");
+  flagged = (await import("./savedog-suite")).audit({ random: random > 0 ? Number(process.argv[random + 1]) : undefined });
 }
 console.log(`\n${flagged} level(s) flagged`);
 process.exit(flagged === 0 ? 0 : 1);

@@ -42,18 +42,48 @@ export interface BodySpec {
   density?: number;
   fixedRotation?: boolean;
   bullet?: boolean;
+  /// 0 for a body that flies. SpriteKit's affectedByGravity = false.
+  gravityScale?: number;
   ref?: unknown;
 }
 
 export interface ContactEvent {
   a: planck.Body;
   b: planck.Body;
+  /// Where the two first touched, in canvas points, when the engine has a contact point for the pair.
+  point?: Vec;
 }
 
 export const tagOf = (body: planck.Body): Tag => body.getUserData() as Tag;
 
 const responds = (a: Tag, b: Tag) => (a.collision & b.category) !== 0 || (b.collision & a.category) !== 0;
 const reports = (a: Tag, b: Tag) => (a.contactTest & b.category) !== 0 || (b.contactTest & a.category) !== 0;
+
+/// Worlds that asked for SpriteKit's one-sided collisions.
+const oneSidedWorlds = new WeakSet<planck.World>();
+let oneSidedInstalled = false;
+
+interface ContactMasses { v_invMassA: number; v_invMassB: number; v_invIA: number; v_invIB: number; p_invMassA: number; p_invMassB: number; p_invIA: number; p_invIB: number }
+
+/// SpriteKit lets each body choose what moves it: a body whose collision mask leaves the other out
+/// is not pushed by it, while the other still bounces off. The solver has no such notion, so for
+/// those pairs the body that takes no part is solved as if it could not be moved. This wraps the
+/// engine's own contact set-up once, and only touches contacts in worlds that opted in.
+const installOneSided = () => {
+  if (oneSidedInstalled) return;
+  oneSidedInstalled = true;
+  const proto = planck.Contact.prototype;
+  const init = proto.initConstraint;
+  proto.initConstraint = function (this: planck.Contact, step) {
+    init.call(this, step);
+    const a = this.getFixtureA().getBody(), b = this.getFixtureB().getBody();
+    if (!oneSidedWorlds.has(a.getWorld())) return;
+    const ta = tagOf(a), tb = tagOf(b);
+    const masses = this as unknown as ContactMasses;
+    if ((ta.collision & tb.category) === 0) masses.v_invMassA = masses.v_invIA = masses.p_invMassA = masses.p_invIA = 0;
+    if ((tb.collision & ta.category) === 0) masses.v_invMassB = masses.v_invIB = masses.p_invMassB = masses.p_invIB = 0;
+  };
+};
 
 export class SKWorld {
   readonly world: planck.World;
@@ -63,10 +93,15 @@ export class SKWorld {
   private nextId = 1;
   private doomed: planck.Body[] = [];
 
-  constructor(gravityY: number) {
+  /// `oneSided` turns on SpriteKit's rule that a body is only pushed by what its own collision mask lists.
+  constructor(gravityY: number, options: { oneSided?: boolean } = {}) {
     // No sleeping. A liquid here is a pile of slow circles, and a body that sleeps the moment it
     // slows stops a spread short: level 06 depends on lava creeping the last few points to the hero.
     this.world = new planck.World({ gravity: planck.Vec2(0, gravityY), allowSleep: false });
+    if (options.oneSided) {
+      installOneSided();
+      oneSidedWorlds.add(this.world);
+    }
     this.world.on("begin-contact", (contact) => {
       const a = contact.getFixtureA().getBody(), b = contact.getFixtureB().getBody();
       const ta = tagOf(a), tb = tagOf(b);
@@ -75,7 +110,9 @@ export class SKWorld {
       const key = ia < ib ? ia + ":" + ib : ib + ":" + ia;
       if (this.seen.has(key)) return;
       this.seen.add(key);
-      this.events.push({ a, b });
+      const manifold = contact.getManifold().pointCount > 0 ? contact.getWorldManifold(null) : undefined;
+      const at = manifold?.points[0];
+      this.events.push(at ? { a, b, point: { x: at.x * PPM, y: at.y * PPM } } : { a, b });
     });
     // A pair that only reports (a drain, a goal) must not push anything.
     this.world.on("pre-solve", (contact) => {
@@ -93,6 +130,7 @@ export class SKWorld {
       angularDamping: spec.angularDamping ?? 0.1,
       fixedRotation: spec.fixedRotation ?? false,
       bullet: spec.bullet ?? false,
+      gravityScale: spec.gravityScale ?? 1,
     });
     const tag: Tag = {
       kind: spec.kind,
@@ -164,6 +202,19 @@ export class SKWorld {
     return body;
   }
 
+  /// Every live body with a solid shape under a canvas point (SpriteKit's enumerateBodies(at:)).
+  /// Edge chains have no inside, so they never match.
+  bodiesAt(point: Vec): planck.Body[] {
+    const p = planck.Vec2(point.x / PPM, point.y / PPM);
+    const found: planck.Body[] = [];
+    this.world.queryAABB(new planck.AABB(p, p), (fixture) => {
+      const body = fixture.getBody();
+      if (!tagOf(body).removed && !found.includes(body) && fixture.testPoint(p)) found.push(body);
+      return true;
+    });
+    return found;
+  }
+
   /// Take a body out of the world. Safe at any time: the body stops colliding at once and is
   /// destroyed after the step that is running.
   remove(body: planck.Body) {
@@ -213,6 +264,24 @@ export const velocity = (body: planck.Body): Vec => {
 export const setVelocity = (body: planck.Body, v: Vec) => {
   body.setLinearVelocity(planck.Vec2(v.x / PPM, v.y / PPM));
 };
+
+/// Set a body's mass outright, as SpriteKit's `mass` setter does: the density the shapes imply is
+/// scaled, so the centre of mass stays put and the rotational inertia scales with the mass.
+export const setMass = (body: planck.Body, mass: number) => {
+  const data = { mass: 0, center: planck.Vec2(0, 0), I: 0 };
+  body.getMassData(data);
+  if (data.mass <= 0) return;
+  body.setMassData({ mass, center: data.center, I: (data.I * mass) / data.mass });
+};
+
+/// An impulse through the centre of mass. `impulse` is mass times points per second, the scale
+/// the scenes wrote their forces in, so an acceleration in pt/s^2 times `body.getMass()` times dt works.
+export const applyImpulse = (body: planck.Body, impulse: Vec) => {
+  body.applyLinearImpulse(planck.Vec2(impulse.x / PPM, impulse.y / PPM), body.getWorldCenter(), true);
+};
+
+/// Radians per second, counterclockwise positive.
+export const angularVelocity = (body: planck.Body): number => body.getAngularVelocity();
 
 /// Linear speed in points per second.
 export const speed = (body: planck.Body): number => {

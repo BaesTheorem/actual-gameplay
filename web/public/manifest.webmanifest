@@ -1,0 +1,15 @@
+{
+  "name": "Actual Gameplay",
+  "short_name": "Actual Gameplay",
+  "description": "The three games that only exist in mobile ads, built for real. No ads, no purchases.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F3EBDC",
+  "theme_color": "#F3EBDC",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

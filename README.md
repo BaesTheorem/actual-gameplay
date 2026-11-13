@@ -43,7 +43,33 @@ imperfect player and prices each upgrade level at the same number of wins per po
 odds, so the shop can say "+5% odds at run 16" next to the cost. Rivals are sized to the
 base crowd of five, so extra starting runners are a real edge rather than a bigger fight.
 
-## Build
+## Play in a browser
+
+The same three games run as a web app at https://baestheorem.github.io/actual-gameplay/, on a
+phone or a desktop. It installs to a home screen, and progress stays in that browser.
+
+The web build is in `web/`: TypeScript, [planck.js](https://github.com/piqnt/planck.js) for
+physics and [PixiJS](https://github.com/pixijs/pixijs) for drawing. It reads the levels, art and
+audio from `ActualGameplay/`, so there is one copy of each. Each game's rules live in
+`web/src/sim/` as a simulation with no drawing in it, which is what lets the level checks run in
+Node in a few seconds with no simulator:
+
+    cd web && npm install
+    npm run dev                      build the art sheets, then serve with reload
+    npm test                         unit tests (the Swift tests, ported)
+    npm run replay -- pinPull        play every stored solution: pinPull, saveDog or runner
+    npm run audit -- pinPull         every pull order up to par; each level must report UNIQUE
+    npm run build                    type-check and write web/dist
+
+A push to `main` runs the tests and the replays, then deploys `web/dist` to GitHub Pages
+(`.github/workflows/pages.yml`). A stored solution that stops winning stops the deploy.
+
+Two things differ from SpriteKit on purpose. The physics world never sleeps a body, because a
+liquid here is a pile of slow circles and a sleeping pile stops spreading (level 06 depends on
+the last few points of that spread). And the step is a fixed 1/60 s whatever the display rate.
+`DESIGN.md` holds the look both builds share.
+
+## Build the iPhone app
 
 Requires Xcode 26 and [XcodeGen](https://github.com/yonaskolb/XcodeGen). The
 `.xcodeproj` is generated and never committed.

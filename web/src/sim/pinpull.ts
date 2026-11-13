@@ -3,7 +3,7 @@
 import type * as planck from "planck";
 import { Clock, type Emit } from "./clock";
 import {
-  ALL, PLAYFIELD, STEP, SKWorld, clampSpeed, pair, position, setPosition, speed, tagOf,
+  PLAYFIELD, STEP, SKWorld, clampSpeed, pair, position, setPosition, speed, tagOf,
   type ContactEvent, type Outcome, type Vec,
 } from "./sk";
 

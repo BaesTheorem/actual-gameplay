@@ -23,5 +23,7 @@ export type Cue =
   | { type: "sound"; name: string }
   | { type: "puff"; x: number; y: number }
   | { type: "haptic"; name: string }
-  | { type: "mood"; who: unknown; clip: string };
+  | { type: "mood"; who: unknown; clip: string }
+  /// A sound that runs until it is stopped. `volume` is 0 to 1 and can change while it runs.
+  | { type: "loop"; name: string; on: boolean; volume: number };
 export type Emit = (cue: Cue) => void;

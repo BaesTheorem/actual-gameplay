@@ -1,2 +1,8 @@
 node_modules/
 dist/
+public/art/
+public/audio/
+public/levels/
+public/icon-*.png
+public/apple-touch-icon.png
+src/generated/
