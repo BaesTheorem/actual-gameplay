@@ -53,7 +53,9 @@ button:active { opacity: 0.8; }
 .icon-btn { width: 44px; height: 44px; display: grid; place-items: center; flex: none; }
 
 .title { font-family: var(--marker); font-size: 40px; line-height: 0.8; margin: 6px 0 0; }
-.mode-card { display: flex; align-items: center; gap: 14px; padding: 14px; width: 100%; text-align: left; }
+.mode-card { display: flex; align-items: center; gap: 14px; padding: 10px 14px; width: 100%; text-align: left; }
+.small-print { font-size: 12px; line-height: 17px; color: var(--muted); }
+.small-print div:first-child { font-family: var(--marker); font-size: 14px; color: var(--ink); }
 .mode-card h2 { font-family: var(--marker); font-size: 21px; font-weight: 400; margin: 0; }
 .mode-card p { margin: 2px 0 0; font-size: 13px; }
 .swatch { position: relative; flex: none; }

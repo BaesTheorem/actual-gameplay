@@ -72,19 +72,42 @@ const summary = (m: ModeInfo): string => {
   return ids.length === 0 ? "Coming soon" : cleared === 0 ? `${ids.length} levels` : `${cleared}/${ids.length} cleared`;
 };
 
+/// Every star earned across the modes with levels, and how many there are to earn.
+const starCount = (): { earned: number; total: number } => {
+  let earned = 0, total = 0;
+  for (const m of MODES) {
+    if (m.kind !== "levels") continue;
+    const ids = levelIDs(m.id), saved = results(store.progress, m.id);
+    total += ids.length * 3;
+    for (const id of ids) earned += saved[id]?.bestStars ?? 0;
+  }
+  return { earned, total };
+};
+
 const home = () => {
   audio.playMusic("menu");
+  const count = starCount(), star = h("div");
+  art.paint(star, "ui_star_on", 18);
   const header = h("div",
     h("div.row", { style: { alignItems: "flex-start" } },
       h("h1.title.grow", "ACTUAL", h("br"), "GAMEPLAY"),
       iconButton("settings", "Settings", () => go("/settings"))),
-    h("p.muted", { style: { fontSize: "15px", margin: "14px 0 0" } }, "The games from the ads. Without the ads."),
-    h("div.hairline", { style: { marginTop: "16px" } }));
+    h("div.row", { style: { margin: "12px 0 0", gap: "8px" } },
+      h("p.muted.grow", { style: { fontSize: "15px", margin: "0" } }, "The games from the ads. Without the ads."),
+      h("div.row", { style: { gap: "4px" }, "aria-label": `${count.earned} of ${count.total} stars` }, star, h("span.marker", { style: { fontSize: "15px" } }, `${count.earned}/${count.total}`))),
+    h("div.hairline", { style: { marginTop: "14px" } }));
+  // The level that is new today, where a mode has one, sits above the modes.
+  const today = MODES.flatMap((m) => (m.kind === "levels" && m.daily ? [dailyTile(m, m.daily)] : []));
   const cards = MODES.map((m) => art.frame(h<"button">("button.mode-card", { onclick: () => { audio.play("tap"); go(`/${m.id}`); } },
-    swatch(m.preview[0], m.preview[1], m.swatch, 68),
+    swatch(m.preview[0], m.preview[1], m.swatch, 60),
     h("div.grow", h("h2", m.title), h("p.muted", m.blurb), h("p.mono", { style: { fontSize: "12px" } }, summary(m))),
     icon("chevronRight"))));
-  ui.replaceChildren(screen("paper", header, ...cards, h("div.grow"), h("div.mono.muted", { style: { fontSize: "12px" } }, `v${VERSION}`)));
+  // The ads carry a line in small print: "Not all images represent actual gameplay." Here all of them do.
+  const small = h("div.small-print",
+    h("div", "All images represent actual gameplay."),
+    h("div", "Every \"only X%\" on a level is measured: random play, counted."),
+    h("div.mono", `v${VERSION}`));
+  ui.replaceChildren(screen("paper", header, ...today, ...cards, h("div.grow"), small));
 };
 
 /// One level on the list: its place in the chapter, its stars, and a corner tag when its
