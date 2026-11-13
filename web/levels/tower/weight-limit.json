@@ -1,0 +1,21 @@
+{
+  "id": "weight-limit",
+  "name": "Weight limit",
+  "hint": "Some rooms have a weight limit, and a hero above it falls.",
+  "start": 7,
+  "w": 2,
+  "h": 3,
+  "rooms": [
+    {"things":[{"kind":"enemy","n":9}]},
+    {"things":[{"kind":"enemy","n":6}]},
+    {"things":[{"kind":"enemy","n":16}]},
+    {"things":[{"kind":"mirror"}],"max":24},
+    {"things":[{"kind":"boss","n":45}]},
+    {"things":[{"kind":"key"}]}
+  ],
+  "walls": [[2,4]],
+  "entries": [0,1],
+  "solution": [1,3,0,2,5,4],
+  "best": 101,
+  "seed": 3000
+}

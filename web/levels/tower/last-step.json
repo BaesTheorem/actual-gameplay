@@ -1,0 +1,21 @@
+{
+  "id": "last-step",
+  "name": "Last step",
+  "hint": "Two floors up, a times 2 beside the boss. The halve is not worth it.",
+  "start": 6,
+  "w": 2,
+  "h": 3,
+  "rooms": [
+    {"things":[{"kind":"enemy","n":6}]},
+    {"things":[{"kind":"plus","n":1}]},
+    {"things":[{"kind":"halve","k":2}]},
+    {"things":[{"kind":"plus","n":2}]},
+    {"things":[{"kind":"boss","n":28}]},
+    {"things":[{"kind":"times","k":2}]}
+  ],
+  "walls": [],
+  "entries": [0,1],
+  "solution": [1,0,3,5,4],
+  "best": 58,
+  "seed": 2400
+}

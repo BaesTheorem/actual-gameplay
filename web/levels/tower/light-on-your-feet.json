@@ -1,0 +1,24 @@
+{
+  "id": "light-on-your-feet",
+  "name": "Light on your feet",
+  "hint": "Every limit here is small. Stay light.",
+  "start": 4,
+  "w": 3,
+  "h": 3,
+  "rooms": [
+    {"things":[{"kind":"minus","n":1}],"max":2},
+    {"things":[{"kind":"times","k":3}]},
+    {"things":[{"kind":"enemy","n":1},{"kind":"halve","k":2}],"max":4},
+    {"things":[{"kind":"mirror"}],"max":9},
+    {"things":[{"kind":"enemy","n":2}]},
+    {"things":[{"kind":"enemy","n":1}]},
+    {"things":[{"kind":"key"}],"max":12},
+    {"things":[{"kind":"enemy","n":4}],"max":8},
+    {"things":[{"kind":"boss","n":9}],"max":12}
+  ],
+  "walls": [[6,7]],
+  "entries": [0,1,2],
+  "solution": [2,1,4,3,6,7,8],
+  "best": 21,
+  "seed": 3300
+}

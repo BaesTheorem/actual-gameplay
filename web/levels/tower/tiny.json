@@ -1,0 +1,19 @@
+{
+  "id": "tiny",
+  "name": "Tiny",
+  "hint": "You need every room. The boss is 9 and the rest add up to 6.",
+  "start": 4,
+  "w": 1,
+  "h": 4,
+  "rooms": [
+    {"things":[{"kind":"plus","n":2}]},
+    {"things":[{"kind":"enemy","n":3}]},
+    {"things":[{"kind":"enemy","n":1}]},
+    {"things":[{"kind":"boss","n":9}]}
+  ],
+  "walls": [],
+  "entries": [0,1,2,3],
+  "solution": [0,1,2,3],
+  "best": 19,
+  "seed": 1300
+}

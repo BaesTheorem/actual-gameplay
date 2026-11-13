@@ -1,0 +1,23 @@
+{
+  "id": "cheap-tickets",
+  "name": "Cheap tickets",
+  "hint": "The minus 16 stays where it is.",
+  "start": 7,
+  "w": 2,
+  "h": 4,
+  "rooms": [
+    {"things":[{"kind":"times","k":2}]},
+    {"things":[{"kind":"enemy","n":13}]},
+    {"things":[{"kind":"minus","n":16}]},
+    {"things":[{"kind":"enemy","n":25}]},
+    {"things":[{"kind":"plus","n":34}]},
+    {"things":[{"kind":"enemy","n":30}]},
+    {"things":[{"kind":"boss","n":146}]},
+    {"things":[{"kind":"plus","n":57}]}
+  ],
+  "walls": [],
+  "entries": [0,1],
+  "solution": [0,1,3,5,4,7,6],
+  "best": 319,
+  "seed": 2300
+}

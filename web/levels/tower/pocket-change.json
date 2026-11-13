@@ -1,0 +1,20 @@
+{
+  "id": "pocket-change",
+  "name": "Pocket change",
+  "hint": "You are 3. The 7 is out of reach until you collect.",
+  "start": 3,
+  "w": 1,
+  "h": 5,
+  "rooms": [
+    {"things":[{"kind":"enemy","n":7}]},
+    {"things":[{"kind":"plus","n":1}]},
+    {"things":[{"kind":"plus","n":4}]},
+    {"things":[{"kind":"plus","n":2}]},
+    {"things":[{"kind":"boss","n":13}]}
+  ],
+  "walls": [],
+  "entries": [0,1,2,3,4],
+  "solution": [1,2,0,3,4],
+  "best": 30,
+  "seed": 1600
+}

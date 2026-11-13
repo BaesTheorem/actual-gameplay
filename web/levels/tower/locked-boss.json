@@ -1,0 +1,23 @@
+{
+  "id": "locked-boss",
+  "name": "Locked boss",
+  "hint": "The boss is behind a lock.",
+  "start": 7,
+  "w": 2,
+  "h": 4,
+  "rooms": [
+    {"things":[{"kind":"plus","n":2}],"max":7},
+    {"things":[{"kind":"enemy","n":7}]},
+    {"things":[{"kind":"key"}]},
+    {"things":[{"kind":"enemy","n":9}]},
+    {"things":[{"kind":"minus","n":4},{"kind":"mirror"}]},
+    {"things":[{"kind":"times","k":2},{"kind":"plus","n":10}]},
+    {"things":[{"kind":"boss","n":66}],"locked":true,"max":76},
+    {"things":[{"kind":"enemy","n":24}]}
+  ],
+  "walls": [[3,5],[4,6]],
+  "entries": [0,1],
+  "solution": [0,1,2,4,5,7,6],
+  "best": 142,
+  "seed": 3400
+}

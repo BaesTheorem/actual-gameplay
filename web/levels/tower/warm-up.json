@@ -1,0 +1,19 @@
+{
+  "id": "warm-up",
+  "name": "Warm-up",
+  "hint": "The boss is 17. You are 6. Collect before you fight.",
+  "start": 6,
+  "w": 1,
+  "h": 4,
+  "rooms": [
+    {"things":[{"kind":"plus","n":9}]},
+    {"things":[{"kind":"enemy","n":4}]},
+    {"things":[{"kind":"enemy","n":3}]},
+    {"things":[{"kind":"boss","n":17}]}
+  ],
+  "walls": [],
+  "entries": [0,1,2,3],
+  "solution": [0,1,2,3],
+  "best": 39,
+  "seed": 1100
+}

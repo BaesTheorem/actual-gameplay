@@ -1,0 +1,18 @@
+{
+  "id": "ground-floor",
+  "name": "Ground floor",
+  "hint": "Beat anything smaller than you and add it to your number.",
+  "start": 5,
+  "w": 1,
+  "h": 3,
+  "rooms": [
+    {"things":[{"kind":"plus","n":1}]},
+    {"things":[{"kind":"enemy","n":2}]},
+    {"things":[{"kind":"boss","n":6}]}
+  ],
+  "walls": [],
+  "entries": [0,1,2],
+  "solution": [0,1,2],
+  "best": 14,
+  "seed": 1000
+}

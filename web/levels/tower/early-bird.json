@@ -1,0 +1,24 @@
+{
+  "id": "early-bird",
+  "name": "Early bird",
+  "hint": "The grower is 1 now. It is 10 after three rooms.",
+  "start": 4,
+  "w": 3,
+  "h": 3,
+  "rooms": [
+    {"things":[{"kind":"grower","n":1,"grow":3}],"max":11},
+    {"things":[{"kind":"enemy","n":4}]},
+    {"things":[{"kind":"enemy","n":3}]},
+    {"things":[{"kind":"plus","n":11}]},
+    {"things":[{"kind":"plus","n":11}],"locked":true},
+    {"things":[{"kind":"key"}]},
+    {"things":[{"kind":"minus","n":16}]},
+    {"things":[{"kind":"plus","n":28}],"max":53},
+    {"things":[{"kind":"boss","n":64}]}
+  ],
+  "walls": [[1,4],[5,8]],
+  "entries": [0,1,2],
+  "solution": [2,1,5,0,3,4,7,8],
+  "best": 135,
+  "seed": 4100
+}

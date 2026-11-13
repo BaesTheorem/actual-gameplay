@@ -1,0 +1,21 @@
+{
+  "id": "plus-twelve",
+  "name": "Plus twelve",
+  "hint": "A 9 is bigger than you. The plus 12 is not.",
+  "start": 7,
+  "w": 1,
+  "h": 6,
+  "rooms": [
+    {"things":[{"kind":"enemy","n":2}]},
+    {"things":[{"kind":"enemy","n":5}]},
+    {"things":[{"kind":"enemy","n":9}]},
+    {"things":[{"kind":"plus","n":12}]},
+    {"things":[{"kind":"enemy","n":5}]},
+    {"things":[{"kind":"boss","n":38}]}
+  ],
+  "walls": [],
+  "entries": [0,1,2,3,4,5],
+  "solution": [0,1,2,3,4,5],
+  "best": 78,
+  "seed": 1500
+}

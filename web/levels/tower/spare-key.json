@@ -1,0 +1,21 @@
+{
+  "id": "spare-key",
+  "name": "Spare key",
+  "hint": "Two keys, one lock, and a floor that holds 10.",
+  "start": 5,
+  "w": 3,
+  "h": 2,
+  "rooms": [
+    {"things":[{"kind":"key"}]},
+    {"things":[{"kind":"enemy","n":8},{"kind":"enemy","n":14}],"max":10},
+    {"things":[{"kind":"enemy","n":4},{"kind":"key"}]},
+    {"things":[{"kind":"times","k":2}]},
+    {"things":[{"kind":"enemy","n":10}],"locked":true},
+    {"things":[{"kind":"boss","n":74}],"max":105}
+  ],
+  "walls": [],
+  "entries": [0,1,2],
+  "solution": [0,2,1,4,3,5],
+  "best": 156,
+  "seed": 3200
+}

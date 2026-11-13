@@ -1,0 +1,23 @@
+{
+  "id": "only-one-way",
+  "name": "Only one way",
+  "hint": "One order wins. It skips three rooms.",
+  "start": 6,
+  "w": 2,
+  "h": 4,
+  "rooms": [
+    {"things":[{"kind":"minus","n":63}]},
+    {"things":[{"kind":"enemy","n":3}]},
+    {"things":[{"kind":"times","k":3}]},
+    {"things":[{"kind":"enemy","n":7},{"kind":"enemy","n":10}]},
+    {"things":[{"kind":"halve","k":2}]},
+    {"things":[{"kind":"enemy","n":21}]},
+    {"things":[{"kind":"enemy","n":28}]},
+    {"things":[{"kind":"boss","n":123}]}
+  ],
+  "walls": [],
+  "entries": [0,1],
+  "solution": [1,3,5,2,7],
+  "best": 264,
+  "seed": 2700
+}

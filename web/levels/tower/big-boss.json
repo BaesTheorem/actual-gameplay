@@ -1,0 +1,24 @@
+{
+  "id": "big-boss",
+  "name": "Big boss",
+  "hint": "The boss is 840. The plus 60 is locked.",
+  "start": 8,
+  "w": 3,
+  "h": 3,
+  "rooms": [
+    {"things":[{"kind":"plus","n":5},{"kind":"enemy","n":8}]},
+    {"things":[{"kind":"enemy","n":6}]},
+    {"things":[{"kind":"enemy","n":19}]},
+    {"things":[{"kind":"grower","n":13,"grow":2}]},
+    {"things":[{"kind":"key"}]},
+    {"things":[{"kind":"plus","n":60}],"locked":true},
+    {"things":[{"kind":"boss","n":840}]},
+    {"things":[{"kind":"times","k":4},{"kind":"mirror"}]},
+    {"things":[{"kind":"plus","n":28}]}
+  ],
+  "walls": [[1,4],[2,5],[4,5]],
+  "entries": [0,1,2],
+  "solution": [0,3,1,4,7,2,8,5,6],
+  "best": 1808,
+  "seed": 4300
+}

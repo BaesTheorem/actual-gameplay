@@ -1,0 +1,19 @@
+{
+  "id": "stairs",
+  "name": "Stairs",
+  "hint": "You may enter the ground floor, or a room next to one you cleared.",
+  "start": 8,
+  "w": 2,
+  "h": 2,
+  "rooms": [
+    {"things":[{"kind":"enemy","n":3},{"kind":"times","k":2}]},
+    {"things":[{"kind":"enemy","n":18},{"kind":"times","k":4}]},
+    {"things":[{"kind":"enemy","n":8}]},
+    {"things":[{"kind":"boss","n":156}]}
+  ],
+  "walls": [],
+  "entries": [0,1],
+  "solution": [0,2,1,3],
+  "best": 348,
+  "seed": 2000
+}

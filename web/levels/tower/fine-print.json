@@ -1,0 +1,21 @@
+{
+  "id": "fine-print",
+  "name": "Fine print",
+  "hint": "A 10 and an 8 stand over you. The 5 and the plus 5 come first.",
+  "start": 6,
+  "w": 1,
+  "h": 6,
+  "rooms": [
+    {"things":[{"kind":"enemy","n":10}]},
+    {"things":[{"kind":"enemy","n":5}]},
+    {"things":[{"kind":"plus","n":5}]},
+    {"things":[{"kind":"enemy","n":8}]},
+    {"things":[{"kind":"enemy","n":3}]},
+    {"things":[{"kind":"boss","n":35}]}
+  ],
+  "walls": [],
+  "entries": [0,1,2,3,4,5],
+  "solution": [1,0,2,3,4,5],
+  "best": 72,
+  "seed": 1700
+}

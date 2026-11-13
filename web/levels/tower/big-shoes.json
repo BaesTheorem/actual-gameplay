@@ -1,0 +1,20 @@
+{
+  "id": "big-shoes",
+  "name": "Big shoes",
+  "hint": "A 12 stands over you. Take the plus 8 first.",
+  "start": 6,
+  "w": 1,
+  "h": 5,
+  "rooms": [
+    {"things":[{"kind":"enemy","n":12}]},
+    {"things":[{"kind":"plus","n":8}]},
+    {"things":[{"kind":"enemy","n":5}]},
+    {"things":[{"kind":"plus","n":14}]},
+    {"things":[{"kind":"boss","n":37}]}
+  ],
+  "walls": [],
+  "entries": [0,1,2,3,4],
+  "solution": [1,0,2,3,4],
+  "best": 82,
+  "seed": 1400
+}

@@ -1,0 +1,23 @@
+{
+  "id": "key-and-lock",
+  "name": "Key and lock",
+  "hint": "A locked room needs a key. The key is above it.",
+  "start": 3,
+  "w": 2,
+  "h": 4,
+  "rooms": [
+    {"things":[{"kind":"enemy","n":2}]},
+    {"things":[{"kind":"enemy","n":3}]},
+    {"things":[{"kind":"times","k":2}]},
+    {"things":[{"kind":"enemy","n":64}],"locked":true},
+    {"things":[{"kind":"mirror"}]},
+    {"things":[{"kind":"key"}]},
+    {"things":[{"kind":"enemy","n":27}],"max":75},
+    {"things":[{"kind":"boss","n":135}],"max":196}
+  ],
+  "walls": [[0,1],[2,3],[3,5]],
+  "entries": [0,1],
+  "solution": [0,1,2,4,5,6,3,7],
+  "best": 287,
+  "seed": 3100
+}

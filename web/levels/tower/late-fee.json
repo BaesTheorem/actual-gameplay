@@ -1,0 +1,25 @@
+{
+  "id": "late-fee",
+  "name": "Late fee",
+  "hint": "The grower starts at 29 and gains 3 a room.",
+  "start": 5,
+  "w": 2,
+  "h": 5,
+  "rooms": [
+    {"things":[{"kind":"enemy","n":4}]},
+    {"things":[{"kind":"enemy","n":7}],"max":10},
+    {"things":[{"kind":"times","k":2}]},
+    {"things":[{"kind":"minus","n":48},{"kind":"grower","n":29,"grow":3}],"max":130},
+    {"things":[{"kind":"enemy","n":23}]},
+    {"things":[{"kind":"enemy","n":30}],"max":110},
+    {"things":[{"kind":"key"}]},
+    {"things":[{"kind":"enemy","n":41}]},
+    {"things":[{"kind":"boss","n":119}]},
+    {"things":[{"kind":"key"}]}
+  ],
+  "walls": [[6,8]],
+  "entries": [0,1],
+  "solution": [0,1,2,4,5,6,7,9,3,8],
+  "best": 250,
+  "seed": 4200
+}

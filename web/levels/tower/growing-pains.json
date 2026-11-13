@@ -1,0 +1,23 @@
+{
+  "id": "growing-pains",
+  "name": "Growing pains",
+  "hint": "A grower gets bigger by its second number each time you enter a room.",
+  "start": 8,
+  "w": 2,
+  "h": 4,
+  "rooms": [
+    {"things":[{"kind":"enemy","n":4},{"kind":"enemy","n":9}]},
+    {"things":[{"kind":"grower","n":12,"grow":3}]},
+    {"things":[{"kind":"plus","n":22}]},
+    {"things":[{"kind":"key"}]},
+    {"things":[{"kind":"times","k":2}],"max":112},
+    {"things":[{"kind":"enemy","n":31}]},
+    {"things":[{"kind":"plus","n":86}],"max":195},
+    {"things":[{"kind":"boss","n":256}]}
+  ],
+  "walls": [],
+  "entries": [0,1],
+  "solution": [0,2,3,1,5,4,6,7],
+  "best": 532,
+  "seed": 4000
+}

@@ -1,0 +1,27 @@
+{
+  "id": "overgrown",
+  "name": "Overgrown",
+  "hint": "Four growers, two locks, one way through.",
+  "start": 5,
+  "w": 3,
+  "h": 4,
+  "rooms": [
+    {"things":[{"kind":"enemy","n":21}]},
+    {"things":[{"kind":"grower","n":3,"grow":3},{"kind":"grower","n":5,"grow":1}]},
+    {"things":[{"kind":"enemy","n":9}]},
+    {"things":[{"kind":"plus","n":43}]},
+    {"things":[{"kind":"enemy","n":21}],"locked":true},
+    {"things":[{"kind":"grower","n":6,"grow":3}]},
+    {"things":[{"kind":"key"}]},
+    {"things":[{"kind":"mirror"}]},
+    {"things":[{"kind":"grower","n":25,"grow":1}]},
+    {"things":[{"kind":"enemy","n":81}],"locked":true},
+    {"things":[{"kind":"key"}]},
+    {"things":[{"kind":"boss","n":210}]}
+  ],
+  "walls": [[0,3],[7,10],[10,11]],
+  "entries": [0,1,2],
+  "solution": [1,2,0,5,8,7,6,3,9,10,4,11],
+  "best": 433,
+  "seed": 4700
+}

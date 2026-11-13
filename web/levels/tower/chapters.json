@@ -1,0 +1,62 @@
+[
+  {
+    "id": "1",
+    "title": "As advertised",
+    "blurb": "Exactly what the ad showed. Pick any floor.",
+    "levels": [
+      "ground-floor",
+      "warm-up",
+      "odd-jobs",
+      "tiny",
+      "big-shoes",
+      "plus-twelve",
+      "pocket-change",
+      "fine-print"
+    ]
+  },
+  {
+    "id": "2",
+    "title": "The stairs",
+    "blurb": "The ad left out the stairs. Rooms connect, and you walk.",
+    "levels": [
+      "stairs",
+      "right-side-up",
+      "skip-the-half",
+      "cheap-tickets",
+      "last-step",
+      "shortcut",
+      "halve-first",
+      "only-one-way"
+    ]
+  },
+  {
+    "id": "3",
+    "title": "House rules",
+    "blurb": "The tower has rules. Some floors will not hold a big number.",
+    "levels": [
+      "weight-limit",
+      "key-and-lock",
+      "spare-key",
+      "light-on-your-feet",
+      "locked-boss",
+      "one-key",
+      "behind-the-door",
+      "five-or-less"
+    ]
+  },
+  {
+    "id": "4",
+    "title": "They grow",
+    "blurb": "Some of them train while you wander. The longer you take, the bigger they get.",
+    "levels": [
+      "growing-pains",
+      "early-bird",
+      "late-fee",
+      "big-boss",
+      "thin-margins",
+      "shared-room",
+      "easy-boss",
+      "overgrown"
+    ]
+  }
+]

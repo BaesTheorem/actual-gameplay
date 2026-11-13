@@ -1,0 +1,21 @@
+{
+  "id": "right-side-up",
+  "name": "Right side up",
+  "hint": "A times 2 sits beside the boss. Reach it first.",
+  "start": 6,
+  "w": 2,
+  "h": 3,
+  "rooms": [
+    {"things":[{"kind":"enemy","n":2}]},
+    {"things":[{"kind":"enemy","n":6},{"kind":"plus","n":6}]},
+    {"things":[{"kind":"minus","n":1}]},
+    {"things":[{"kind":"plus","n":2},{"kind":"enemy","n":4}]},
+    {"things":[{"kind":"boss","n":45}]},
+    {"things":[{"kind":"times","k":2}]}
+  ],
+  "walls": [],
+  "entries": [0,1],
+  "solution": [0,1,3,5,4],
+  "best": 97,
+  "seed": 2100
+}

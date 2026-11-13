@@ -1,0 +1,23 @@
+{
+  "id": "shortcut",
+  "name": "Shortcut",
+  "hint": "Four rooms, then the boss. Skip the rest.",
+  "start": 8,
+  "w": 2,
+  "h": 4,
+  "rooms": [
+    {"things":[{"kind":"enemy","n":11}]},
+    {"things":[{"kind":"enemy","n":6}]},
+    {"things":[{"kind":"halve","k":2}]},
+    {"things":[{"kind":"enemy","n":9}]},
+    {"things":[{"kind":"minus","n":13}]},
+    {"things":[{"kind":"times","k":2}]},
+    {"things":[{"kind":"plus","n":3}]},
+    {"things":[{"kind":"boss","n":57}]}
+  ],
+  "walls": [],
+  "entries": [0,1],
+  "solution": [1,0,3,5,7],
+  "best": 125,
+  "seed": 2500
+}

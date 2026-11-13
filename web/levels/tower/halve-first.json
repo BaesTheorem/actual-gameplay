@@ -1,0 +1,21 @@
+{
+  "id": "halve-first",
+  "name": "Halve first",
+  "hint": "A halve is cheap when you are small. Times six is not.",
+  "start": 7,
+  "w": 2,
+  "h": 3,
+  "rooms": [
+    {"things":[{"kind":"enemy","n":28}]},
+    {"things":[{"kind":"halve","k":2}]},
+    {"things":[{"kind":"enemy","n":3}]},
+    {"things":[{"kind":"times","k":2},{"kind":"minus","n":1}]},
+    {"things":[{"kind":"boss","n":68}]},
+    {"things":[{"kind":"times","k":2},{"kind":"times","k":3}]}
+  ],
+  "walls": [],
+  "entries": [0,1],
+  "solution": [1,3,2,5,0,4],
+  "best": 144,
+  "seed": 2600
+}

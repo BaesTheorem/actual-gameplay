@@ -1,0 +1,19 @@
+{
+  "id": "skip-the-half",
+  "name": "Skip the half",
+  "hint": "One room here only costs you.",
+  "start": 3,
+  "w": 2,
+  "h": 2,
+  "rooms": [
+    {"things":[{"kind":"enemy","n":3}]},
+    {"things":[{"kind":"enemy","n":2}]},
+    {"things":[{"kind":"halve","k":2},{"kind":"plus","n":1}]},
+    {"things":[{"kind":"boss","n":6}]}
+  ],
+  "walls": [],
+  "entries": [0,1],
+  "solution": [1,0,3],
+  "best": 14,
+  "seed": 2200
+}

@@ -1,0 +1,20 @@
+{
+  "id": "odd-jobs",
+  "name": "Odd jobs",
+  "hint": "Four rooms to clear before a 20.",
+  "start": 8,
+  "w": 1,
+  "h": 5,
+  "rooms": [
+    {"things":[{"kind":"enemy","n":2}]},
+    {"things":[{"kind":"plus","n":4}]},
+    {"things":[{"kind":"plus","n":4}]},
+    {"things":[{"kind":"enemy","n":7}]},
+    {"things":[{"kind":"boss","n":20}]}
+  ],
+  "walls": [],
+  "entries": [0,1,2,3,4],
+  "solution": [0,1,2,3,4],
+  "best": 45,
+  "seed": 1200
+}
