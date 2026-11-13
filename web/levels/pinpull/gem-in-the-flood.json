@@ -1,0 +1,129 @@
+{
+  "id": "gem-in-the-flood",
+  "name": "Gem in the flood",
+  "hint": "The gem rides the water. Let the flood in first, then drop in after it.",
+  "parPins": 2,
+  "winWhen": "both",
+  "walls": [
+    {
+      "x": 200,
+      "y": 68,
+      "w": 14,
+      "h": 386
+    },
+    {
+      "x": 200,
+      "y": 560,
+      "w": 14,
+      "h": 154
+    }
+  ],
+  "slabs": [
+    {
+      "x1": 364,
+      "y1": 570,
+      "x2": 214,
+      "y2": 470,
+      "t": 14
+    }
+  ],
+  "pins": [
+    {
+      "id": "p1",
+      "x": 38,
+      "y": 600,
+      "w": 162,
+      "side": "left"
+    },
+    {
+      "id": "p2",
+      "x": 38,
+      "y": 440,
+      "w": 162,
+      "side": "left",
+      "angle": 5.0
+    },
+    {
+      "id": "p3",
+      "x": 214,
+      "y": 590,
+      "w": 150,
+      "side": "right"
+    },
+    {
+      "id": "p4",
+      "x": 214,
+      "y": 660,
+      "w": 150,
+      "side": "right"
+    },
+    {
+      "id": "p5",
+      "x": 38,
+      "y": 670,
+      "w": 162,
+      "side": "left"
+    }
+  ],
+  "pools": [
+    {
+      "liquid": "water",
+      "x": 220,
+      "y": 604,
+      "w": 80,
+      "h": 40,
+      "count": 90
+    },
+    {
+      "liquid": "lava",
+      "x": 220,
+      "y": 674,
+      "w": 138,
+      "h": 24,
+      "count": 60
+    },
+    {
+      "liquid": "lava",
+      "x": 44,
+      "y": 684,
+      "w": 150,
+      "h": 20,
+      "count": 40
+    },
+    {
+      "liquid": "lava",
+      "x": 44,
+      "y": 68,
+      "w": 150,
+      "h": 20,
+      "count": 45
+    }
+  ],
+  "actors": {
+    "hero": {
+      "x": 176,
+      "y": 630
+    },
+    "treasure": {
+      "x": 330,
+      "y": 616
+    },
+    "foes": [
+      {
+        "x": 176,
+        "y": 464
+      }
+    ],
+    "goal": {
+      "x": 44,
+      "y": 434,
+      "w": 150,
+      "h": 90
+    }
+  },
+  "solution": [
+    "p3",
+    "p1"
+  ],
+  "settleSeconds": 6
+}

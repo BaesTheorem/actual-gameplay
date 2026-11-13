@@ -30,7 +30,7 @@ body { color: var(--ink); font-family: var(--body); user-select: none; -webkit-u
 #scene, #ui, .screen { position: absolute; inset: 0; }
 #scene { top: -60px; bottom: auto; height: 874px; }
 #scene canvas { width: 402px; height: 874px; display: block; }
-#ui { pointer-events: none; overflow: hidden; }
+#ui { pointer-events: none; }
 .screen { pointer-events: auto; }
 .screen { overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; touch-action: pan-y; scrollbar-width: none; background: var(--paper) center / cover; }
 .screen::-webkit-scrollbar { display: none; }
@@ -60,9 +60,16 @@ button:active { opacity: 0.8; }
 .swatch .clawd { position: absolute; left: 50%; bottom: 0; }
 .sprite { background-repeat: no-repeat; display: block; }
 
+/* A level list is its chapters: a title, one line about it, and four tiles to a row. */
+.chapter { display: flex; flex-direction: column; gap: 4px; }
+.chapter h2 { font-family: var(--marker); font-size: 20px; font-weight: 400; line-height: 26px; margin: 0; display: flex; align-items: center; gap: 8px; }
+.chapter h2 .num { width: 26px; height: 26px; flex: none; text-align: center; font-size: 16px; background: var(--cream); border: 2px solid var(--ink); border-radius: 6px; line-height: 22px; }
+.chapter p { margin: 0 0 8px; font-size: 13px; }
 .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-.tile { height: 86px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.tile { position: relative; height: 86px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
 .tile .n { font-family: var(--marker); font-size: 28px; height: 36px; line-height: 36px; }
+/* The share of random play that wins the level, on the levels where it shows as 10% or less. */
+.tile .tag { position: absolute; top: -7px; right: -7px; padding: 0 5px; background: var(--rose); border: 2px solid var(--ink); border-radius: 6px; font-family: var(--marker); font-size: 11px; line-height: 15px; transform: rotate(6deg); }
 .stars { display: flex; justify-content: center; }
 
 .hud .bar { position: absolute; left: 12px; right: 12px; top: 6px; display: flex; gap: 10px; align-items: stretch; }
@@ -72,10 +79,26 @@ button:active { opacity: 0.8; }
 .hud .info .r { font-size: 13px; line-height: 1.1; opacity: 0.8; }
 .hud .progress { position: absolute; left: 14px; right: 14px; top: 58px; height: 9px; border-radius: 5px; background: var(--cream); border: 1.5px solid var(--ink); overflow: hidden; pointer-events: none; }
 .hud .progress i { display: block; height: 100%; }
+/* The level's measured difficulty, as a paper sticker under the HUD: a line that shouts and a
+   line that says what was measured. It takes no touches, and after three seconds it fades back
+   so it stops competing with the level. It is 36 points tall on purpose: a scene's hint plate
+   starts 84 points down and its words 93 down, so the sticker laps the plate's edge and stops
+   short of the words. */
+.hud > .sticker { position: absolute; top: 52px; right: 12px; padding: 1px 8px 2px; background: var(--cream); border: 2px solid var(--ink); border-radius: 6px; text-align: center; white-space: nowrap; transform: rotate(2deg); pointer-events: none; animation: sticker-rest 0.6s ease-out 3s forwards; }
+.sticker .big { font-family: var(--marker); font-size: 18px; line-height: 18px; color: var(--rose); }
+.sticker.warm .big { color: var(--sap); }
+.sticker .small { font-size: 10px; font-weight: 700; line-height: 11px; }
+@keyframes sticker-rest { to { opacity: 0.45; } }
 
-.result { background: rgba(43, 34, 51, 0.4); display: grid; place-items: center; }
+/* The dim reaches over the canvas's two bands, so the whole scene goes dark and not only the stage. */
+.result { top: -60px; bottom: -34px; background: rgba(43, 34, 51, 0.4); display: grid; place-items: center; }
 .result .card { width: 320px; padding: 22px 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
-.result h1 { font-family: var(--marker); font-size: 36px; font-weight: 400; margin: 0; }
+/* The title is a rubber stamp: marker in a border of its own colour, set at a tilt, and it lands. */
+.result .stamp { font-family: var(--marker); font-size: 34px; font-weight: 400; line-height: 38px; margin: 2px 0; padding: 2px 14px 0; border: 3px solid currentColor; border-radius: 6px; transform: rotate(-6deg); animation: stamp 120ms ease-out both; }
+.result .stamp.cleared { color: var(--sap); }
+.result .stamp.fail { color: var(--rose); }
+@keyframes stamp { from { transform: rotate(-6deg) scale(2); } to { transform: rotate(-6deg) scale(1); } }
+.result .measured { font-size: 13px; line-height: 17px; }
 .result .buttons { width: 100%; display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
 
 .hub-top .sub { font-size: 13px; white-space: pre; }
@@ -95,4 +118,8 @@ button:active { opacity: 0.8; }
 .switch.on { background: var(--sap); }
 .switch.on::after { transform: translateX(20px); }
 .loading { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--marker); font-size: 22px; }
-@media (prefers-reduced-motion: reduce) { .switch::after { transition: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .switch::after { transition: none; }
+  .result .stamp { animation: none; }
+  .hud > .sticker { animation-duration: 0.1s; }
+}

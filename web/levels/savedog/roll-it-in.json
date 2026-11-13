@@ -1,0 +1,131 @@
+{
+  "id": "roll-it-in",
+  "name": "Roll it in",
+  "hint": "The boulder is your lid, but it will fly past. Ink sticks here: build it a wall.",
+  "inkBudget": 110,
+  "stars": [
+    80,
+    95
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 34,
+      "w": 402,
+      "h": 40,
+      "skin": "grass"
+    },
+    {
+      "type": "rect",
+      "x": 150,
+      "y": 74,
+      "w": 14,
+      "h": 126,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 238,
+      "y": 74,
+      "w": 14,
+      "h": 126,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 150,
+      "y": 186,
+      "w": 40,
+      "h": 14,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 212,
+      "y": 186,
+      "w": 40,
+      "h": 14,
+      "skin": "stone"
+    },
+    {
+      "type": "chain",
+      "points": [
+        [
+          20,
+          318
+        ],
+        [
+          135,
+          285
+        ]
+      ]
+    }
+  ],
+  "props": [
+    {
+      "id": "boulder",
+      "shape": "ball",
+      "x": 52,
+      "y": 325,
+      "r": 16,
+      "density": 2
+    }
+  ],
+  "decor": [
+    {
+      "sprite": "torch_on_a",
+      "x": 172,
+      "y": 130,
+      "w": 16,
+      "h": 26
+    }
+  ],
+  "dogs": [
+    {
+      "id": "clawd",
+      "x": 201,
+      "y": 92
+    }
+  ],
+  "hives": [
+    {
+      "x": 60,
+      "y": 700,
+      "count": 8,
+      "delay": 2.5
+    },
+    {
+      "x": 342,
+      "y": 700,
+      "count": 8,
+      "delay": 2.5
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            212,
+            222
+          ],
+          [
+            212,
+            300
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 16
+  },
+  "pinnedInk": true,
+  "forbidden": [
+    {
+      "x": 164,
+      "y": 74,
+      "w": 74,
+      "h": 112
+    }
+  ]
+}

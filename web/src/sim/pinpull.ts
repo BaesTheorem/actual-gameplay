@@ -85,6 +85,12 @@ export class Pin {
 
   get id() { return this.spec.id; }
 
+  /// Where the knob sits while the pin is in place: off the end of the bar, outside the chamber wall.
+  get knob(): Vec {
+    const reach = this.direction * (this.spec.w / 2 + KNOB_OFFSET);
+    return { x: this.home.x + reach * Math.cos(this.angle), y: this.home.y + reach * Math.sin(this.angle) };
+  }
+
   /// Where the bar's centre is now.
   get center(): Vec {
     // Ease in: slow off the mark, fastest as it clears the wall.
@@ -263,6 +269,7 @@ export class PinSim {
     this.calmFrames = 0;
     this.emit({ type: "haptic", name: "thud" });
     this.emit({ type: "sound", name: "pinPull" });
+    this.emit({ type: "fx", name: "pin", ...pin.knob });
     this.splashArmed = true;
     return true;
   }
@@ -290,11 +297,16 @@ export class PinSim {
   private tick(dt: number) {
     this.elapsed += dt;
     this.steamBudget = 6;
-    let fastest = 0, landings = 0;
+    let fastest = 0, landings = 0, landedX = 0, landedY = 0;
     for (const p of this.particles) {
       const s = speed(p.body);
       // 200 pt/s is a fall of about 20 pt; losing most of it in one step is an impact.
-      if (p.kind === "water" && p.lastSpeed > 200 && s < p.lastSpeed * 0.4) landings += 1;
+      if (p.kind === "water" && p.lastSpeed > 200 && s < p.lastSpeed * 0.4) {
+        const at = position(p.body);
+        landings += 1;
+        landedX += at.x;
+        landedY += at.y;
+      }
       p.lastSpeed = s;
       if (s > LIQUID_MAX_SPEED) clampSpeed(p.body, LIQUID_MAX_SPEED);
       fastest = Math.max(fastest, Math.min(s, LIQUID_MAX_SPEED));
@@ -303,6 +315,7 @@ export class PinSim {
     if (this.splashArmed && landings >= 3) {
       this.splashArmed = false;
       this.emit({ type: "sound", name: "splash" });
+      this.emit({ type: "fx", name: "splash", x: landedX / landings, y: landedY / landings });
     }
     // A goblin still falling is as unsettled as the hero: he may be about to land on him.
     const movers = [this.hero, this.treasure, ...this.foes.filter((f) => f.active).map((f) => f.body)];
@@ -385,6 +398,7 @@ export class PinSim {
     if (this.latched.has(name)) return;
     this.latched.add(name);
     this.emit({ type: "sound", name: "gemLand" });
+    if (this.treasure) this.emit({ type: "fx", name: "gem", ...position(this.treasure) });
   }
 
   private removeParticle(body: planck.Body) {
@@ -407,6 +421,7 @@ export class PinSim {
     this.emit({ type: "sound", name: "hit" });
     const at = position(foe.body);
     for (const [dx, dy] of [[-10, 4], [0, 14], [10, 4]]) this.emit({ type: "puff", x: at.x + dx, y: at.y + dy });
+    this.emit({ type: "fx", name: "knockout", x: at.x, y: at.y });
   }
 
   /// Down the drain: he shrinks into it and is gone.
@@ -426,6 +441,7 @@ export class PinSim {
     if (this.elapsed - this.lastSizzle > 0.8) {
       this.lastSizzle = this.elapsed;
       this.emit({ type: "sound", name: "sizzle" });
+      this.emit({ type: "fx", name: "steam", x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
     }
     if (this.steamBudget > 0) {
       this.steamBudget -= 1;
@@ -449,6 +465,7 @@ export class PinSim {
     this.treasureMelting = this.elapsed;
     this.emit({ type: "haptic", name: "slam" });
     this.emit({ type: "sound", name: "melt" });
+    this.emit({ type: "fx", name: "melt", ...position(this.treasure) });
     this.clock.after(0.5, () => this.lose("The treasure melted."));
   }
 
@@ -460,6 +477,8 @@ export class PinSim {
     this.emit({ type: "haptic", name: "slam" });
     this.emit({ type: "sound", name: "cooked" });
     this.emit({ type: "sound", name: sound });
+    // Lava burns him and a goblin catches him; the scene draws the two differently.
+    this.emit({ type: "fx", name: sound === "caught" ? "caught" : "burn", ...position(this.hero) });
     // A beat on the knocked-out pose, then the fade, then the result.
     this.clock.after(1.1, () => this.lose(reason));
   }
@@ -469,6 +488,8 @@ export class PinSim {
     this.heroStateSince = this.elapsed;
     this.emit({ type: "haptic", name: "success" });
     this.emit({ type: "sound", name: "win" });
+    const star = this.hero ?? this.treasure;
+    if (star) this.emit({ type: "fx", name: "win", ...position(star) });
     this.outcome = { won: true, stars: stars(this.level, this.pulled.length), coins: 0, score: this.pulled.length };
   }
 

@@ -1,13 +1,18 @@
-// Turn the iPhone app's art and audio into what the browser loads.
-//   node scripts/build-assets.mjs
-// Reads ../ActualGameplay (the one copy of every asset) and writes public/art, public/audio
-// and public/levels, which are generated and not committed. Still images become WebP, each
-// animated clip becomes one WebP sheet, and src/generated/art.json records where every frame is.
+// Turn the art, the audio and the levels into what the browser loads.
+//   npm run assets          (tsx scripts/build-assets.mjs: it reads the level loader, which is TypeScript)
+// Art and audio come from ../ActualGameplay, the one copy of every asset, and go to public/art
+// and public/audio. Still images become WebP, each animated clip becomes one WebP sheet, and
+// src/generated/art.json records where every frame is. The levels come from web/levels and go
+// to src/generated/levels.json, each mode's chapters and levels in play order, with the measured
+// difficulty of each level beside them in src/generated/stats.json. Everything written here is
+// generated and not committed.
 import { copyFileSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import sharp from "sharp";
+import { LEVEL_MODES } from "../src/app/modetable.ts";
+import { LEVELS, levelHash, loadSet } from "./levels.ts";
 
 const web = join(dirname(fileURLToPath(import.meta.url)), "..");
 const app = join(web, "../ActualGameplay");
@@ -87,15 +92,31 @@ for (const f of readdirSync(join(app, "Audio/sfx"))) {
 copyFileSync(join(app, "Audio/CREDITS.txt"), join(out, "audio/CREDITS.txt"));
 if (existsSync(join(app, "Art/CREDITS.txt"))) copyFileSync(join(app, "Art/CREDITS.txt"), join(out, "art/CREDITS.txt"));
 
-// Levels, one file per mode, in play order.
+// Levels: for every mode that has them, its chapters and its levels in play order, by folder.
+// The loader stops the build on a level no chapter lists or a chapter entry with no file.
 const levels = {};
-for (const mode of ["savedog", "pinpull"]) {
-  levels[mode] = readdirSync(join(app, "Levels", mode)).filter((f) => f.endsWith(".json")).sort()
-    .map((f) => JSON.parse(readFileSync(join(app, "Levels", mode, f), "utf8")));
-}
+for (const mode of LEVEL_MODES) levels[mode.folder] = loadSet(mode.folder);
 writeFileSync(join(web, "src/generated/levels.json"), JSON.stringify(levels));
+
+// The measured difficulty of each level, from web/levels/stats.json, under "<mode>/<level id>".
+// Only a figure measured on the level file as it is now goes in: the game shows no number for
+// a level that changed since, which is better than showing the wrong one.
+const statsFile = join(LEVELS, "stats.json");
+const measured = existsSync(statsFile) ? JSON.parse(readFileSync(statsFile, "utf8")) : {};
+const stats = {};
+let unmeasured = 0;
+for (const mode of LEVEL_MODES) {
+  for (const level of levels[mode.folder].levels) {
+    const key = `${mode.id}/${level.id}`, entry = measured[key];
+    if (entry && entry.hash === levelHash(mode.folder, level.id)) stats[key] = { randomWin: entry.randomWin, sample: entry.sample, exact: entry.exact };
+    else unmeasured += 1;
+  }
+}
+if (unmeasured > 0) console.warn(`${unmeasured} level(s) have no current statistics and will show no number: run "npm run stats"`);
+writeFileSync(join(web, "src/generated/stats.json"), JSON.stringify(stats));
 
 const size = (dir) => readdirSync(dir, { recursive: true }).reduce((n, f) => {
   const s = statSync(join(dir, f)); return n + (s.isFile() ? s.size : 0);
 }, 0);
-console.log(`art ${Object.keys(art).length} assets, ${(size(join(out, "art")) / 1e6).toFixed(1)} MB; audio ${(size(join(out, "audio")) / 1e6).toFixed(1)} MB`);
+const levelCount = Object.values(levels).reduce((n, set) => n + set.levels.length, 0);
+console.log(`art ${Object.keys(art).length} assets, ${(size(join(out, "art")) / 1e6).toFixed(1)} MB; audio ${(size(join(out, "audio")) / 1e6).toFixed(1)} MB; ${levelCount} levels`);

@@ -1,0 +1,87 @@
+{
+  "id": "across-the-water",
+  "name": "Across the water",
+  "hint": "One foot on the low ground, one on the far bank. The water takes anything that lands in it.",
+  "inkBudget": 360,
+  "stars": [
+    335,
+    350
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 34,
+      "w": 402,
+      "h": 40,
+      "skin": "grass"
+    },
+    {
+      "type": "rect",
+      "x": 100,
+      "y": 74,
+      "w": 62,
+      "h": 40,
+      "skin": "grass"
+    },
+    {
+      "type": "rect",
+      "x": 270,
+      "y": 74,
+      "w": 132,
+      "h": 80,
+      "skin": "grass"
+    }
+  ],
+  "dogs": [
+    {
+      "id": "clawd",
+      "x": 140,
+      "y": 132
+    }
+  ],
+  "hives": [
+    {
+      "x": 40,
+      "y": 700,
+      "count": 8,
+      "interval": 0.15
+    },
+    {
+      "x": 362,
+      "y": 700,
+      "count": 8,
+      "interval": 0.15
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            60,
+            78
+          ],
+          [
+            140,
+            210
+          ],
+          [
+            296,
+            158
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 14
+  },
+  "killers": [
+    {
+      "x": 162,
+      "y": 74,
+      "w": 108,
+      "h": 40,
+      "kind": "water"
+    }
+  ]
+}

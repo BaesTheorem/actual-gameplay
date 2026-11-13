@@ -25,5 +25,9 @@ export type Cue =
   | { type: "haptic"; name: string }
   | { type: "mood"; who: unknown; clip: string }
   /// A sound that runs until it is stopped. `volume` is 0 to 1 and can change while it runs.
-  | { type: "loop"; name: string; on: boolean; volume: number };
+  | { type: "loop"; name: string; on: boolean; volume: number }
+  /// A moment worth an effect, at a canvas point: a splash, a gate taken, a win. `name` says what
+  /// happened and the scene decides what to draw for it. `n` is a count that goes with the moment,
+  /// such as how many runners a gate added or took.
+  | { type: "fx"; name: string; x: number; y: number; n?: number };
 export type Emit = (cue: Cue) => void;

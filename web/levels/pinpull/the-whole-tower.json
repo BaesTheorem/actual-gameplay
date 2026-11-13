@@ -1,0 +1,145 @@
+{
+  "id": "the-whole-tower",
+  "name": "The whole tower",
+  "hint": "Lava clears the room, water clears the lava, and the gem rides the water. Then you.",
+  "parPins": 3,
+  "winWhen": "both",
+  "walls": [
+    {
+      "x": 200,
+      "y": 68,
+      "w": 14,
+      "h": 386
+    },
+    {
+      "x": 200,
+      "y": 560,
+      "w": 14,
+      "h": 154
+    }
+  ],
+  "slabs": [
+    {
+      "x1": 364,
+      "y1": 570,
+      "x2": 214,
+      "y2": 470,
+      "t": 14
+    }
+  ],
+  "pins": [
+    {
+      "id": "p1",
+      "x": 38,
+      "y": 600,
+      "w": 162,
+      "side": "left"
+    },
+    {
+      "id": "p2",
+      "x": 38,
+      "y": 440,
+      "w": 162,
+      "side": "left",
+      "angle": 5.0
+    },
+    {
+      "id": "p3",
+      "x": 214,
+      "y": 650,
+      "w": 150,
+      "side": "right"
+    },
+    {
+      "id": "p4",
+      "x": 38,
+      "y": 670,
+      "w": 162,
+      "side": "left"
+    },
+    {
+      "id": "p5",
+      "x": 214,
+      "y": 330,
+      "w": 150,
+      "side": "right"
+    },
+    {
+      "id": "p6",
+      "x": 214,
+      "y": 590,
+      "w": 150,
+      "side": "right"
+    }
+  ],
+  "pools": [
+    {
+      "liquid": "water",
+      "x": 220,
+      "y": 664,
+      "w": 90,
+      "h": 40,
+      "count": 110
+    },
+    {
+      "liquid": "lava",
+      "x": 220,
+      "y": 604,
+      "w": 138,
+      "h": 20,
+      "count": 30
+    },
+    {
+      "liquid": "lava",
+      "x": 44,
+      "y": 684,
+      "w": 150,
+      "h": 20,
+      "count": 40
+    },
+    {
+      "liquid": "lava",
+      "x": 220,
+      "y": 344,
+      "w": 138,
+      "h": 20,
+      "count": 45
+    },
+    {
+      "liquid": "lava",
+      "x": 44,
+      "y": 68,
+      "w": 150,
+      "h": 20,
+      "count": 45
+    }
+  ],
+  "actors": {
+    "hero": {
+      "x": 176,
+      "y": 630
+    },
+    "treasure": {
+      "x": 336,
+      "y": 676
+    },
+    "foes": [
+      {
+        "x": 176,
+        "y": 464
+      }
+    ],
+    "goal": {
+      "x": 44,
+      "y": 434,
+      "w": 150,
+      "h": 90
+    }
+  },
+  "solution": [
+    "p6",
+    "p3",
+    "p1"
+  ],
+  "settleSeconds": 6
+}

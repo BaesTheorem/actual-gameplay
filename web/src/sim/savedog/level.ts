@@ -98,6 +98,25 @@ export const applyTransform = (t: StrokeTransform, points: Vec[]): Vec[] => {
   return points.map((p) => ({ x: c.x + (p.x - c.x) * t.scale + t.dx, y: c.y + (p.y - c.y) * t.scale + t.dy }));
 };
 
+/// Stored solutions that need a nudge in this engine, as a shift of the level file's strokes, by level id.
+///
+/// roll-it-in: the boulder meets the pinned wall at 200 pt/s, comes back at 10 pt/s, and lands
+/// 0.65 pt past the corner of the lip it has to lean on, so it rolls away from the wall. Measured
+/// by moving the wall: the pass boundary is 0.2 pt right of the stored position, which is less
+/// than the 0.75 pt the engine keeps between touching shapes. One point right wins, and so does
+/// every quarter point from +0.25 to +6, so the shifted wall is not on an edge of its own.
+export const WEB_SOLUTIONS: Record<string, StrokeTransform> = {
+  "roll-it-in": { dx: 1, dy: 0, scale: 1 },
+};
+
+/// The solution this engine replays for a level: the stored one, moved when the table says so.
+export const baseTransform = (level: DogLevel): StrokeTransform => WEB_SOLUTIONS[level.id] ?? IDENTITY;
+
+/// The strokes of the solution this engine replays, as points on the canvas. Empty when the
+/// level stores no solution.
+export const solutionStrokes = (level: DogLevel): Vec[][] =>
+  (level.solution?.strokes ?? []).map((stroke) => applyTransform(baseTransform(level), strokePoints(stroke)));
+
 /// The sprite names a level's decor can use: the file stems of the bundled art.
 export const SPRITES: ReadonlySet<string> = new Set([
   "dog", "bee_a", "bee_b", "bee_rest", "saw_a", "saw_b", "spikes", "bomb", "bush", "rock", "mushroom_red",

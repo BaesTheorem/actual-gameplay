@@ -1,28 +1,25 @@
-import { readdirSync } from "node:fs";
-import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { LEVELS, load } from "../scripts/levels";
+import { load } from "../scripts/levels";
+import { folderOf } from "../src/app/modetable";
 import { PLAYFIELD } from "../src/sim/sk";
 import { DRAW_AREA } from "../src/sim/savedog";
 import { contains, containsRect, inset, polylineLength } from "../src/sim/savedog/geometry";
 import { SPRITES, strokePoints, totalBees, type DogLevel } from "../src/sim/savedog/level";
 import { inkCost } from "../src/sim/savedog/stroke";
 
-/// Every level file must load and be internally consistent. These are the files the iPhone app ships.
+/// Every level file must load and be internally consistent. These are the files in web/levels,
+/// read in play order through the loader, which has already checked each id against its file name.
 describe("Save the Clawd levels", () => {
   const canvas = { x: -1, y: -1, w: 404, h: 876 };
-  const ids = readdirSync(join(LEVELS, "savedog")).filter((f) => f.endsWith(".json")).sort().map((f) => f.slice(0, -5));
-  const levels = load<DogLevel>("savedog");
+  const levels = load<DogLevel>(folderOf("saveDog"));
 
-  it("has sixteen levels with distinct ids", () => {
-    expect(ids.length, `expected 16 Save the Clawd levels, found ${ids}`).toBe(16);
-    expect(new Set(ids).size, "duplicate level ids").toBe(ids.length);
+  it("has levels", () => {
+    expect(levels.length).toBeGreaterThan(0);
   });
 
   it("is consistent level by level", () => {
-    ids.forEach((id, index) => {
-      const level = levels[index];
-      expect(level.id, "level id must match its filename").toBe(id);
+    levels.forEach((level) => {
+      const id = level.id;
       expect(level.name.length).toBeGreaterThan(0);
       expect(level.inkBudget).toBeGreaterThan(0);
       expect(level.stars.length, `${id}: two star thresholds`).toBe(2);

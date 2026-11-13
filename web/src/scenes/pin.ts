@@ -1,5 +1,5 @@
 // Pull the Pin on screen: the simulation in sim/pinpull.ts, drawn.
-import { Container, Filter, GlProgram, Graphics, Rectangle, Sprite, Texture, defaultFilterVert } from "pixi.js";
+import { Container, Filter, GlProgram, Graphics, Rectangle, Sprite, Text, Texture, defaultFilterVert } from "pixi.js";
 import * as art from "../app/art";
 import type { Cue } from "../sim/clock";
 import {
@@ -7,7 +7,10 @@ import {
   type Foe, type PinLevel, type Pin,
 } from "../sim/pinpull";
 import { position, tagOf, type Vec } from "../sim/sk";
-import { ClipSprite, H, Pigment, Puffs, W, Y, hintLabel, paper, reducedMotion, sprite, terrain, type Scene } from "./kit";
+import {
+  ClipSprite, Fx, H, MARKER, Pigment, Puffs, W, Y, hintLabel, paper, reducedMotion, sprite, terrain,
+  type BurstOptions, type Scene,
+} from "./kit";
 
 export const PIN_ART = [
   "paper_cave", "pin_knob", "gem_yellow", "sign_exit", "clawd_hard_idle", "clawd_hard_ko", "clawd_hard_excited",
@@ -18,6 +21,21 @@ export const PIN_ART = [
 
 /// Each blob sprite extends this many physics radii; two particles merge when they are closer than about two diameters.
 const BLOB_SCALE = 3;
+
+/// How long a hint stays up, in seconds, before it fades.
+const HINT_SECONDS = 4;
+
+// What each moment looks like. Small and short: the level has to stay readable through it.
+const UP = Math.PI / 2;
+const POP: BurstOptions = { count: 5, color: Pigment.cream, shape: "dot", speed: 70, life: 0.28, size: 2.2 };
+// Water throws drops the colour of its own rim, so they show against the water as well as the paper.
+const SPLASH: BurstOptions = { count: 10, color: Pigment.sky, shape: "drop", speed: 170, life: 0.5, size: 3, gravity: 620, angle: UP, spread: 1.9 };
+const STEAM: BurstOptions = { count: 6, color: Pigment.cream, shape: "dot", speed: 45, life: 0.5, size: 3.2, gravity: -90 };
+const SPARKS: BurstOptions = { count: 8, color: Pigment.ochre, shape: "star", speed: 130, life: 0.5, size: 3.6, gravity: 160 };
+const EMBERS: BurstOptions = { count: 9, color: Pigment.clay, shape: "shard", speed: 150, life: 0.45, size: 3, gravity: 380, angle: UP, spread: 2.6 };
+const SCUFFLE: BurstOptions = { count: 7, color: Pigment.violet, shape: "star", speed: 120, life: 0.4, size: 3.2 };
+const SEEING_STARS: BurstOptions = { count: 5, color: Pigment.cream, shape: "star", speed: 90, life: 0.4, size: 3, gravity: 120, angle: UP, spread: 2.2 };
+const DRIPS: BurstOptions = { count: 6, color: Pigment.ochre, shape: "drop", speed: 80, life: 0.45, size: 2.8, gravity: 420, angle: UP, spread: 2.4 };
 
 /// A white disc whose alpha falls off as (1 - (d/R)^2)^2, peaking at 0.75. The surface shader's cut at
 /// 0.5 shows a lone particle at about 0.43 R and merges neighbours whose falloffs overlap.
@@ -74,12 +92,19 @@ export class PinScene implements Scene {
   private gem: Sprite | null = null;
   private foes = new Map<Foe, ClipSprite>();
   private puffs = new Puffs(8);
+  private fx = new Fx(9);
   private clips: ClipSprite[] = [];
+  private marks: { pin: Pin; node: Container; ring: Graphics }[] = [];
+  private markAge = 0;
+  /// Only a level that stores its solution can show the way.
+  hint?: (step: number) => void;
 
-  constructor(readonly level: PinLevel, index: number, private onCue: (cue: Cue) => void) {
-    this.title = `${index + 1}. ${level.name}`;
+  /// `label` is the level's place in its chapter, "1-3".
+  constructor(readonly level: PinLevel, label: string, private onCue: (cue: Cue) => void) {
+    this.title = `${label} ${level.name}`;
     this.sim = new PinSim(level, (cue) => this.cues.push(cue));
     this.root.sortableChildren = true;
+    if ((level.solution ?? []).length > 0) this.hint = (step) => this.mark(step);
     this.build();
   }
 
@@ -157,7 +182,7 @@ export class PinScene implements Scene {
       this.clips.push(node);
       root.addChild(node);
     }
-    root.addChild(this.puffs.layer);
+    root.addChild(this.puffs.layer, this.fx.layer);
     const hint = hintLabel(level.hint);
     if (hint) root.addChild(hint);
     this.draw(0);
@@ -203,9 +228,56 @@ export class PinScene implements Scene {
   step() {
     this.sim.frame();
     for (const cue of this.cues) {
-      if (cue.type === "puff") this.puffs.add(cue.x, cue.y); else this.onCue(cue);
+      if (cue.type === "puff") this.puffs.add(cue.x, cue.y);
+      else if (cue.type === "fx") this.effect(cue.name, cue.x, cue.y);
+      else this.onCue(cue);
     }
     this.cues.length = 0;
+  }
+
+  /// What the player sees for each moment the simulation reports.
+  private effect(name: string, x: number, y: number) {
+    const fx = this.fx;
+    if (name === "pin") fx.burst(x, y, POP);
+    else if (name === "splash") fx.burst(x, y, SPLASH);
+    else if (name === "steam") { fx.burst(x, y, STEAM); fx.ring(x, y, Pigment.cream); }
+    else if (name === "gem") { fx.burst(x, y, SPARKS); fx.ring(x, y, Pigment.ochre); }
+    else if (name === "burn") { fx.burst(x, y, EMBERS); fx.shake(5, 0.3); }
+    else if (name === "caught") { fx.burst(x, y, SCUFFLE); fx.shake(5, 0.3); }
+    else if (name === "knockout") fx.burst(x, y + 6, SEEING_STARS);
+    else if (name === "melt") { fx.burst(x, y, DRIPS); fx.ring(x, y, Pigment.clay); }
+    else if (name === "win") fx.confetti();
+  }
+
+  /// Ring the first `step` pins of the stored solution, each with its place in the order.
+  private mark(step: number) {
+    this.clearMarks();
+    (this.level.solution ?? []).slice(0, Math.max(1, step)).forEach((id, i) => {
+      const pin = this.sim.pins.find((p) => p.id === id);
+      if (!pin) return;
+      const at = pin.knob, node = new Container();
+      // Ochre over a wider ink line, so the ring has the ink edge everything else has.
+      const ring = new Graphics().circle(0, 0, 19).stroke({ color: Pigment.ink, width: 6 }).circle(0, 0, 19).stroke({ color: Pigment.ochre, width: 3.5 });
+      const plate = new Graphics().circle(0, 0, 9).fill(Pigment.cream).stroke({ color: Pigment.ink, width: 1.5 });
+      const number = new Text({ text: String(i + 1), style: { fontFamily: MARKER, fontSize: 13, fill: Pigment.ink }, resolution: 3 });
+      number.anchor.set(0.5);
+      const tag = new Container();
+      tag.addChild(plate, number);
+      // Up and toward the chamber, which is the side with room for it.
+      tag.position.set(-pin.direction * 16, -18);
+      node.addChild(ring, tag);
+      // A knob sits half off the edge of the canvas. The ring keeps to the canvas, so all of it shows.
+      node.position.set(Math.min(W - 24, Math.max(24, at.x)), Y(at.y));
+      node.zIndex = 32;
+      this.root.addChild(node);
+      this.marks.push({ pin, node, ring });
+    });
+    this.markAge = 0;
+  }
+
+  private clearMarks() {
+    for (const mark of this.marks) mark.node.destroy({ children: true });
+    this.marks.length = 0;
   }
 
   draw(dt: number) {
@@ -276,6 +348,19 @@ export class PinScene implements Scene {
     }
     for (const c of this.clips) c.tick(dt);
     this.puffs.tick(dt, short ? 0.1 : 0.45);
+    this.fx.tick(dt);
+    this.root.position.set(this.fx.offset.x, this.fx.offset.y);
+    if (this.marks.length > 0) {
+      this.markAge += dt;
+      // The rings pulse for four seconds and then fade. A pin that has been pulled drops its ring.
+      const fade = short ? 0.1 : 0.3, left = HINT_SECONDS + fade - this.markAge;
+      for (const mark of this.marks) {
+        mark.node.visible = !mark.pin.pulled;
+        mark.node.alpha = Math.min(1, Math.max(0, left / fade));
+        mark.ring.scale.set(short ? 1 : 1 + 0.1 * Math.sin((this.markAge * 2 * Math.PI) / 0.7));
+      }
+      if (left <= 0) this.clearMarks();
+    }
   }
 
   destroy() {

@@ -134,7 +134,7 @@ export class DogSim {
   private replayTemplate: { time: number; points: Vec[] }[] = [];
   private pendingReplay: { time: number; points: Vec[] }[] = [];
 
-  constructor(readonly level: DogLevel, private emit: Emit = () => {}, readonly levelIndex = Number(level.id) - 1) {
+  constructor(readonly level: DogLevel, private emit: Emit = () => {}) {
     this.capture = new StrokeCapture(DRAW_AREA, level.inkBudget);
     this.decor = level.decor ?? [];
     this.forbidden = (level.forbidden ?? []).map((r) => ({ x: r.x, y: r.y, w: r.w, h: r.h }));
@@ -331,7 +331,10 @@ export class DogSim {
     this.calmFrames = 0;
     this.emit({ type: "haptic", name: "tap" });
     // Pinned ink never falls, so it lands where it is drawn.
-    if (this.pinnedInk) this.emit({ type: "sound", name: "strokeLand" });
+    if (this.pinnedInk) {
+      this.emit({ type: "sound", name: "strokeLand" });
+      for (const piece of pieces) this.emit({ type: "fx", name: "land", ...piece[Math.floor(piece.length / 2)] });
+    }
     if (this.launchAt === null) this.launchAt = this.elapsed + swarmDelay(this.level);
     return true;
   }
@@ -592,6 +595,7 @@ export class DogSim {
         if (stroke.landed) continue;
         stroke.landed = true;
         landed = true;
+        this.emit({ type: "fx", name: "land", ...(event.point ?? stroke.position) });
       }
     }
     if (landed) this.emit({ type: "sound", name: "strokeLand" });
@@ -603,23 +607,27 @@ export class DogSim {
         continue;
       }
       if ((hit = match(event, Cat.drawn | Cat.prop, Cat.liquid))) {
-        this.sink(tagOf(hit[0]).ref as Stroke | Prop);
+        this.sink(tagOf(hit[0]).ref as Stroke | Prop, event.point);
         continue;
       }
       if ((hit = match(event, Cat.actor, Cat.liquid))) {
         const dog = tagOf(hit[0]).ref as Dog;
         this.emit({ type: "sound", name: "splash" });
+        this.emit({ type: "fx", name: "drown", ...dog.position });
         this.lose(tagOf(hit[1]).kind === "lava" ? `${capitalized(dog.id)} went into the lava.` : `${capitalized(dog.id)} went under.`);
         return;
       }
       if ((hit = match(event, Cat.actor, Cat.bee))) {
+        const dog = tagOf(hit[0]).ref as Dog;
         this.emit({ type: "sound", name: "caught" });
-        this.lose(`The bees got ${(tagOf(hit[0]).ref as Dog).id}.`);
+        this.emit({ type: "fx", name: "sting", ...dog.position });
+        this.lose(`The bees got ${dog.id}.`);
         return;
       }
       if ((hit = match(event, Cat.actor, Cat.killer))) {
         const dog = tagOf(hit[0]).ref as Dog;
         this.emit({ type: "sound", name: "caught" });
+        this.emit({ type: "fx", name: "hurt", ...dog.position });
         this.lose(tagOf(hit[1]).kind === "saw" ? `${capitalized(dog.id)} met the saw.` : `${capitalized(dog.id)} landed on the spikes.`);
         return;
       }
@@ -627,11 +635,13 @@ export class DogSim {
   }
 
   /// Ink or a prop went into a pit. It sinks out of the puzzle: no footing, no plug, gone.
-  private sink(piece: Stroke | Prop) {
+  private sink(piece: Stroke | Prop, point: Vec | undefined) {
     if (!piece.attached || !piece.body) return;
+    const at = point ?? piece.position;
     if (piece instanceof Stroke) piece.release(this.sk, "sunk", this.elapsed);
     else piece.release(this.sk, this.elapsed);
     this.emit({ type: "sound", name: "splash" });
+    this.emit({ type: "fx", name: "sink", x: at.x, y: at.y });
     this.clock.after(0.35, () => this.detach(piece));
   }
 
@@ -645,6 +655,7 @@ export class DogSim {
     this.emit({ type: "puff", x: at.x, y: at.y });
     this.emit({ type: "haptic", name: "thud" });
     this.emit({ type: "sound", name: "strokeCut" });
+    this.emit({ type: "fx", name: "cut", x: at.x, y: at.y });
     this.fieldCountdown = 0;
   }
 
@@ -664,6 +675,8 @@ export class DogSim {
     for (const dog of this.dogs) this.setMood(dog, "excited");
     this.emit({ type: "haptic", name: "success" });
     this.emit({ type: "sound", name: "win" });
+    // The survive timer ran out with everyone still here.
+    if (this.dogs.length > 0) this.emit({ type: "fx", name: "win", ...this.dogs[0].position });
     this.outcome = { won: true, stars: stars(this.level, ink), coins: 0, score: ink };
     this.stopAllLoops();
   }
@@ -678,8 +691,6 @@ export class DogSim {
   }
 
   // MARK: HUD
-
-  get title(): string { return `${this.levelIndex + 1}. ${this.level.name}`; }
 
   /// The line under the title in the HUD.
   get readout(): string {

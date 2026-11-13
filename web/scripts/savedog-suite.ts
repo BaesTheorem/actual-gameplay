@@ -1,32 +1,25 @@
-// Save the Clawd's replay and audit with no browser. Nothing runs when this file is imported.
-//   replay()   play every level's stored solution; the regression suite for physics and level files
-//   audit()    the stored solution shifted and scaled eight ways, five naive strokes, and
-//              (with `random`) that many plausible random strokes per level for a difficulty number
+// Save the Clawd's replay, audit and odds with no browser. Nothing runs when this file is imported.
+//   replay()       play every level's stored solution; the regression suite for physics and level files
+//   auditLevel()   the stored solution shifted and scaled eight ways, five naive strokes, and
+//                  (with `random`) that many plausible random strokes for a difficulty number
+//   odds()         the share of 48 plausible random strokes that survive, for the level statistics
+import { folderOf } from "../src/app/modetable";
 import { playOut, type Attempt, type DogLevel } from "../src/sim/savedog";
-import type { StrokeTransform } from "../src/sim/savedog/level";
+import { baseTransform } from "../src/sim/savedog/level";
 import type { Vec } from "../src/sim/sk";
-import { load } from "./levels";
+import { idNumber, load, loadLevel } from "./levels";
 
-/// Stored solutions that need a nudge in this engine, as a shift of the level file's strokes.
-///
-/// 06: the boulder meets the pinned wall at 200 pt/s, comes back at 10 pt/s, and lands 0.65 pt past
-/// the corner of the lip it has to lean on, so it rolls away from the wall. Measured by moving
-/// the wall: the pass boundary is 0.2 pt right of the stored position, which is less than the
-/// 0.75 pt the engine keeps between touching shapes. One point right wins, and so does every
-/// quarter point from +0.25 to +6, so the shifted wall is not on an edge of its own.
-export const WEB_SOLUTIONS: Record<string, StrokeTransform> = {
-  "06": { dx: 1, dy: 0, scale: 1 },
-};
+// The table of solutions this engine replays shifted is keyed by level id. It lives beside the
+// level types, where the scene that draws a hint can read it too.
+export { WEB_SOLUTIONS, baseTransform } from "../src/sim/savedog/level";
 
-const NONE: StrokeTransform = { dx: 0, dy: 0, scale: 1 };
-/// The solution this engine replays for a level: the stored one, moved when the table says so.
-export const baseTransform = (level: DogLevel): StrokeTransform => WEB_SOLUTIONS[level.id] ?? NONE;
+export const FOLDER = folderOf("saveDog");
 
 const signed = (n: number) => (n < 0 ? `${n}` : `+${n}`);
 
 export const replay = (): { passed: number; total: number } => {
   let passed = 0, total = 0;
-  for (const level of load<DogLevel>("savedog")) {
+  for (const level of load<DogLevel>(FOLDER)) {
     total += 1;
     const t0 = performance.now();
     const base = baseTransform(level);
@@ -35,7 +28,7 @@ export const replay = (): { passed: number; total: number } => {
     if (ok) passed += 1;
     const detail = run.outcome === null ? "no result" : run.outcome.won ? `${run.outcome.stars} stars, ink ${Math.round(run.ink)}` : run.outcome.reason;
     const shift = base.dx === 0 ? "" : `  (solution shifted ${signed(base.dx)} pt for this engine)`;
-    console.log(`${ok ? "PASS" : "FAIL"}  ${level.id} ${level.name.padEnd(22)} ${detail}  (${run.seconds.toFixed(1)} s game, ${(performance.now() - t0).toFixed(0)} ms)${shift}`);
+    console.log(`${ok ? "PASS" : "FAIL"}  ${level.id.padEnd(20)} ${level.name.padEnd(22)} ${detail}  (${run.seconds.toFixed(1)} s game, ${(performance.now() - t0).toFixed(0)} ms)${shift}`);
   }
   return { passed, total };
 };
@@ -126,8 +119,12 @@ const round1 = (x: number): number => {
 ///
 /// The point is a difficulty number, not a solver. A level where a quarter of these win is easy;
 /// one where none do is a puzzle that needs the idea, not a lucky scribble.
+///
+/// The generator is seeded with `seed` times a thousand plus a number for the level. That number
+/// was the level's place in the list; it is now three digits of a hash of the level's id, so a
+/// level keeps its strokes when the chapters are rearranged.
 export const randomStrokes = (level: DogLevel, n: number, seed = 7): number[][][] => {
-  const rng = new PyRandom(seed * 1000 + Number(level.id));
+  const rng = new PyRandom(seed * 1000 + (idNumber(level.id) % 1000));
   if (level.dogs.length === 0) return [];
   const { x, y } = level.dogs[0];
   const budget = level.inkBudget ?? 200;
@@ -220,20 +217,35 @@ export const verdict = (names: string[], won: Set<string>): string => {
   return flags.length > 0 ? `ok; ${flags.join("; ")}` : "ok";
 };
 
-/// Stress every level and print one verdict each. Returns how many were flagged.
-export const audit = (opts: { random?: number } = {}): number => {
-  let flagged = 0;
-  for (const level of load<DogLevel>("savedog")) {
-    const plan = trials(level, opts.random ?? 0);
-    const won = new Set<string>();
-    for (const [name, attempt] of plan) {
-      if (playOut(level, attempt).outcome?.won === true) won.add(name);
-    }
-    const names = [...plan.keys()];
-    const status = verdict(names, won);
-    if (!status.startsWith("ok")) flagged += 1;
-    const detail = [...names].sort().map((n) => `${n}=${won.has(n) ? "W" : "x"}`).join(" ");
-    console.log(`${level.id}  ${status}\n      ${detail}`);
+/// Stress one level by id. The line is what the audit prints for it.
+export const auditLevel = (id: string, random = 0): { line: string; flagged: boolean } => {
+  const level = loadLevel<DogLevel>(FOLDER, id);
+  const plan = trials(level, random);
+  const won = new Set<string>();
+  for (const [name, attempt] of plan) {
+    if (playOut(level, attempt).outcome?.won === true) won.add(name);
   }
-  return flagged;
+  const names = [...plan.keys()];
+  const status = verdict(names, won);
+  const detail = [...names].sort().map((n) => `${n}=${won.has(n) ? "W" : "x"}`).join(" ");
+  return { line: `${level.id}  ${status}\n      ${detail}`, flagged: !status.startsWith("ok") };
+};
+
+// MARK: the odds
+
+/// How many random strokes the statistics try on each level.
+const DOODLES = 48;
+
+/// The share of random play that survives a level: 48 plausible random strokes from the
+/// generator above, each played as the only stroke of an attempt.
+export const odds = (id: string): { randomWin: number; sample: number; exact: boolean; detail: string } => {
+  const level = loadLevel<DogLevel>(FOLDER, id);
+  const strokes = randomStrokes(level, DOODLES);
+  const survived = strokes.filter((stroke) => playOut(level, { strokes: [toVec(stroke)] }).outcome?.won === true).length;
+  return {
+    randomWin: strokes.length === 0 ? 0 : survived / strokes.length,
+    sample: strokes.length,
+    exact: false,
+    detail: `${survived} of ${strokes.length} random strokes survived`,
+  };
 };

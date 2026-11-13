@@ -58,6 +58,8 @@ def main(steps):
             elif kind == "size":  # the window, as WxH
                 w, h = (int(v) for v in arg.split("x"))
                 page.set_viewport_size({"width": w, "height": h})
+            elif kind == "motion":  # "reduce" asks for reduced motion, as the system setting does; "no-preference" stops asking
+                page.emulate_media(reduced_motion=arg)
             elif kind == "wait":
                 page.wait_for_timeout(int(float(arg) * 1000))
             elif kind == "tap":  # canvas points, y up, as the levels are written

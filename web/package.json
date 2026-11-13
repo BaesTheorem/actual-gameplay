@@ -3,12 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "assets": "node scripts/build-assets.mjs",
+    "assets": "tsx scripts/build-assets.mjs",
     "dev": "npm run assets && vite",
     "build": "tsc --noEmit && vite build",
     "test": "vitest run",
     "replay": "tsx scripts/replay.ts",
-    "audit": "tsx scripts/audit.ts"
+    "audit": "tsx scripts/audit.ts",
+    "stats": "tsx scripts/stats.ts"
   },
   "dependencies": {
     "pixi.js": "^8.23.0",

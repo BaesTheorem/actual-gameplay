@@ -8,7 +8,7 @@
 // since torque tips what a straight push cannot slide, and every other pair tilted 30 degrees up,
 // since lifting takes the friction away. Two proper heaves in a row that move nothing, and the
 // crew moves on to the next weakest body. Bees in different pockets of open air (the two holes
-// under level 11's floor) are separate crews with their own targets.
+// under the floor of Holes below) are separate crews with their own targets.
 //
 // Nothing here is random: every choice follows from the physics state, so a replay stays
 // reproducible.

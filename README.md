@@ -46,27 +46,92 @@ base crowd of five, so extra starting runners are a real edge rather than a bigg
 ## Play in a browser
 
 The same three games run as a web app at https://baestheorem.github.io/actual-gameplay/, on a
-phone or a desktop. It installs to a home screen, and progress stays in that browser.
+phone or a desktop. It installs to a home screen, and progress stays in that browser. The web
+build is the game now: new levels and new modes are made there, and the iPhone app keeps the
+levels it shipped with.
 
 The web build is in `web/`: TypeScript, [planck.js](https://github.com/piqnt/planck.js) for
-physics and [PixiJS](https://github.com/pixijs/pixijs) for drawing. It reads the levels, art and
+physics and [PixiJS](https://github.com/pixijs/pixijs) for drawing. It reads the art and the
 audio from `ActualGameplay/`, so there is one copy of each. Each game's rules live in
 `web/src/sim/` as a simulation with no drawing in it, which is what lets the level checks run in
-Node in a few seconds with no simulator:
+Node with no simulator:
 
     cd web && npm install
-    npm run dev                      build the art sheets, then serve with reload
-    npm test                         unit tests (the Swift tests, ported)
+    npm run dev                      build the art sheets and the level bundle, then serve with reload
+    npm test                         unit tests
     npm run replay -- pinPull        play every stored solution: pinPull, saveDog or runner
     npm run audit -- pinPull         every pull order up to par; each level must report UNIQUE
+    npm run stats                    measure the levels that changed: the share of random play that wins
+    npm run stats -- --check         exit 1 if a level has no number, or a stale one
     npm run build                    type-check and write web/dist
 
-A push to `main` runs the tests and the replays, then deploys `web/dist` to GitHub Pages
-(`.github/workflows/pages.yml`). A stored solution that stops winning stops the deploy.
+### Levels and chapters
+
+A level is one file, `web/levels/<folder>/<id>.json`. The folder is `pinpull` or `savedog`, and
+the id is a kebab-case slug made from the level's name, such as `two-ways-down`. The id is the
+file's name, it is what a save and a route use (`#/pinPull/two-ways-down`), and it never changes.
+`chapters.json` in the same folder puts the levels in play order: a list of chapters, each with
+an `id`, a `title`, a one-line `blurb` and its `levels` by id. The label a player sees, "1-3", is
+the chapter's id and the level's place in that chapter. It is worked out from the chapter list
+each time, so a level can move to another chapter without anyone losing its stars.
+
+To add a level, write the file with its solution in it and list its id in a chapter. Then run
+the replay, the audit and `npm run stats`. The loader (`web/scripts/levels.ts`) stops on a level
+file that no chapter lists and on a chapter entry with no file, and names the culprit. The format
+of a level is the one under "Adding a level" below.
+
+A mode is one row of the table in `web/src/app/modetable.ts`: its name and look, and either its
+level folder or `kind: "runner"` for the endless one. The level list, the routes, the save and
+the statistics all follow that table. A new mode with levels needs a row there, a scene branch
+in `web/src/app/modes.ts`, and a way to measure it in `web/scripts/stats.ts`.
+
+### The real number
+
+The ads say "only 1% can solve this". `npm run stats` works out the real number for every level:
+the share of random play that wins it.
+
+For Pull the Pin the number is exact. A random player pulls any pin still in place, each as
+likely as the next, every time the world has settled, and keeps going past par until the level
+is won or lost. Every pull order is played out and the chances of the winning ones are added up.
+A level with more than 400 orders to play is sampled with 300 random ones and marked as an
+estimate.
+
+For Save the Clawd the number is a sample: 48 plausible random strokes, each tried as the only
+stroke, and the share of them that survive.
+
+The numbers live in `web/levels/stats.json`, each stamped with the SHA-256 of the level file it
+was measured on. A level whose file has not changed is skipped, `--force` measures everything
+again, and the build gives the app a number only when it matches the level as it is now. The
+statistics and the two level audits run their simulations in two processes at once
+(`web/scripts/parallel.ts`) and print in play order.
+
+The game shows the number in the ads' own voice and says what was measured. In a level it is a
+paper sticker under the HUD: "ONLY 8%" over "of random pulls win", "UNDER 2%" when no random try
+won (one win in 48 would have been 2%), "WARM-UP" when random play wins half the time or more.
+The level list tags every level at 10% or less, and the result card says it once more in a line.
+The wording is about random pulls and random doodles. Players were not measured, so it never
+mentions them.
+
+### Fails and hints
+
+The ads show a hand that fails, and then an ad. Here a fail says why. From the second loss on a
+level the card also offers "Hint (no ad)": Pull the Pin rings the pins of the stored solution in
+the order to pull them, one pin more with each hint taken, and Save the Clawd shows the stored
+strokes as a dotted ghost. Both last four seconds. A level with no stored solution offers nothing.
+
+### Checks and deploys
+
+A push to `main` runs the tests, the replays and the stats check, then deploys `web/dist` to
+GitHub Pages (`.github/workflows/pages.yml`). A stored solution that stops winning stops the
+deploy, and so does a level whose number is missing or out of date.
+
+`web/scripts/shots.py` drives the built site in headless Chromium, with the sound muted, and
+saves screenshots to `build/webtest/`. Run it through `web/scripts/browser-lock.sh`, which lets
+one headless browser run at a time.
 
 Two things differ from SpriteKit on purpose. The physics world never sleeps a body, because a
-liquid here is a pile of slow circles and a sleeping pile stops spreading (level 06 depends on
-the last few points of that spread). And the step is a fixed 1/60 s whatever the display rate.
+liquid here is a pile of slow circles and a sleeping pile stops spreading (Mind the hole depends
+on the last few points of that spread). And the step is a fixed 1/60 s whatever the display rate.
 `DESIGN.md` holds the look both builds share.
 
 ## Build the iPhone app

@@ -1,0 +1,87 @@
+{
+  "id": "holes-below",
+  "name": "Holes below",
+  "hint": "Two holes, far apart. Nothing from the sky today.",
+  "inkBudget": 130,
+  "stars": [
+    116,
+    124
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 34,
+      "w": 60,
+      "h": 40,
+      "skin": "grass"
+    },
+    {
+      "type": "rect",
+      "x": 96,
+      "y": 34,
+      "w": 210,
+      "h": 40,
+      "skin": "grass"
+    },
+    {
+      "type": "rect",
+      "x": 342,
+      "y": 34,
+      "w": 60,
+      "h": 40,
+      "skin": "grass"
+    }
+  ],
+  "dogs": [
+    {
+      "id": "clawd",
+      "x": 201,
+      "y": 92
+    }
+  ],
+  "hives": [
+    {
+      "x": 78,
+      "y": 50,
+      "count": 7,
+      "interval": 0.2
+    },
+    {
+      "x": 324,
+      "y": 50,
+      "count": 7,
+      "interval": 0.2
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            50,
+            80
+          ],
+          [
+            106,
+            80
+          ]
+        ]
+      },
+      {
+        "delay": 0.3,
+        "points": [
+          [
+            296,
+            80
+          ],
+          [
+            352,
+            80
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 14
+  }
+}

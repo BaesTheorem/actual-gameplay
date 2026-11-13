@@ -200,6 +200,7 @@ export class RunnerSim {
       const good = GateOp.isGood(op);
       this.emit({ type: "haptic", name: good ? "tap" : "thud" });
       this.emit({ type: "sound", name: good ? "gateGood" : "gateBad" });
+      this.emit({ type: "fx", name: "gate", ...this.crowdPoint(), n: this.crowd.count - before });
       this.pops(this.crowd.count - before);
       if (this.crowd.count === 0) {
         this.lose("The gate wiped out the crowd.");
@@ -216,6 +217,7 @@ export class RunnerSim {
       if (killed > 0) {
         this.emit({ type: "haptic", name: "thud" });
         this.emit({ type: "sound", name: "hit" });
+        this.emit({ type: "fx", name: "hazard", ...this.crowdPoint(), n: -killed });
         this.pops(killed);
       }
       if (this.crowd.count === 0) {
@@ -233,6 +235,13 @@ export class RunnerSim {
     this.setBossClip("clawd_boss_hit");
     this.emit({ type: "haptic", name: "slam" });
     this.emit({ type: "sound", name: "hit" });
+    // The two sides meet a little up the road from the crowd.
+    this.emit({ type: "fx", name: "finale", ...Projection.point(this.anchorX / 2, Projection.anchorZ + 0.75) });
+  }
+
+  /// Where the middle of the player's crowd is on the canvas.
+  private crowdPoint(): Vec {
+    return Projection.point(this.anchorX, Projection.anchorZ);
   }
 
   private setBossClip(clip: BossState["clip"]) {
@@ -286,6 +295,7 @@ export class RunnerSim {
     const coins = this.economy.coins(this.level, stars);
     this.emit({ type: "haptic", name: "success" });
     this.emit({ type: "sound", name: "win" });
+    this.emit({ type: "fx", name: "win", ...this.crowdPoint() });
     // The coins land after the fanfare, as the result card shows them.
     this.clock.after(0.5, () => this.emit({ type: "sound", name: "coin" }));
     this.outcome = { won: true, stars, coins, score: alive };

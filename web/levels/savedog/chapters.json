@@ -1,0 +1,39 @@
+[
+  {
+    "id": "1",
+    "title": "First shields",
+    "blurb": "Draw a roof. The bees will check your work.",
+    "levels": [
+      "first-shield",
+      "lid",
+      "pedestal",
+      "the-plug",
+      "side-door",
+      "roll-it-in"
+    ]
+  },
+  {
+    "id": "2",
+    "title": "Bad ground",
+    "blurb": "Water, lava and holes. The ink has to stand on something.",
+    "levels": [
+      "two-cliffs",
+      "across-the-water",
+      "between-the-blades",
+      "no-ink-overhead",
+      "holes-below"
+    ]
+  },
+  {
+    "id": "3",
+    "title": "Blades",
+    "blurb": "Saws cut ink. Draw where they are not.",
+    "levels": [
+      "slope",
+      "moat",
+      "two-caves",
+      "low-ceiling",
+      "saws"
+    ]
+  }
+]

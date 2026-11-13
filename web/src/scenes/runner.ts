@@ -7,7 +7,7 @@ import {
   type Crowd, type GateState, type Label, type Leaver, type Member, type ObstacleState,
 } from "../sim/runner";
 import type { Vec } from "../sim/sk";
-import { ClipSprite, MARKER, Pigment, W, Y, paper, reducedMotion, sprite, type Scene } from "./kit";
+import { ClipSprite, Fx, MARKER, Pigment, W, Y, paper, reducedMotion, sprite, type BurstOptions, type Scene } from "./kit";
 
 export const RUNNER_ART = [
   "paper", "background_color_hills", "clawd_run", "clawd_foe_run", "clawd_boss_idle", "clawd_boss_hit",
@@ -30,6 +30,12 @@ const Palette = {
 
 const PANEL_W = Projection.halfRoad - 8, PANEL_H = 96;
 const BOSS_HEIGHT = 110;
+
+// What each moment looks like. Small and short: the road has to stay readable through it.
+const UP = Math.PI / 2;
+const GAIN: BurstOptions = { count: 7, color: Palette.good, shape: "star", speed: 120, life: 0.45, size: 3.2, gravity: 160, angle: UP, spread: 2.4 };
+const LOSS: BurstOptions = { count: 7, color: Pigment.rose, shape: "shard", speed: 140, life: 0.4, size: 2.8, gravity: 380, angle: UP, spread: 2.8 };
+const DUST: BurstOptions = { count: 9, color: Pigment.cream, shape: "dot", speed: 110, life: 0.45, size: 3, gravity: -40 };
 
 /// A label in Permanent Marker. `baseline` puts the text's baseline on its position, as the
 /// count labels sit; without it the text is centred on the position.
@@ -172,6 +178,7 @@ export class RunnerScene implements Scene {
   private bossBar: Graphics | null = null;
   private countLabel = marker(22, true);
   private enemyLabel = marker(20, true);
+  private fx = new Fx(210);
 
   /// `level` is the 0-based run.
   constructor(level: number, economy: RunnerEconomy, private onCue: (cue: Cue) => void) {
@@ -227,7 +234,7 @@ export class RunnerScene implements Scene {
       root.addChild(node);
     }
     this.countLabel.zIndex = this.enemyLabel.zIndex = 200;
-    root.addChild(this.countLabel, this.enemyLabel);
+    root.addChild(this.countLabel, this.enemyLabel, this.fx.layer);
     this.draw(0);
   }
 
@@ -245,9 +252,31 @@ export class RunnerScene implements Scene {
   step() {
     this.sim.frame();
     for (const cue of this.cues) {
-      if (cue.type !== "mood") this.onCue(cue);
+      if (cue.type === "fx") this.effect(cue.name, cue.x, cue.y, cue.n ?? 0);
+      else if (cue.type !== "mood") this.onCue(cue);
     }
     this.cues.length = 0;
+  }
+
+  /// What the player sees for each moment the simulation reports. `n` is the change in the crowd.
+  private effect(name: string, x: number, y: number, n: number) {
+    const fx = this.fx;
+    // The change floats up from just over the crowd's own count.
+    const over = this.sim.countLabel.position.y + 26;
+    if (name === "gate" && n !== 0) {
+      fx.text(x, over, n > 0 ? `+${n}` : `${n}`, { color: n > 0 ? Palette.good : Pigment.rose, size: 24 });
+      fx.burst(x, y + 14, n > 0 ? GAIN : LOSS);
+    } else if (name === "hazard") {
+      fx.text(x, over, `${n}`, { color: Pigment.rose, size: 22 });
+      fx.burst(x, y + 14, LOSS);
+      fx.shake(3, 0.2);
+    } else if (name === "finale") {
+      fx.ring(x, y + 10, Pigment.cream);
+      fx.burst(x, y + 10, DUST);
+      fx.shake(4, 0.25);
+    } else if (name === "win") {
+      fx.confetti();
+    }
   }
 
   draw(dt: number) {
@@ -302,6 +331,8 @@ export class RunnerScene implements Scene {
     }
     place(this.countLabel, sim.countLabel);
     place(this.enemyLabel, sim.enemyLabel);
+    this.fx.tick(dt);
+    this.root.position.set(this.fx.offset.x, this.fx.offset.y);
   }
 
   destroy() {

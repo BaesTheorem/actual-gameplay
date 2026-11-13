@@ -96,7 +96,7 @@ export class SKWorld {
   /// `oneSided` turns on SpriteKit's rule that a body is only pushed by what its own collision mask lists.
   constructor(gravityY: number, options: { oneSided?: boolean } = {}) {
     // No sleeping. A liquid here is a pile of slow circles, and a body that sleeps the moment it
-    // slows stops a spread short: level 06 depends on lava creeping the last few points to the hero.
+    // slows stops a spread short: Mind the hole depends on lava creeping the last few points to the hero.
     this.world = new planck.World({ gravity: planck.Vec2(0, gravityY), allowSleep: false });
     if (options.oneSided) {
       installOneSided();

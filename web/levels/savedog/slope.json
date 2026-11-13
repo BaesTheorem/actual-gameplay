@@ -1,0 +1,117 @@
+{
+  "id": "slope",
+  "name": "Slope",
+  "hint": "Uneven ground and a saw on each side. Keep it narrow and make both feet land.",
+  "inkBudget": 340,
+  "stars": [
+    280,
+    310
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 34,
+      "w": 402,
+      "h": 40,
+      "skin": "grass"
+    },
+    {
+      "type": "chain",
+      "points": [
+        [
+          0,
+          210
+        ],
+        [
+          60,
+          200
+        ],
+        [
+          340,
+          74
+        ]
+      ]
+    }
+  ],
+  "decor": [
+    {
+      "sprite": "bush",
+      "x": 370,
+      "y": 92,
+      "w": 40,
+      "h": 34
+    }
+  ],
+  "dogs": [
+    {
+      "id": "clawd",
+      "x": 201,
+      "y": 157
+    }
+  ],
+  "hives": [
+    {
+      "x": 201,
+      "y": 700,
+      "count": 14
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            150,
+            164
+          ],
+          [
+            152,
+            200
+          ],
+          [
+            165,
+            228
+          ],
+          [
+            185,
+            243
+          ],
+          [
+            201,
+            246
+          ],
+          [
+            217,
+            240
+          ],
+          [
+            237,
+            220
+          ],
+          [
+            250,
+            180
+          ],
+          [
+            252,
+            118
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 14
+  },
+  "saws": [
+    {
+      "x": 122,
+      "y": 190,
+      "r": 16
+    },
+    {
+      "x": 282,
+      "y": 118,
+      "r": 16
+    }
+  ]
+}

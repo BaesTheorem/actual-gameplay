@@ -1,0 +1,28 @@
+[
+  {
+    "id": "1",
+    "title": "Fire and water",
+    "blurb": "Water puts out lava. Lava puts out heroes.",
+    "levels": [
+      "two-ways-down",
+      "wash-him-out",
+      "clear-the-landing",
+      "the-slide",
+      "down-the-chute",
+      "mind-the-hole"
+    ]
+  },
+  {
+    "id": "2",
+    "title": "Towers",
+    "blurb": "More floors, more goblins. The only way out is down.",
+    "levels": [
+      "down-the-well",
+      "the-side-door",
+      "two-taps",
+      "gem-in-the-flood",
+      "ride-the-pin",
+      "the-whole-tower"
+    ]
+  }
+]

@@ -1,0 +1,102 @@
+{
+  "id": "pedestal",
+  "name": "Pedestal",
+  "hint": "Water on both sides, and only the plinth to build on. Make it fit the socket.",
+  "inkBudget": 190,
+  "stars": [
+    150,
+    170
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 161,
+      "y": 34,
+      "w": 80,
+      "h": 186,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 161,
+      "y": 220,
+      "w": 8,
+      "h": 10,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 233,
+      "y": 220,
+      "w": 8,
+      "h": 10,
+      "skin": "stone"
+    }
+  ],
+  "killers": [
+    {
+      "x": 0,
+      "y": 34,
+      "w": 161,
+      "h": 40,
+      "kind": "water"
+    },
+    {
+      "x": 241,
+      "y": 34,
+      "w": 161,
+      "h": 40,
+      "kind": "water"
+    }
+  ],
+  "dogs": [
+    {
+      "id": "clawd",
+      "x": 201,
+      "y": 238
+    }
+  ],
+  "hives": [
+    {
+      "x": 40,
+      "y": 700,
+      "count": 8,
+      "interval": 0.15
+    },
+    {
+      "x": 362,
+      "y": 700,
+      "count": 8,
+      "interval": 0.15
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            172,
+            226
+          ],
+          [
+            176,
+            258
+          ],
+          [
+            201,
+            278
+          ],
+          [
+            226,
+            258
+          ],
+          [
+            230,
+            226
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 14
+  }
+}

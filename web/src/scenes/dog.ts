@@ -5,9 +5,14 @@ import type { Cue } from "../sim/clock";
 import { DogSim, type Dog, type DogLevel, type Effect, type Prop } from "../sim/savedog";
 import type { Bee } from "../sim/savedog/bee";
 import { DOG_RADIUS } from "../sim/savedog/beecrew";
+import { resample } from "../sim/savedog/geometry";
+import { solutionStrokes } from "../sim/savedog/level";
 import { WIDTH, type Stroke } from "../sim/savedog/stroke";
 import type { Vec } from "../sim/sk";
-import { ClipSprite, MARKER, Pigment, Y, hintLabel, paper, reducedMotion, sprite, terrain, type Scene } from "./kit";
+import {
+  ClipSprite, Fx, MARKER, Pigment, Y, hintLabel, paper, reducedMotion, sprite, terrain,
+  type BurstOptions, type Scene,
+} from "./kit";
 
 const TILES = ["block_center", "block_top", "block_left", "block_right", "block_top_left", "block_top_right",
   "horizontal_left", "horizontal_middle", "horizontal_right"];
@@ -21,6 +26,20 @@ export const DOG_ART = [
 const WOOD = 0x7a4b31;
 /// A dog's clip frame leaves room above him for emotes, so a 58 pt frame makes his body as wide as his 36 pt circle.
 const DOG_HEIGHT = 58;
+
+/// How long a hint stays up, in seconds, before it fades.
+const HINT_SECONDS = 4;
+
+// What each moment looks like. Small and short: the level has to stay readable through it.
+const UP = Math.PI / 2;
+const FLECKS: BurstOptions = { count: 6, color: Pigment.ink, shape: "dot", speed: 90, life: 0.3, size: 1.6, gravity: 420, angle: UP, spread: 2.4, outline: false };
+const CHIPS: BurstOptions = { count: 7, color: Pigment.ink, shape: "shard", speed: 160, life: 0.35, size: 2.4, gravity: 520, angle: UP, spread: 2, outline: false };
+// A pit throws drops the colour of its own rim, so they show against the pit as well as the sky.
+const SPLASH: BurstOptions = { count: 8, color: Pigment.sky, shape: "drop", speed: 170, life: 0.5, size: 3, gravity: 620, angle: UP, spread: 1.7 };
+const SPIT: BurstOptions = { count: 8, color: Pigment.ochre, shape: "drop", speed: 150, life: 0.5, size: 3, gravity: 560, angle: UP, spread: 1.7 };
+const STING: BurstOptions = { count: 8, color: Pigment.ochre, shape: "shard", speed: 150, life: 0.4, size: 2.8 };
+const HURT: BurstOptions = { count: 8, color: Pigment.rose, shape: "shard", speed: 150, life: 0.4, size: 2.8, gravity: 300, angle: UP, spread: 2.6 };
+const CHEER: BurstOptions = { count: 6, color: Pigment.ochre, shape: "star", speed: 110, life: 0.5, size: 3.4, gravity: 140, angle: UP, spread: 2.2 };
 
 /// Decorative motion runs full length normally and near-instant under reduced motion.
 const decorative = (full: number) => (reducedMotion() ? Math.min(full, 0.1) : full);
@@ -58,7 +77,7 @@ const label = (text: string, size: number, color: number, alpha = 1): Text => {
 };
 
 interface DogNode { holder: Container; clip: ClipSprite; mood: string; since: number }
-interface EffectNode { node: Container; chips?: { g: Graphics; dx: number; dy: number }[]; text?: Text }
+interface EffectNode { node: Container; text?: Text }
 
 export class DogScene implements Scene {
   readonly root = new Container();
@@ -77,11 +96,18 @@ export class DogScene implements Scene {
   private bees = new Map<Bee, Sprite>();
   private beeLayer = new Container();
   private effects = new Map<Effect, EffectNode>();
+  private fx = new Fx(20);
+  private ghost: Graphics | null = null;
+  private ghostAge = 0;
+  /// Only a level that stores its solution can show the way.
+  hint?: (step: number) => void;
 
-  constructor(readonly level: DogLevel, index: number, private onCue: (cue: Cue) => void) {
-    this.title = `${index + 1}. ${level.name}`;
-    this.sim = new DogSim(level, (cue) => this.cues.push(cue), index);
+  /// `label` is the level's place in its chapter, "1-3".
+  constructor(readonly level: DogLevel, label: string, private onCue: (cue: Cue) => void) {
+    this.title = `${label} ${level.name}`;
+    this.sim = new DogSim(level, (cue) => this.cues.push(cue));
     this.root.sortableChildren = true;
+    if (solutionStrokes(level).length > 0) this.hint = () => this.showGhost();
     this.build();
   }
 
@@ -159,7 +185,7 @@ export class DogScene implements Scene {
     }
     this.beeLayer.zIndex = 12;
     this.live.zIndex = 50;
-    root.addChild(this.beeLayer, this.live);
+    root.addChild(this.beeLayer, this.live, this.fx.layer);
     const hint = hintLabel(this.level.hint);
     if (hint) root.addChild(hint);
     this.draw(0);
@@ -230,11 +256,51 @@ export class DogScene implements Scene {
 
   step() {
     this.sim.frame();
-    // Moods are read from the dogs when drawing, and a cut draws its own chips.
+    // Moods are read from the dogs when drawing, and a cut has its own effect.
     for (const cue of this.cues) {
-      if (cue.type !== "puff" && cue.type !== "mood") this.onCue(cue);
+      if (cue.type === "fx") this.effect(cue.name, cue.x, cue.y);
+      else if (cue.type !== "puff" && cue.type !== "mood") this.onCue(cue);
     }
     this.cues.length = 0;
+  }
+
+  /// What the player sees for each moment the simulation reports.
+  private effect(name: string, x: number, y: number) {
+    const fx = this.fx;
+    if (name === "land") fx.burst(x, y, FLECKS);
+    else if (name === "cut") fx.burst(x, y, CHIPS);
+    else if (name === "sink") fx.burst(x, y, this.lavaAt(x) ? SPIT : SPLASH);
+    else if (name === "drown") { fx.burst(x, y, this.lavaAt(x) ? SPIT : SPLASH); fx.shake(5, 0.3); }
+    else if (name === "sting") { fx.burst(x, y, STING); fx.ring(x, y, Pigment.rose); fx.shake(5, 0.3); }
+    else if (name === "hurt") { fx.burst(x, y, HURT); fx.shake(5, 0.3); }
+    else if (name === "win") {
+      fx.confetti();
+      for (const dog of this.sim.dogs) fx.burst(dog.position.x, dog.position.y + 22, CHEER);
+    }
+  }
+
+  /// Whether the pit nearest to a canvas x is lava. A splash takes its colour from the pit it came out of.
+  private lavaAt(x: number): boolean {
+    let nearest: { kind: string } | null = null, best = Infinity;
+    for (const pit of this.sim.liquids) {
+      const gap = Math.max(pit.rect.x - x, x - (pit.rect.x + pit.rect.w), 0);
+      if (gap < best) { best = gap; nearest = pit; }
+    }
+    return nearest?.kind === "lava";
+  }
+
+  /// The stored solution as a dotted ghost: where the ink goes, for four seconds.
+  private showGhost() {
+    this.ghost?.destroy();
+    const g = new Graphics();
+    for (const stroke of solutionStrokes(this.level)) {
+      for (const p of stroke.length === 1 ? stroke : resample(stroke, 9)) g.circle(p.x, Y(p.y), 2.2);
+    }
+    g.fill({ color: Pigment.ink, alpha: 0.6 });
+    g.zIndex = 45;
+    this.root.addChild(g);
+    this.ghost = g;
+    this.ghostAge = 0;
   }
 
   draw(dt: number) {
@@ -260,6 +326,14 @@ export class DogScene implements Scene {
     this.drawDogs(dt, still);
     this.drawBees(still);
     this.drawEffects();
+    this.fx.tick(dt);
+    this.root.position.set(this.fx.offset.x, this.fx.offset.y);
+    if (this.ghost) {
+      this.ghostAge += dt;
+      const left = HINT_SECONDS + decorative(0.4) - this.ghostAge;
+      this.ghost.alpha = Math.min(1, Math.max(0, left / decorative(0.4)));
+      if (left <= 0) { this.ghost.destroy(); this.ghost = null; }
+    }
   }
 
   private drawProps() {
@@ -351,7 +425,8 @@ export class DogScene implements Scene {
   private drawEffects() {
     const sim = this.sim, now = sim.elapsed;
     for (const effect of sim.effects) {
-      if (!this.effects.has(effect)) this.effects.set(effect, this.effectNode(effect));
+      // Sawdust is a burst from the effects kit, set off by the cut itself.
+      if (effect.kind !== "chips" && !this.effects.has(effect)) this.effects.set(effect, this.effectNode(effect));
     }
     const liveSet = new Set(sim.effects);
     for (const [effect, entry] of this.effects) {
@@ -364,17 +439,13 @@ export class DogScene implements Scene {
         // The refused ink holds for 0.15 s and fades; its reason stays a little longer.
         entry.node.children[0].alpha = 1 - Math.min(1, Math.max(0, (age - 0.15) / decorative(0.35)));
         if (entry.text) entry.text.alpha = 1 - Math.min(1, Math.max(0, (age - 0.7) / 0.3));
-      } else {
-        const t = Math.min(1, age / 0.35);
-        for (const chip of entry.chips ?? []) chip.g.position.set(chip.dx * t, -chip.dy * t);
-        entry.node.alpha = 1 - t;
       }
     }
   }
 
-  private effectNode(effect: Effect): EffectNode {
+  private effectNode(effect: Exclude<Effect, { kind: "chips" }>): EffectNode {
     const node = new Container();
-    node.zIndex = effect.kind === "chips" ? 20 : 60;
+    node.zIndex = 60;
     this.root.addChild(node);
     if (effect.kind === "trim") {
       const g = new Graphics();
@@ -383,27 +454,16 @@ export class DogScene implements Scene {
       node.addChild(g);
       return { node };
     }
-    if (effect.kind === "reject") {
-      const g = new Graphics(), first = effect.points[0];
-      if (effect.points.length === 1) g.circle(first.x, Y(first.y), 4).fill(Pigment.rose);
-      else {
-        g.position.set(0, Y(0));
-        inkLine(g, effect.points, Pigment.rose, WIDTH);
-      }
-      const text = label(effect.reason, 14, Pigment.clayDark);
-      text.position.set(effect.label.x, Y(effect.label.y) - 5);
-      node.addChild(g, text);
-      return { node, text };
+    const g = new Graphics(), first = effect.points[0];
+    if (effect.points.length === 1) g.circle(first.x, Y(first.y), 4).fill(Pigment.rose);
+    else {
+      g.position.set(0, Y(0));
+      inkLine(g, effect.points, Pigment.rose, WIDTH);
     }
-    // Sawdust: six chips of ink thrown up and out from where the blade met the stroke.
-    node.position.set(effect.point.x, Y(effect.point.y));
-    const chips = [];
-    for (let i = 0; i < 6; i++) {
-      const g = new Graphics().rect(-2, -1, 4, 2).fill(Pigment.ink);
-      node.addChild(g);
-      chips.push({ g, dx: -40 + Math.random() * 80, dy: 10 + Math.random() * 50 });
-    }
-    return { node, chips };
+    const text = label(effect.reason, 14, Pigment.clayDark);
+    text.position.set(effect.label.x, Y(effect.label.y) - 5);
+    node.addChild(g, text);
+    return { node, text };
   }
 
   destroy() {

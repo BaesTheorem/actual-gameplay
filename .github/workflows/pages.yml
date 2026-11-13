@@ -3,7 +3,7 @@ name: Deploy the web build to GitHub Pages
 on:
   push:
     branches: [main]
-    paths: ["web/**", "ActualGameplay/Levels/**", "ActualGameplay/Art/**", "ActualGameplay/Audio/**", ".github/workflows/pages.yml"]
+    paths: ["web/**", "ActualGameplay/Art/**", "ActualGameplay/Audio/**", ".github/workflows/pages.yml"]
   workflow_dispatch:
 
 permissions:
@@ -40,6 +40,9 @@ jobs:
       - run: npm run replay -- pinPull
       - run: npm run replay -- runner
       - run: npm run replay -- saveDog
+      # Every level ships with its measured difficulty: a level with no figure, or one measured
+      # before the level last changed, stops the deploy until "npm run stats" has been run.
+      - run: npm run stats -- --check
       - run: npm run build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

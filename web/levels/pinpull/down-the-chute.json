@@ -1,0 +1,133 @@
+{
+  "id": "down-the-chute",
+  "name": "Down the chute",
+  "hint": "The lava is right under his floor. Send it down the chute first.",
+  "parPins": 2,
+  "winWhen": "heroReachesGoal",
+  "walls": [
+    {
+      "x": 200,
+      "y": 454,
+      "w": 14,
+      "h": 66
+    },
+    {
+      "x": 200,
+      "y": 590,
+      "w": 14,
+      "h": 90
+    },
+    {
+      "x": 226,
+      "y": 654,
+      "w": 14,
+      "h": 36
+    }
+  ],
+  "slabs": [
+    {
+      "x1": 364,
+      "y1": 620,
+      "x2": 214,
+      "y2": 548,
+      "t": 14
+    }
+  ],
+  "pins": [
+    {
+      "id": "p1",
+      "x": 38,
+      "y": 610,
+      "w": 162,
+      "side": "left"
+    },
+    {
+      "id": "p2",
+      "x": 38,
+      "y": 520,
+      "w": 162,
+      "side": "left"
+    },
+    {
+      "id": "p3",
+      "x": 38,
+      "y": 440,
+      "w": 162,
+      "side": "left"
+    },
+    {
+      "id": "p4",
+      "x": 35,
+      "y": 359,
+      "w": 260,
+      "side": "left",
+      "angle": -15
+    },
+    {
+      "id": "p5",
+      "x": 240,
+      "y": 640,
+      "w": 124,
+      "side": "right"
+    }
+  ],
+  "pools": [
+    {
+      "liquid": "lava",
+      "x": 44,
+      "y": 624,
+      "w": 150,
+      "h": 20,
+      "count": 40
+    },
+    {
+      "liquid": "lava",
+      "x": 44,
+      "y": 454,
+      "w": 150,
+      "h": 30,
+      "count": 50
+    },
+    {
+      "liquid": "lava",
+      "x": 246,
+      "y": 654,
+      "w": 112,
+      "h": 20,
+      "count": 40
+    },
+    {
+      "liquid": "lava",
+      "x": 44,
+      "y": 68,
+      "w": 220,
+      "h": 20,
+      "count": 50
+    }
+  ],
+  "drains": [
+    {
+      "x": 270,
+      "y": 240,
+      "w": 94,
+      "h": 20
+    }
+  ],
+  "actors": {
+    "hero": {
+      "x": 110,
+      "y": 550
+    },
+    "goal": {
+      "x": 50,
+      "y": 380,
+      "w": 130,
+      "h": 60
+    }
+  },
+  "solution": [
+    "p3",
+    "p2"
+  ],
+  "settleSeconds": 6
+}

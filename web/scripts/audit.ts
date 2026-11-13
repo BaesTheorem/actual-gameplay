@@ -3,56 +3,35 @@
 //                                each level is UNIQUE or the other winning orders are listed
 //   npm run audit -- runner      greedy steering against never steering, always left, and random
 //   npm run audit -- saveDog [--random N]   the solution shifted and scaled, naive strokes, N random strokes
-import { playOut, type PinLevel } from "../src/sim/pinpull";
+// The two level modes run their simulations in a pool of processes and print in play order.
+// "--jobs N" sets how many processes, 2 at most and by default.
+import { folderOf } from "../src/app/modetable";
+import type { PinLevel } from "../src/sim/pinpull";
 import { load } from "./levels";
+import { Pool, inOrder, moduleURL } from "./parallel";
+import { auditLevel as auditPins, type End } from "./pin-suite";
 
-const STALL = "Settled short of the goal.";
+interface Verdict { line: string; flagged: boolean }
 
-/// Search pull sequences up to par, extending only the ones that neither won nor died.
-/// A sequence that stalled (everything settled, nothing won) can still be extended; one that
-/// ended in a death, a melt or a drain cannot, and one that won needs no more pulls.
-const exhaustivePins = (level: PinLevel) => {
-  const ids = level.pins.map((p) => p.id);
-  let frontier: string[][] = [[]];
-  const winners: string[][] = [];
-  let tried = 0;
-  for (let k = 1; k <= level.parPins; k++) {
-    const next: string[][] = [];
-    for (const prefix of frontier) {
-      for (const pin of ids) {
-        if (prefix.includes(pin)) continue;
-        const seq = [...prefix, pin];
-        tried += 1;
-        const { outcome } = playOut(level, seq);
-        if (outcome?.won) winners.push(seq);
-        else if (outcome === null || outcome.reason === STALL) next.push(seq);
-      }
-    }
-    frontier = next;
-  }
-  return { winners, tried };
-};
+/// Print each level's line as it comes in, in play order, and count the flagged ones.
+const report = async (verdicts: Promise<Verdict>[]): Promise<number> =>
+  (await inOrder(verdicts, (verdict) => console.log(verdict.line))).filter((verdict) => verdict.flagged).length;
 
 const mode = process.argv[2] ?? "pinPull";
 let flagged = 0;
 if (mode === "pinPull") {
-  for (const level of load<PinLevel>("pinpull")) {
-    const { winners, tried } = exhaustivePins(level);
-    const solution = (level.solution ?? []).join("+");
-    const won = winners.map((w) => w.join("+"));
-    let verdict: string;
-    if (won.length === 0) verdict = "UNWINNABLE within par";
-    else if (won.length === 1 && won[0] === solution) verdict = "UNIQUE";
-    else if (won.includes(solution)) verdict = `NOT UNIQUE: also ${won.filter((w) => w !== solution).join(", ")}`;
-    else verdict = `BROKEN: solution does not win; winners ${won.join(", ")}`;
-    if (verdict !== "UNIQUE") flagged += 1;
-    console.log(`${level.id}  ${level.name.padEnd(22)} par ${level.parPins}  ${String(tried).padStart(3)} sequences  ${verdict}`);
-  }
+  const pool = new Pool(), suite = moduleURL("./pin-suite.ts", import.meta.url);
+  const play = (level: PinLevel, pins: string[]) => pool.run<End>({ module: suite, name: "play", args: [level.id, pins] });
+  flagged = await report(load<PinLevel>(folderOf("pinPull")).map((level) => auditPins(level, play)));
+  pool.close();
 }
 if (mode === "runner") flagged = (await import("./runner-suite")).audit();
 if (mode === "saveDog") {
-  const random = process.argv.indexOf("--random");
-  flagged = (await import("./savedog-suite")).audit({ random: random > 0 ? Number(process.argv[random + 1]) : undefined });
+  const at = process.argv.indexOf("--random"), random = at > 0 ? Number(process.argv[at + 1]) : 0;
+  const pool = new Pool(), suite = moduleURL("./savedog-suite.ts", import.meta.url);
+  flagged = await report(load<{ id: string }>(folderOf("saveDog"))
+    .map((level) => pool.run<Verdict>({ module: suite, name: "auditLevel", args: [level.id, random] })));
+  pool.close();
 }
 console.log(`\n${flagged} level(s) flagged`);
 process.exit(flagged === 0 ? 0 : 1);

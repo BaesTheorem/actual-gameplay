@@ -1,0 +1,85 @@
+{
+  "id": "side-door",
+  "name": "Side door",
+  "hint": "Three walls and a low roof. Close the fourth side, and make it stand.",
+  "inkBudget": 90,
+  "stars": [
+    72,
+    80
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 34,
+      "w": 402,
+      "h": 40,
+      "skin": "grass"
+    },
+    {
+      "type": "rect",
+      "x": 100,
+      "y": 114,
+      "w": 132,
+      "h": 14,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 100,
+      "y": 74,
+      "w": 14,
+      "h": 40,
+      "skin": "stone"
+    }
+  ],
+  "decor": [
+    {
+      "sprite": "torch_on_a",
+      "x": 126,
+      "y": 130,
+      "w": 16,
+      "h": 26
+    }
+  ],
+  "dogs": [
+    {
+      "id": "clawd",
+      "x": 170,
+      "y": 92
+    }
+  ],
+  "hives": [
+    {
+      "x": 372,
+      "y": 300,
+      "count": 10
+    },
+    {
+      "x": 372,
+      "y": 700,
+      "count": 6
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            232,
+            110
+          ],
+          [
+            232,
+            79
+          ],
+          [
+            196,
+            79
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 14
+  }
+}

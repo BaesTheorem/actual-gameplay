@@ -4,9 +4,13 @@ import * as art from "./app/art";
 import * as audio from "./app/audio";
 import { button, h, icon, iconButton, stars, swatch } from "./app/dom";
 import { Game, setStageScale, warmRenderer } from "./app/game";
-import { MODES, levelCount, levelID, mode as findMode, prefetchAll, warm, type ModeInfo } from "./app/modes";
+import {
+  MODES, chapters, levelIDs, levelLabel, levelName, levelStat, mode as findMode, nextLevel, prefetchAll, warm,
+  type LevelMode, type ModeInfo,
+} from "./app/modes";
+import { oddsText } from "./app/odds";
 import { showRunnerHub } from "./app/runnerhub";
-import { record, store, type Mode } from "./app/store";
+import { record, results, store, takeHint } from "./app/store";
 import { W } from "./scenes/kit";
 
 const VERSION = "0.1.0";
@@ -41,20 +45,27 @@ const applySettings = () => {
 const go = (path: string) => { location.hash = path; };
 const back = (path: string) => () => go(path);
 
+/// The paper behind the stage. A window taller than the stage shows it above and below, so it
+/// has to be the same sheet the screen itself is on.
+const setPaper = (paperName: string) => {
+  document.body.style.backgroundImage = `url(${art.url(paperName)})`;
+};
+
 const screen = (paperName: string, ...children: (Node | string)[]) => {
   const el = h("div.screen", ...children);
   el.style.backgroundImage = `url(${art.url(paperName)})`;
+  setPaper(paperName);
   return el;
 };
 
 const summary = (m: ModeInfo): string => {
-  if (m.id === "runner") {
+  if (m.kind === "runner") {
     const r = store.progress.runner;
     return r.bestLevel === 0 && r.coins === 0 ? "Not started" : `Level ${r.level + 1}, ${r.coins} coins`;
   }
-  const total = levelCount(m.id);
-  const cleared = Object.values(store.progress[m.id]).filter((r) => r.cleared).length;
-  return total === 0 ? "Coming soon" : cleared === 0 ? `${total} levels` : `${cleared}/${total} cleared`;
+  const ids = levelIDs(m.id), saved = results(store.progress, m.id);
+  const cleared = ids.filter((id) => saved[id]?.cleared).length;
+  return ids.length === 0 ? "Coming soon" : cleared === 0 ? `${ids.length} levels` : `${cleared}/${ids.length} cleared`;
 };
 
 const home = () => {
@@ -72,59 +83,80 @@ const home = () => {
   ui.replaceChildren(screen("paper", header, ...cards, h("div.grow"), h("div.mono.muted", { style: { fontSize: "12px" } }, `v${VERSION}`)));
 };
 
-const levelSelect = (m: ModeInfo) => {
+/// One level on the list: its place in the chapter, its stars, and a corner tag when its
+/// measured number shows as 10% or less. Every level is open from the start.
+const tile = (m: LevelMode, id: string, place: number, bestStars: number) => {
+  const stat = levelStat(m.id, id);
+  const tag = stat ? oddsText(stat, m.random).tag : null;
+  const odds = tag ? `, ${tag} of random ${m.random.tries} ${m.random.win}` : "";
+  return art.frame(h<"button">("button.tile", {
+    "aria-label": `Level ${levelLabel(m.id, id)}, ${levelName(m.id, id)}, ${bestStars} of 3 stars${odds}`,
+    onclick: () => { audio.play("select"); go(`/${m.id}/${id}`); },
+  }, h("div.n", String(place)), stars(bestStars, 15), tag && h("div.tag", tag)));
+};
+
+const levelSelect = (m: LevelMode) => {
   audio.playMusic(m.track);
   // The player is about to pick a level: get this mode's code and art ready now.
   void warm(m.id);
-  const count = levelCount(m.id as Mode);
-  const results = store.progress[m.id as "saveDog" | "pinPull"];
-  const cleared = Object.values(results).filter((r) => r.cleared).length;
-  const grid = h("div.grid");
-  for (let i = 0; i < count; i++) {
-    const result = results[levelID(m.id, i)];
-    grid.append(art.frame(h<"button">("button.tile", {
-      "aria-label": `Level ${i + 1}, ${result?.bestStars ?? 0} stars`,
-      onclick: () => { audio.play("select"); go(`/${m.id}/${i + 1}`); },
-    }, h("div.n", String(i + 1)), stars(result?.bestStars ?? 0, 15))));
-  }
+  const ids = levelIDs(m.id), saved = results(store.progress, m.id);
+  const earned = ids.reduce((sum, id) => sum + (saved[id]?.bestStars ?? 0), 0);
+  const star = h("div");
+  art.paint(star, "ui_star_on", 24);
+  const total = h("div.row", { style: { gap: "6px" }, role: "img", "aria-label": `${earned} of ${ids.length * 3} stars` },
+    star, h("span.marker", { style: { fontSize: "20px" } }, `${earned}/${ids.length * 3}`));
+  const sections = chapters(m.id).map((chapter) => {
+    const grid = h("div.grid");
+    chapter.levels.forEach((id, i) => grid.append(tile(m, id, i + 1, saved[id]?.bestStars ?? 0)));
+    return h("section.chapter",
+      h("h2", h("span.num", chapter.id), chapter.title),
+      h("p.muted", chapter.blurb),
+      grid);
+  });
   ui.replaceChildren(screen(m.paper,
     h("div.row", iconButton("arrowBack", "Back", back("/")),
-      h("div.grow", h("div.marker", { style: { fontSize: "26px", lineHeight: "1.1" } }, m.title.toUpperCase()),
-        h("div.mono.muted", { style: { fontSize: "13px" } }, `${cleared}/${count} cleared`)),
-      swatch(m.preview[0], m.preview[1], m.swatch, 52)),
-    count === 0 ? h("p.muted", "No levels yet.") : grid));
+      h("div.grow.marker", { style: { fontSize: "24px", lineHeight: "1.1" } }, m.title.toUpperCase()),
+      total),
+    ...(sections.length === 0 ? [h("p.muted", "No levels yet.")] : sections)));
 };
 
-const play = (m: ModeInfo, index: number) => {
-  const count = levelCount(m.id);
+const play = (m: LevelMode, level: string) => {
+  const next = nextLevel(m.id, level);
   stage.style.backgroundImage = `url(${art.url(m.paper)})`;
+  setPaper(m.paper);
   game = new Game(ui, {
-    mode: m, index, hasNext: index + 1 < count, exitLabel: "Back to levels",
+    mode: m, level, hasNext: next !== null, exitLabel: "Back to levels",
     onExit: back(`/${m.id}`),
-    onNext: () => go(`/${m.id}/${index + 2}`),
+    onNext: () => { if (next) go(`/${m.id}/${next}`); },
     onResult: (outcome) => {
-      if (outcome.won) store.update((p) => record(p, m.id, levelID(m.id, index), outcome.stars, outcome.score));
+      if (outcome.won) store.update((p) => record(p, m.id, level, outcome.stars, outcome.score));
+    },
+    onHint: () => {
+      let step = 1;
+      store.update((p) => { step = takeHint(p, m.id, level); });
+      return step;
     },
   });
 };
 
-const runnerHub = () => {
-  audio.playMusic("runner");
-  void warm("runner");
-  const el = screen("paper");
+const runnerHub = (m: ModeInfo) => {
+  audio.playMusic(m.track);
+  void warm(m.id);
+  const el = screen(m.paper);
   ui.replaceChildren(el);
-  showRunnerHub(el, { onBack: back("/"), onRun: () => go("/runner/play") });
+  showRunnerHub(el, { onBack: back("/"), onRun: () => go(`/${m.id}/play`) });
 };
 
 /// One run of Crowd Run, at the level the store holds now. Retry replays this same run; Next
 /// routes again, which starts the run after it.
 const playRun = (m: ModeInfo) => {
   stage.style.backgroundImage = `url(${art.url(m.paper)})`;
+  setPaper(m.paper);
   // A win is paid once. A retry after it replays the same track, and that must not pay again or skip a run.
   let paid = false;
   game = new Game(ui, {
-    mode: m, index: store.progress.runner.level, hasNext: true, exitLabel: "Back",
-    onExit: back("/runner"),
+    mode: m, level: String(store.progress.runner.level), hasNext: true, exitLabel: "Back",
+    onExit: back(`/${m.id}`),
     onNext: route,
     onResult: (outcome) => {
       if (!outcome.won || paid) return;
@@ -182,13 +214,14 @@ const route = () => {
   game?.close();
   game = null;
   stage.style.backgroundImage = "";
+  // #/<mode> is a mode's level list (or the runner's hub) and #/<mode>/<level id> is one level.
   const [, first, second] = location.hash.replace(/^#/, "").split("/");
   const m = findMode(first ?? "");
   if (first === "settings") settings();
-  else if (m && m.id !== "runner" && second && +second >= 1 && +second <= levelCount(m.id)) play(m, +second - 1);
-  else if (m && m.id !== "runner") levelSelect(m);
+  else if (m?.kind === "levels" && second && levelIDs(m.id).includes(second)) play(m, second);
+  else if (m?.kind === "levels") levelSelect(m);
   else if (m && second === "play") playRun(m);
-  else if (m) runnerHub();
+  else if (m) runnerHub(m);
   else home();
 };
 

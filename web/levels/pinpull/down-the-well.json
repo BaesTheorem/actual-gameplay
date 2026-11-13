@@ -1,0 +1,130 @@
+{
+  "id": "down-the-well",
+  "name": "Down the well",
+  "hint": "The goblin is standing on the lid of the gem's well.",
+  "parPins": 2,
+  "winWhen": "treasureReachesHero",
+  "walls": [
+    {
+      "x": 200,
+      "y": 194,
+      "w": 14,
+      "h": 56
+    },
+    {
+      "x": 200,
+      "y": 320,
+      "w": 14,
+      "h": 360
+    }
+  ],
+  "slabs": [
+    {
+      "x1": 364,
+      "y1": 360,
+      "x2": 214,
+      "y2": 290,
+      "t": 14
+    }
+  ],
+  "pins": [
+    {
+      "id": "p1",
+      "x": 38,
+      "y": 600,
+      "w": 162,
+      "side": "left"
+    },
+    {
+      "id": "p2",
+      "x": 38,
+      "y": 480,
+      "w": 162,
+      "side": "left"
+    },
+    {
+      "id": "p3",
+      "x": 38,
+      "y": 320,
+      "w": 162,
+      "side": "left"
+    },
+    {
+      "id": "p4",
+      "x": 214,
+      "y": 400,
+      "w": 150,
+      "side": "right"
+    },
+    {
+      "id": "p5",
+      "x": 38,
+      "y": 180,
+      "w": 162,
+      "side": "left"
+    }
+  ],
+  "pools": [
+    {
+      "liquid": "lava",
+      "x": 44,
+      "y": 614,
+      "w": 150,
+      "h": 20,
+      "count": 40
+    },
+    {
+      "liquid": "water",
+      "x": 44,
+      "y": 194,
+      "w": 50,
+      "h": 40,
+      "count": 35
+    },
+    {
+      "liquid": "water",
+      "x": 126,
+      "y": 194,
+      "w": 68,
+      "h": 40,
+      "count": 45
+    },
+    {
+      "liquid": "lava",
+      "x": 220,
+      "y": 414,
+      "w": 138,
+      "h": 40,
+      "count": 110
+    },
+    {
+      "liquid": "lava",
+      "x": 44,
+      "y": 68,
+      "w": 314,
+      "h": 20,
+      "count": 40
+    }
+  ],
+  "actors": {
+    "hero": {
+      "x": 110,
+      "y": 510
+    },
+    "treasure": {
+      "x": 110,
+      "y": 206
+    },
+    "foes": [
+      {
+        "x": 138,
+        "y": 350
+      }
+    ]
+  },
+  "solution": [
+    "p3",
+    "p2"
+  ],
+  "settleSeconds": 6
+}

@@ -1,0 +1,105 @@
+{
+  "id": "the-plug",
+  "name": "The plug",
+  "hint": "One hole in the roof and only enough ink to stop it. Anything else slides off.",
+  "inkBudget": 80,
+  "stars": [
+    56,
+    70
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 34,
+      "w": 402,
+      "h": 40,
+      "skin": "grass"
+    },
+    {
+      "type": "rect",
+      "x": 130,
+      "y": 74,
+      "w": 14,
+      "h": 130,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 272,
+      "y": 74,
+      "w": 14,
+      "h": 130,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 130,
+      "y": 190,
+      "w": 96,
+      "h": 14,
+      "skin": "stone"
+    },
+    {
+      "type": "chain",
+      "points": [
+        [
+          130,
+          204
+        ],
+        [
+          226,
+          242
+        ]
+      ]
+    },
+    {
+      "type": "rect",
+      "x": 226,
+      "y": 190,
+      "w": 10,
+      "h": 14,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 268,
+      "y": 190,
+      "w": 18,
+      "h": 14,
+      "skin": "stone"
+    }
+  ],
+  "dogs": [
+    {
+      "id": "clawd",
+      "x": 201,
+      "y": 92
+    }
+  ],
+  "hives": [
+    {
+      "x": 252,
+      "y": 700,
+      "count": 14,
+      "interval": 0.14
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            230,
+            222
+          ],
+          [
+            276,
+            222
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 14
+  }
+}
