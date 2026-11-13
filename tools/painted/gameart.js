@@ -453,6 +453,10 @@
   frame9('ui_button_ochre', 192, 96, PAL.ochre, PAL.ink, '#C88A1E', 60);
   frame9('ui_button_violet', 192, 96, PAL.violet, PAL.ink, PURPLE_DK, 60);
   for (const name of ['ui_button_ochre', 'ui_button_violet']) window.ASSETS[name].noBleed = true;   // no pale specks on the edges a 9-slice stretches
+  // the first set of Clawd clips had the same pale wedge under the body, and it shows on stone and on the cave paper
+  for (const name of ['clawd_idle', 'clawd_happy', 'clawd_excited', 'clawd_nervous', 'clawd_scared', 'clawd_sad', 'clawd_ko', 'clawd_determined', 'clawd_run',
+                      'clawd_hard_idle', 'clawd_hard_excited', 'clawd_hard_ko', 'clawd_foe_run', 'clawd_foe_idle', 'clawd_foe_ko', 'clawd_boss_idle', 'clawd_boss_hit'])
+    window.ASSETS[name].noBleed = true;
 
   // ---------- paper (kept in paper mode: these ARE the background) ----------
   add('paper', { box: [0, 0, 1920, 1080], anchor: [0.5, 0.5], frames: 1, len: 1, fps: 1, paper: true, draw: t => {} });
