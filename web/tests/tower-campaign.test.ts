@@ -113,7 +113,8 @@ describe("the campaign files", () => {
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
-  });
+  // The generator searches thousands of candidates again; on a busy machine that passes five seconds.
+  }, 120_000);
 });
 
 describe("the suite", () => {

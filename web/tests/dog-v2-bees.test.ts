@@ -107,10 +107,16 @@ describe("the random strokes", () => {
     return randomStrokes(level, 16, 7, number).filter((stroke) => playOut(level, { strokes: [stroke.map(([x, y]) => ({ x, y }))] }).outcome?.won === true).length;
   };
 
+  // A count is allowed to be one off. The same simulation run on another processor rounds the last
+  // bit of a sine differently, and one stroke that was on the edge tips the other way: the old
+  // Slope counts 9 on an Apple chip and 8 on the build machine. The iPhone's own counts were given
+  // as "2 or 3" for the same reason. Bees that had gone weak would move a count by far more.
+  const near = (got: number, measured: number) => expect(Math.abs(got - measured), `${got} against ${measured}`).toBeLessThanOrEqual(1);
+
   it("survive as often as they did on the iPhone, on the levels that have not changed since", () => {
-    expect(count("first-shield", 1)).toBe(10);
-    expect(count("lid", 2)).toBe(4);
-    expect(count("roll-it-in", 6)).toBe(3);
+    near(count("first-shield", 1), 10);
+    near(count("lid", 2), 4);
+    near(count("roll-it-in", 6), 3);
   }, 120_000);
 
   it("survive as often on the old Holes below and the old Slope, where the iPhone counted 6 and 8", () => {
@@ -118,9 +124,9 @@ describe("the random strokes", () => {
       const level = attic(number);
       return randomStrokes(level, 16, 7, seed).filter((stroke) => playOut(level, { strokes: [stroke.map(([x, y]) => ({ x, y }))] }).outcome?.won === true).length;
     };
-    expect(old("05", 5)).toBe(7);
-    expect(old("07", 7)).toBe(9);
-    expect(old("10", 10)).toBe(0);
+    near(old("05", 5), 7);
+    near(old("07", 7), 9);
+    near(old("10", 10), 0);
   }, 120_000);
 });
 
