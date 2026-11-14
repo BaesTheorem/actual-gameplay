@@ -8,6 +8,7 @@ import { BeeCrew, Swarm } from "../src/sim/savedog/beecrew";
 import { baseTransform } from "../src/sim/savedog/level";
 import { Cat, makeBody } from "../src/sim/savedog/stroke";
 import { SKWorld, STEP, applyImpulse, clampSpeed, position, velocity } from "../src/sim/sk";
+import { GRASS, level as small, play } from "./dog-v2-kit";
 
 // How strong the bees are, held to three things that are known from outside this engine: what
 // the constants work out to by hand, what the iPhone build measured when its heave was tuned,
@@ -100,11 +101,12 @@ describe("the crew's heave", () => {
 
 describe("the random strokes", () => {
   // The iPhone build's first audit with random strokes, on 2026-09-25, seeded its strokes with
-  // 7000 plus the level's number. Three of today's levels are those levels byte for byte. It
-  // counted 10 of 16 on First shield and 2 or 3 of 16 on Lid and on Roll it in.
-  const count = (id: string, number: number) => {
-    const level = campaign.find((l) => l.id === id)!;
-    return randomStrokes(level, 16, 7, number).filter((stroke) => playOut(level, { strokes: [stroke.map(([x, y]) => ({ x, y }))] }).outcome?.won === true).length;
+  // 7000 plus the level's number. It counted 10 of 16 on First shield and 2 or 3 of 16 on Lid
+  // and on Roll it in. Those three levels are in the attic as the iPhone build had them, under
+  // their numbers; the campaign's Lid and Roll it in have since been rebuilt.
+  const old = (number: string, seed: number) => {
+    const level = attic(number);
+    return randomStrokes(level, 16, 7, seed).filter((stroke) => playOut(level, { strokes: [stroke.map(([x, y]) => ({ x, y }))] }).outcome?.won === true).length;
   };
 
   // A count is allowed to be one off. The same simulation run on another processor rounds the last
@@ -113,17 +115,13 @@ describe("the random strokes", () => {
   // as "2 or 3" for the same reason. Bees that had gone weak would move a count by far more.
   const near = (got: number, measured: number) => expect(Math.abs(got - measured), `${got} against ${measured}`).toBeLessThanOrEqual(1);
 
-  it("survive as often as they did on the iPhone, on the levels that have not changed since", () => {
-    near(count("first-shield", 1), 10);
-    near(count("lid", 2), 4);
-    near(count("roll-it-in", 6), 3);
+  it("survive as often as they did on the iPhone, on First shield, Lid and Roll it in as they were", () => {
+    near(old("01", 1), 10);
+    near(old("02", 2), 4);
+    near(old("06", 6), 3);
   }, 120_000);
 
   it("survive as often on the old Holes below and the old Slope, where the iPhone counted 6 and 8", () => {
-    const old = (number: string, seed: number) => {
-      const level = attic(number);
-      return randomStrokes(level, 16, 7, seed).filter((stroke) => playOut(level, { strokes: [stroke.map(([x, y]) => ({ x, y }))] }).outcome?.won === true).length;
-    };
     near(old("05", 5), 7);
     near(old("07", 7), 9);
     near(old("10", 10), 0);
@@ -133,15 +131,18 @@ describe("the random strokes", () => {
 describe("the stored solutions", () => {
   // Every level's stored solution as it plays today: stars, and ink to the nearest point.
   const pinned: Record<string, [number, number]> = {
-    "first-shield": [3, 236], lid: [3, 130], pedestal: [3, 129], "the-plug": [3, 46], "side-door": [3, 67], "roll-it-in": [3, 78],
-    "two-cliffs": [3, 422], "across-the-water": [3, 319], "between-the-blades": [3, 180], "no-ink-overhead": [3, 588], "holes-below": [3, 112],
-    slope: [3, 258], moat: [3, 145], "two-caves": [3, 218], "low-ceiling": [3, 158], saws: [3, 145],
+    "first-shield": [3, 236], "both-feet": [3, 156], lid: [3, 130], "two-roofs": [3, 276], "drop-it": [3, 223],
+    pedestal: [3, 144], "across-the-water": [3, 248], "holes-below": [3, 180], moat: [3, 235], "two-cliffs": [3, 330],
+    "side-door": [3, 56], "low-ceiling": [3, 158], "the-plug": [3, 46], "roll-it-in": [3, 78], "two-caves": [3, 264],
+    slope: [3, 229], "between-the-blades": [3, 210], "thread-it": [3, 194], "three-blades": [3, 242], saws: [3, 183],
+    campfire: [3, 244], hearth: [3, 166], "two-fires": [3, 178], "low-fire": [3, 157], wildfire: [3, 208],
+    blast: [3, 166], "heads-up": [3, 158], "thin-ice": [3, 355], "two-fuses": [3, 164], "the-lot": [3, 264],
   };
 
   it("win as they did, with the same stars and the same ink", () => {
     const found = campaign.filter((level) => pinned[level.id]);
     // The levels can change, and then their lines here change with them. They cannot all go unnoticed.
-    expect(found.length).toBeGreaterThanOrEqual(12);
+    expect(found.length).toBeGreaterThanOrEqual(24);
     for (const level of found) {
       const run = playOut(level, { transform: baseTransform(level) });
       const stars = run.outcome?.won ? run.outcome.stars : 0;
@@ -149,3 +150,43 @@ describe("the stored solutions", () => {
     }
   }, 60_000);
 });
+
+describe("bees and a plank", () => {
+  // Clawd stands on a plank that falls 32 degrees, under a closed shield with both feet on the
+  // plank. The bees' map opens the cells within reach of him so that he can be reached from inside
+  // a shield. It used to open the ones just under the plank too, and those led out: every bee
+  // then had a way in on the map, flew under the wood, and stayed there for the whole level.
+  const fall = 0.625, top = (x: number) => 295 - fall * (x - 60), lean = Math.atan(fall);
+  const at = { x: 200 + 18 * Math.sin(lean), y: top(200) + 18 * Math.cos(lean) };
+  const left = { x: at.x - 44, y: top(at.x - 44) + 5 }, right = { x: at.x + 40, y: top(at.x + 40) + 5 };
+  const shield = [left, { x: left.x + 2, y: at.y + 30 }, { x: at.x - 20, y: at.y + 52 }, { x: at.x + 8, y: at.y + 50 }, { x: at.x + 34, y: at.y + 28 }, { x: right.x, y: at.y - 4 }, right];
+  const plank = small({
+    statics: [GRASS, { type: "chain", points: [[60, top(60)], [340, top(340)]] }],
+    dogs: [{ id: "clawd", ...at }],
+    hives: [{ x: 201, y: 700, count: 14 }],
+  });
+
+  it("work on the shield as a crew, with no way in under the wood", () => {
+    let routes = 0, under = 0;
+    const run = play(plank, [shield], {
+      each: (sim) => {
+        if (!sim.released) return;
+        if (sim.routeOpen) routes += 1;
+        // A bee below the plank and within 60 points of him has gone for the cells under it.
+        for (const bee of sim.bees) if (bee.position.y < top(bee.position.x) - 6 && Math.abs(bee.position.x - at.x) < 60) under += 1;
+      },
+    });
+    expect(run.won).toBe(true);
+    expect(routes).toBe(0);
+    expect(under).toBe(0);
+    expect(run.sounds).toContain("heave");
+    expect(run.sim.field.direction({ x: at.x + 14, y: at.y - 40 })).toBeNull();
+  }, 30_000);
+
+  it("still find him when nothing is over him", () => {
+    // A bar on the grass, far from him, sets the level going.
+    const run = play(plank, [[{ x: 300, y: 80 }, { x: 360, y: 80 }]]);
+    expect(run.reason).toBe("The bees got clawd.");
+  }, 30_000);
+});
+

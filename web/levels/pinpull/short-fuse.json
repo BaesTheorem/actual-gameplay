@@ -1,0 +1,40 @@
+{
+  "id": "short-fuse",
+  "name": "Short fuse",
+  "hint": "Lava lights it. Water ruins it.",
+  "parPins": 1,
+  "winWhen": "treasureReachesHero",
+  "walls": [
+    {"x": 158, "y": 108, "w": 14, "h": 60},
+    {"x": 197, "y": 108, "w": 6, "h": 60},
+    {"x": 228, "y": 108, "w": 14, "h": 60},
+    {"x": 286, "y": 250, "w": 14, "h": 60},
+    {"x": 100, "y": 250, "w": 14, "h": 60}
+  ],
+  "cracked": [
+    {"x": 222, "y": 68, "w": 14, "h": 40}
+  ],
+  "grates": [
+    {"x": 148, "y": 68, "w": 104, "h": 12}
+  ],
+  "pins": [
+    {"id": "p1", "x": 172, "y": 108, "w": 25, "side": "left"},
+    {"id": "p2", "x": 203, "y": 108, "w": 25, "side": "right"},
+    {"id": "p3", "x": 300, "y": 250, "w": 64, "side": "right"},
+    {"id": "p4", "x": 38, "y": 250, "w": 62, "side": "left"}
+  ],
+  "pools": [
+    {"liquid": "lava", "x": 174, "y": 122, "w": 21, "h": 30, "count": 6},
+    {"liquid": "water", "x": 205, "y": 122, "w": 21, "h": 40, "count": 12},
+    {"liquid": "lava", "x": 302, "y": 264, "w": 60, "h": 30, "count": 20},
+    {"liquid": "lava", "x": 40, "y": 264, "w": 58, "h": 30, "count": 20}
+  ],
+  "bombs": [
+    {"x": 200, "y": 80}
+  ],
+  "actors": {
+    "hero": {"x": 66, "y": 84},
+    "treasure": {"x": 336, "y": 79}
+  },
+  "solution": ["p1"]
+}

@@ -1,0 +1,94 @@
+{
+  "id": "blast",
+  "name": "Blast",
+  "hint": "The bomb goes off when its ring runs out. Ink stops a blast, and the blast shoves the ink.",
+  "inkBudget": 235,
+  "stars": [
+    190,
+    232
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 34,
+      "w": 262,
+      "h": 40,
+      "skin": "grass"
+    }
+  ],
+  "killers": [
+    {
+      "x": 262,
+      "y": 34,
+      "w": 140,
+      "h": 26,
+      "kind": "lava"
+    }
+  ],
+  "bombs": [
+    {
+      "x": 140,
+      "y": 86,
+      "at": 3.2
+    }
+  ],
+  "dogs": [
+    {
+      "id": "clawd",
+      "x": 201,
+      "y": 92
+    }
+  ],
+  "hives": [
+    {
+      "x": 60,
+      "y": 660,
+      "count": 6,
+      "delay": 1.1
+    },
+    {
+      "x": 342,
+      "y": 660,
+      "count": 6,
+      "delay": 1.1
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            170,
+            78
+          ],
+          [
+            172,
+            116
+          ],
+          [
+            184,
+            138
+          ],
+          [
+            202,
+            146
+          ],
+          [
+            220,
+            138
+          ],
+          [
+            232,
+            116
+          ],
+          [
+            234,
+            78
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 14
+  }
+}

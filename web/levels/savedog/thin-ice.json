@@ -1,0 +1,112 @@
+{
+  "id": "thin-ice",
+  "name": "Thin ice",
+  "hint": "Nothing grips ice. When the boulder goes, he goes. Hook the roof on the post.",
+  "inkBudget": 500,
+  "stars": [
+    409,
+    498
+  ],
+  "statics": [
+    {
+      "type": "chain",
+      "points": [
+        [
+          20,
+          199.4
+        ],
+        [
+          352,
+          142.8
+        ]
+      ],
+      "skin": "ice"
+    },
+    {
+      "type": "rect",
+      "x": 60,
+      "y": 189.9,
+      "w": 8,
+      "h": 46,
+      "skin": "stone"
+    }
+  ],
+  "killers": [
+    {
+      "x": 0,
+      "y": 34,
+      "w": 402,
+      "h": 104,
+      "kind": "water"
+    }
+  ],
+  "rocks": [
+    {
+      "x": 263.6,
+      "y": 174.2,
+      "at": 3
+    }
+  ],
+  "dogs": [
+    {
+      "id": "clawd",
+      "x": 230,
+      "y": 181.9
+    }
+  ],
+  "hives": [
+    {
+      "x": 60,
+      "y": 660,
+      "count": 6,
+      "delay": 1.1
+    },
+    {
+      "x": 342,
+      "y": 660,
+      "count": 6,
+      "delay": 1.1
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            42,
+            209.7
+          ],
+          [
+            44,
+            244
+          ],
+          [
+            70,
+            268
+          ],
+          [
+            150,
+            276
+          ],
+          [
+            230,
+            262
+          ],
+          [
+            272,
+            236
+          ],
+          [
+            292,
+            204
+          ],
+          [
+            292,
+            167.1
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 14
+  }
+}

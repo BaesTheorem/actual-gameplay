@@ -1,0 +1,40 @@
+{
+  "id": "missing-link",
+  "name": "Missing link",
+  "hint": "One crate cannot reach the wall. Two can.",
+  "parPins": 2,
+  "winWhen": "treasureReachesHero",
+  "walls": [
+    {"x": 144, "y": 108, "w": 14, "h": 150},
+    {"x": 182, "y": 108, "w": 14, "h": 252},
+    {"x": 224, "y": 300, "w": 14, "h": 60},
+    {"x": 84, "y": 300, "w": 14, "h": 60},
+    {"x": 126, "y": 300, "w": 14, "h": 60}
+  ],
+  "cracked": [
+    {"x": 250, "y": 68, "w": 14, "h": 40}
+  ],
+  "grates": [
+    {"x": 118, "y": 68, "w": 104, "h": 12}
+  ],
+  "pins": [
+    {"id": "p1", "x": 196, "y": 300, "w": 28, "side": "right"},
+    {"id": "p2", "x": 158, "y": 108, "w": 24, "side": "left"},
+    {"id": "p3", "x": 158, "y": 190, "w": 24, "side": "left"},
+    {"id": "p4", "x": 98, "y": 300, "w": 28, "side": "left"}
+  ],
+  "pools": [
+    {"liquid": "lava", "x": 160, "y": 122, "w": 20, "h": 30, "count": 6},
+    {"liquid": "water", "x": 160, "y": 204, "w": 20, "h": 40, "count": 12}
+  ],
+  "bombs": [
+    {"x": 170, "y": 80},
+    {"x": 210, "y": 326},
+    {"x": 112, "y": 326}
+  ],
+  "actors": {
+    "hero": {"x": 60, "y": 84},
+    "treasure": {"x": 338, "y": 79}
+  },
+  "solution": ["p1", "p2"]
+}

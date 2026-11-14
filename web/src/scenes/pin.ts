@@ -3,7 +3,7 @@ import { Container, Filter, GlProgram, Graphics, Rectangle, Sprite, Text, Textur
 import * as art from "../app/art";
 import type { Cue } from "../sim/clock";
 import {
-  BOMB_SIZE, FRAME_THICKNESS, FRIEND_RADIUS, HERO_RADIUS, KNOB_OFFSET, LIQUID_RADIUS, PIN_THICKNESS, PinSim, doorRect, segmentQuad, walks,
+  BOMB_SIZE, FRAME_THICKNESS, FRIEND_RADIUS, HERO_RADIUS, KNOB_OFFSET, LIQUID_RADIUS, PIN_THICKNESS, PinSim, doorRect, segmentQuad,
   type Bomb, type Boulder, type Cracked, type Door, type Foe, type Particle, type PinLevel, type Pin, type Plate, type Rect,
 } from "../sim/pinpull";
 import { position, tagOf, type Vec } from "../sim/sk";
@@ -20,9 +20,8 @@ export const PIN_ART = [
 ];
 
 /// The art one level needs on top of PIN_ART: the clips of whoever walks in it, and the pieces
-/// it carries. A level under the first rules needs none of it.
+/// it carries.
 export const pinArt = (level: PinLevel): string[] => {
-  if (!walks(level)) return [];
   const names: string[] = [];
   if (level.actors.hero) names.push("clawd_hard_run");
   if ((level.actors.foes ?? []).length > 0) names.push("clawd_foe_run");
@@ -150,8 +149,6 @@ export class PinScene implements Scene {
   }
 
   private build() {
-    // The simulation's copy of the level is the one that is drawn: under the first rules it has
-    // none of the newer pieces in it, whatever the file says.
     const { sim, root } = this, level = sim.level;
     root.addChild(paper("paper_cave"));
     for (const d of level.decor ?? []) {

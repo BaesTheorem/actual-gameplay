@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { FRIEND_RADIUS, GEM_REACH, HERO_RADIUS, HERO_REACH } from "../src/sim/pinpull";
 import { position } from "../src/sim/sk";
 import { FLOOR, cup, doorPin, level, play, ramp } from "./pin-v2-kit";
 
@@ -128,6 +129,43 @@ describe("the hero walks", () => {
     expect(position(run.sim.hero!).x).toBeGreaterThan(260);
   });
 
+  it("has the gem from a drop's width away, when water he pushed ahead is caught between them", () => {
+    // A valley full of water between him and the gem. He wades through it and pushes water up
+    // the far bank ahead of him, and the gem lies against the wall at the end of that bank.
+    const bank = FLOOR + 46;
+    const lvl = level({
+      walls: [{ x: 38, y: FLOOR, w: 60, h: 46 }, { x: 244, y: FLOOR, w: 120, h: 46 }],
+      slabs: [ramp(98, bank, 166, FLOOR), ramp(176, FLOOR, 244, bank)],
+      pins: [{ ...doorPin("p1", 258), y: bank + 14 }],
+      pools: [{ liquid: "water", x: 141, y: FLOOR + 6, w: 60, h: 40, count: 26 }],
+      actors: { hero: { x: 66, y: bank + 16 }, treasure: { x: 345, y: bank + 11 } },
+    });
+    let nearest = Infinity;
+    const run = play(lvl, ["p1"], {
+      each: (sim) => {
+        const hero = position(sim.hero!), gem = position(sim.treasure!);
+        nearest = Math.min(nearest, Math.hypot(hero.x - gem.x, hero.y - gem.y));
+      },
+    });
+    // The two never touched: water held them a few points apart. He has the gem all the same.
+    expect(nearest).toBeGreaterThan(HERO_RADIUS + GEM_REACH + 1);
+    expect(nearest).toBeLessThanOrEqual(HERO_RADIUS + GEM_REACH + HERO_REACH);
+    expect(run.when("gem")).toBeGreaterThan(run.when("walk"));
+    expect(run.won).toBe(true);
+  });
+
+  it("does not reach through stone, however thin", () => {
+    // A slab four points thick stands between him and the gem, and each of them is right against it.
+    const run = play(level({
+      slabs: [{ x1: 189, y1: FLOOR, x2: 189, y2: FLOOR + 80, t: 4 }],
+      actors: { hero: { x: 170, y: FLOOR + 16 }, treasure: { x: 205, y: FLOOR + 11 } },
+    }), [], { seconds: 4 });
+    const hero = position(run.sim.hero!), gem = position(run.sim.treasure!);
+    expect(Math.hypot(hero.x - gem.x, hero.y - gem.y)).toBeLessThan(HERO_RADIUS + GEM_REACH + HERO_REACH);
+    expect(run.when("gem")).toBe(-1);
+    expect(run.won).toBe(false);
+  });
+
   it("wants nothing in a level where the gem does the travelling", () => {
     let walked = false;
     play(level({ winWhen: "treasureReachesGoal", actors: { hero: HERO, treasure: GEM, goal: { x: 38, y: 300, w: 40, h: 40 } } }),
@@ -137,6 +175,28 @@ describe("the hero walks", () => {
 });
 
 describe("the hero and his friend", () => {
+  it("has met his friend from a drop's width away, as he has the gem", () => {
+    // The valley of water again, with the friend against the wall at the end of the far bank.
+    const bank = FLOOR + 46;
+    let nearest = Infinity;
+    const run = play(level({
+      winWhen: "heroReachesFriend",
+      walls: [{ x: 38, y: FLOOR, w: 60, h: 46 }, { x: 244, y: FLOOR, w: 120, h: 46 }],
+      slabs: [ramp(98, bank, 166, FLOOR), ramp(176, FLOOR, 244, bank)],
+      pins: [{ ...doorPin("p1", 258), y: bank + 14 }],
+      pools: [{ liquid: "water", x: 141, y: FLOOR + 6, w: 60, h: 40, count: 26 }],
+      actors: { hero: { x: 66, y: bank + 16 }, friend: { x: 348, y: bank + 13 } },
+    }), ["p1"], {
+      each: (sim) => {
+        const hero = position(sim.hero!), friend = position(sim.friend!);
+        nearest = Math.min(nearest, Math.hypot(hero.x - friend.x, hero.y - friend.y));
+      },
+    });
+    expect(nearest).toBeGreaterThan(HERO_RADIUS + FRIEND_RADIUS + 1);
+    expect(run.won).toBe(true);
+    expect(run.sim.friendState).toBe("happy");
+  });
+
   it("wins by reaching the friend", () => {
     const run = play(level({ winWhen: "heroReachesFriend", pins: [doorPin("p1", 200)], actors: { hero: HERO, friend: { x: 330, y: FLOOR + 13 } } }), ["p1"]);
     expect(run.won).toBe(true);

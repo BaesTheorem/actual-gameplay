@@ -1,0 +1,120 @@
+{
+  "id": "wildfire",
+  "name": "Wildfire",
+  "hint": "Fire beside him, fire beyond it, fire overhead. One roof that touches none of them.",
+  "inkBudget": 295,
+  "stars": [
+    240,
+    292
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 34,
+      "w": 181,
+      "h": 40,
+      "skin": "grass"
+    },
+    {
+      "type": "rect",
+      "x": 181,
+      "y": 34,
+      "w": 40,
+      "h": 34,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 221,
+      "y": 34,
+      "w": 181,
+      "h": 40,
+      "skin": "grass"
+    }
+  ],
+  "fires": [
+    {
+      "x": 96,
+      "y": 74
+    },
+    {
+      "x": 159,
+      "y": 74
+    },
+    {
+      "x": 271,
+      "y": 74
+    },
+    {
+      "x": 189,
+      "y": 166
+    }
+  ],
+  "dogs": [
+    {
+      "id": "clawd",
+      "x": 201,
+      "y": 86
+    }
+  ],
+  "hives": [
+    {
+      "x": 40,
+      "y": 660,
+      "count": 8,
+      "delay": 1
+    },
+    {
+      "x": 362,
+      "y": 660,
+      "count": 8,
+      "delay": 1
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            128,
+            78
+          ],
+          [
+            128,
+            108
+          ],
+          [
+            135.4,
+            128
+          ],
+          [
+            155.5,
+            142.6
+          ],
+          [
+            183,
+            148
+          ],
+          [
+            210.5,
+            142.6
+          ],
+          [
+            230.6,
+            128
+          ],
+          [
+            238,
+            108
+          ],
+          [
+            238,
+            78
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 14
+  }
+}

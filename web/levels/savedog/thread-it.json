@@ -1,0 +1,106 @@
+{
+  "id": "thread-it",
+  "name": "Thread it",
+  "hint": "No ink near him, and a blade on each side of the drop. Keep it narrow.",
+  "inkBudget": 330,
+  "stars": [
+    223,
+    271
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 34,
+      "w": 402,
+      "h": 40,
+      "skin": "grass"
+    }
+  ],
+  "saws": [
+    {
+      "x": 131,
+      "y": 160,
+      "r": 16
+    },
+    {
+      "x": 271,
+      "y": 160,
+      "r": 16
+    }
+  ],
+  "forbidden": [
+    {
+      "x": 111,
+      "y": 74,
+      "w": 180,
+      "h": 140
+    }
+  ],
+  "dogs": [
+    {
+      "id": "clawd",
+      "x": 201,
+      "y": 92
+    }
+  ],
+  "hives": [
+    {
+      "x": 40,
+      "y": 660,
+      "count": 8,
+      "delay": 1
+    },
+    {
+      "x": 362,
+      "y": 660,
+      "count": 8,
+      "delay": 1
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            167,
+            218
+          ],
+          [
+            167,
+            262
+          ],
+          [
+            171.6,
+            279
+          ],
+          [
+            184,
+            291.4
+          ],
+          [
+            201,
+            296
+          ],
+          [
+            218,
+            291.4
+          ],
+          [
+            230.4,
+            279
+          ],
+          [
+            235,
+            262
+          ],
+          [
+            235,
+            218
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 14
+  }
+}

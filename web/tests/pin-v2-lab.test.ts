@@ -2,9 +2,9 @@ import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { moves, playOut, walks, type PinLevel } from "../src/sim/pinpull";
+import { moves, playOut, type PinLevel } from "../src/sim/pinpull";
 
-// The levels in the lab: one small level for each of the newer pieces, played in the game at
+// The levels in the lab: small levels that each show a piece or two, played in the game at
 // #/pinPull/~<file name>. They are in no chapter, so nothing else replays them.
 const LAB = join(dirname(fileURLToPath(import.meta.url)), "../public/lab/pinpull");
 const levels = readdirSync(LAB).filter((file) => file.endsWith(".json")).sort()
@@ -15,7 +15,6 @@ describe("the lab levels", () => {
     expect(levels.length).toBeGreaterThan(0);
     for (const { file, level } of levels) {
       expect(`${level.id}.json`, file).toBe(file);
-      expect(walks(level), file).toBe(true);
       expect(level.name.length, file).toBeGreaterThan(0);
       expect((level.hint ?? "").length, file).toBeGreaterThan(0);
       // Plain and dry: a hint ends with a full stop and never shouts.

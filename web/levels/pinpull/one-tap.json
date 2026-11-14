@@ -1,0 +1,32 @@
+{
+  "id": "one-tap",
+  "name": "One tap",
+  "hint": "Two pins share a colour. One tap pulls both.",
+  "parPins": 1,
+  "winWhen": "treasureReachesHero",
+  "walls": [
+    {"x": 38, "y": 68, "w": 132, "h": 8},
+    {"x": 230, "y": 68, "w": 134, "h": 8},
+    {"x": 156, "y": 250, "w": 14, "h": 60},
+    {"x": 230, "y": 250, "w": 14, "h": 60},
+    {"x": 286, "y": 250, "w": 14, "h": 60},
+    {"x": 100, "y": 250, "w": 14, "h": 60}
+  ],
+  "pins": [
+    {"id": "a1", "x": 100, "y": 90, "w": 40, "side": "right", "angle": 90, "group": "a"},
+    {"id": "a2", "x": 170, "y": 250, "w": 60, "side": "right", "group": "a"},
+    {"id": "p2", "x": 300, "y": 250, "w": 64, "side": "right"},
+    {"id": "p3", "x": 38, "y": 250, "w": 62, "side": "left"}
+  ],
+  "pools": [
+    {"liquid": "lava", "x": 172, "y": 68, "w": 56, "h": 8, "count": 9},
+    {"liquid": "water", "x": 172, "y": 264, "w": 56, "h": 40, "count": 26},
+    {"liquid": "lava", "x": 302, "y": 264, "w": 60, "h": 30, "count": 20},
+    {"liquid": "lava", "x": 40, "y": 264, "w": 58, "h": 30, "count": 20}
+  ],
+  "actors": {
+    "hero": {"x": 66, "y": 92},
+    "treasure": {"x": 330, "y": 87}
+  },
+  "solution": ["a1"]
+}

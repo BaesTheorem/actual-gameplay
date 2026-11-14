@@ -1,0 +1,95 @@
+{
+  "id": "three-blades",
+  "name": "Three blades",
+  "hint": "A blade each side and a bigger one overhead. Go between them.",
+  "inkBudget": 360,
+  "stars": [
+    278,
+    339
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 34,
+      "w": 402,
+      "h": 40,
+      "skin": "grass"
+    }
+  ],
+  "saws": [
+    {
+      "x": 155,
+      "y": 92,
+      "r": 16
+    },
+    {
+      "x": 247,
+      "y": 92,
+      "r": 16
+    },
+    {
+      "x": 201,
+      "y": 186,
+      "r": 32
+    }
+  ],
+  "dogs": [
+    {
+      "id": "clawd",
+      "x": 201,
+      "y": 92
+    }
+  ],
+  "hives": [
+    {
+      "x": 40,
+      "y": 660,
+      "count": 8,
+      "delay": 1
+    },
+    {
+      "x": 362,
+      "y": 660,
+      "count": 8,
+      "delay": 1
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            111,
+            84
+          ],
+          [
+            114,
+            112
+          ],
+          [
+            134,
+            128
+          ],
+          [
+            201,
+            134
+          ],
+          [
+            268,
+            128
+          ],
+          [
+            288,
+            112
+          ],
+          [
+            291,
+            84
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 14
+  }
+}

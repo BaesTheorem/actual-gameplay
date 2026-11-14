@@ -1,0 +1,32 @@
+{
+  "id": "updraught",
+  "name": "Updraught",
+  "hint": "The water goes down. What is under it goes up.",
+  "parPins": 2,
+  "winWhen": "treasureReachesHero",
+  "walls": [
+    {"x": 38, "y": 68, "w": 112, "h": 8},
+    {"x": 250, "y": 68, "w": 114, "h": 8},
+    {"x": 136, "y": 140, "w": 14, "h": 490},
+    {"x": 250, "y": 140, "w": 14, "h": 490}
+  ],
+  "vents": [
+    {"x": 150, "y": 370, "w": 100, "h": 14}
+  ],
+  "pins": [
+    {"id": "p1", "x": 150, "y": 250, "w": 100, "side": "right"},
+    {"id": "p2", "x": 150, "y": 440, "w": 100, "side": "left"},
+    {"id": "p3", "x": 150, "y": 560, "w": 100, "side": "right"}
+  ],
+  "pools": [
+    {"liquid": "lava", "x": 152, "y": 68, "w": 96, "h": 8, "count": 14},
+    {"liquid": "gas", "x": 150, "y": 204, "w": 100, "h": 46, "count": 45},
+    {"liquid": "water", "x": 152, "y": 264, "w": 96, "h": 40, "count": 40},
+    {"liquid": "lava", "x": 152, "y": 574, "w": 96, "h": 30, "count": 24}
+  ],
+  "actors": {
+    "hero": {"x": 200, "y": 470},
+    "treasure": {"x": 330, "y": 87}
+  },
+  "solution": ["p1", "p2"]
+}

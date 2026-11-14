@@ -4,9 +4,10 @@
   "hint": "The boulder is your lid, but it will fly past. Ink sticks here: build it a wall.",
   "inkBudget": 110,
   "stars": [
-    80,
-    95
+    90,
+    109
   ],
+  "pinnedInk": true,
   "statics": [
     {
       "type": "rect",
@@ -53,7 +54,7 @@
       "points": [
         [
           20,
-          318
+          360
         ],
         [
           135,
@@ -66,10 +67,18 @@
     {
       "id": "boulder",
       "shape": "ball",
-      "x": 52,
-      "y": 325,
+      "x": 44,
+      "y": 362,
       "r": 16,
       "density": 2
+    }
+  ],
+  "forbidden": [
+    {
+      "x": 164,
+      "y": 74,
+      "w": 74,
+      "h": 142
     }
   ],
   "decor": [
@@ -91,15 +100,15 @@
   "hives": [
     {
       "x": 60,
-      "y": 700,
+      "y": 660,
       "count": 8,
-      "delay": 2.5
+      "delay": 1.2
     },
     {
       "x": 342,
-      "y": 700,
+      "y": 660,
       "count": 8,
-      "delay": 2.5
+      "delay": 1.2
     }
   ],
   "solution": {
@@ -107,25 +116,16 @@
       {
         "points": [
           [
-            212,
+            225,
             222
           ],
           [
-            212,
+            225,
             300
           ]
         ]
       }
     ],
-    "waitSeconds": 16
-  },
-  "pinnedInk": true,
-  "forbidden": [
-    {
-      "x": 164,
-      "y": 74,
-      "w": 74,
-      "h": 112
-    }
-  ]
+    "waitSeconds": 14
+  }
 }

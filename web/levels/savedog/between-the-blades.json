@@ -2,10 +2,10 @@
   "id": "between-the-blades",
   "name": "Between the blades",
   "hint": "Two blades at his feet and two posts beyond them. Nothing that touches a blade survives.",
-  "inkBudget": 210,
+  "inkBudget": 300,
   "stars": [
-    190,
-    200
+    241,
+    294
   ],
   "statics": [
     {
@@ -21,7 +21,7 @@
       "x": 107,
       "y": 74,
       "w": 14,
-      "h": 52,
+      "h": 114,
       "skin": "stone"
     },
     {
@@ -29,7 +29,7 @@
       "x": 281,
       "y": 74,
       "w": 14,
-      "h": 52,
+      "h": 114,
       "skin": "stone"
     }
   ],
@@ -55,15 +55,17 @@
   "hives": [
     {
       "x": 40,
-      "y": 720,
+      "y": 660,
       "count": 7,
-      "interval": 0.15
+      "interval": 0.15,
+      "delay": 1.3
     },
     {
       "x": 362,
-      "y": 720,
+      "y": 660,
       "count": 7,
-      "interval": 0.15
+      "interval": 0.15,
+      "delay": 1.3
     }
   ],
   "solution": {
@@ -71,12 +73,12 @@
       {
         "points": [
           [
-            111,
-            130
+            96,
+            200
           ],
           [
-            291,
-            130
+            306,
+            200
           ]
         ]
       }

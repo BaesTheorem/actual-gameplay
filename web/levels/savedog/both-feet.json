@@ -1,0 +1,104 @@
+{
+  "id": "both-feet",
+  "name": "Both feet",
+  "hint": "A roof needs ground under both feet. Water is not ground.",
+  "inkBudget": 240,
+  "stars": [
+    180,
+    219
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 34,
+      "w": 244,
+      "h": 40,
+      "skin": "grass"
+    }
+  ],
+  "killers": [
+    {
+      "x": 244,
+      "y": 34,
+      "w": 158,
+      "h": 26,
+      "kind": "water"
+    }
+  ],
+  "decor": [
+    {
+      "sprite": "bush",
+      "x": 60,
+      "y": 92,
+      "w": 44,
+      "h": 38
+    }
+  ],
+  "dogs": [
+    {
+      "id": "clawd",
+      "x": 201,
+      "y": 92
+    }
+  ],
+  "hives": [
+    {
+      "x": 40,
+      "y": 660,
+      "count": 8,
+      "delay": 0.9
+    },
+    {
+      "x": 362,
+      "y": 660,
+      "count": 8,
+      "delay": 0.9
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            173,
+            78
+          ],
+          [
+            173,
+            108
+          ],
+          [
+            176.8,
+            125
+          ],
+          [
+            187,
+            137.4
+          ],
+          [
+            201,
+            142
+          ],
+          [
+            215,
+            137.4
+          ],
+          [
+            225.2,
+            125
+          ],
+          [
+            229,
+            108
+          ],
+          [
+            229,
+            78
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 14
+  }
+}

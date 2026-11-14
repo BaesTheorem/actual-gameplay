@@ -34,15 +34,10 @@ export interface PinLevel {
   id: string;
   name: string;
   hint?: string;
-  /// 2 for the rules with walking characters and the newer pieces (boulders, bombs, cracked walls,
-  /// linked pins, plates, doors, gas, vents, the friend). A level without it plays by the first
-  /// rules, and every newer field in it is ignored.
-  rules?: number;
   /// Pulls the intended solution needs. Three stars at or under it, two for one extra pull.
   parPins: number;
   /// treasureReachesHero, heroReachesGoal, treasureReachesGoal, both, or heroReachesFriend.
   winWhen: string;
-  frame?: boolean;
   walls?: Rect[];
   slabs?: { x1: number; y1: number; x2: number; y2: number; t?: number }[];
   pins: PinSpec[];
@@ -64,7 +59,6 @@ export interface PinLevel {
   vents?: Rect[];
   /// The pull order that wins. It names one pin of a group.
   solution?: string[];
-  settleSeconds?: number;
 }
 
 export const Cat = {
@@ -104,6 +98,12 @@ export const BOMB_SIZE = 24;
 /// How fast a character walks, in points per second.
 export const HERO_WALK = 70;
 export const FOE_WALK = 55;
+/// The hero has the gem, or has met his friend, when the gap between the two is this small and
+/// nothing solid is in it. A drop of water is seven points across, and water he pushes ahead of
+/// him gets caught between them, so the gap he has to close is a little more than one drop.
+export const HERO_REACH = 8;
+/// Half the gem's width: how far its side is from its middle.
+export const GEM_REACH = 13;
 
 /// A boulder that meets a character at this speed or more, measured between the two in the frame
 /// before they touch, flattens him. Slower than this it only pushes.

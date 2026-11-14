@@ -1,0 +1,92 @@
+{
+  "id": "hearth",
+  "name": "Hearth",
+  "hint": "Bees will not pass between two flames. Put the end of the roof there, and a leg on the other side.",
+  "inkBudget": 235,
+  "stars": [
+    191,
+    232
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 34,
+      "w": 143,
+      "h": 40,
+      "skin": "grass"
+    },
+    {
+      "type": "rect",
+      "x": 143,
+      "y": 34,
+      "w": 28,
+      "h": 34,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 171,
+      "y": 34,
+      "w": 231,
+      "h": 40,
+      "skin": "grass"
+    }
+  ],
+  "fires": [
+    {
+      "x": 157,
+      "y": 68
+    },
+    {
+      "x": 157,
+      "y": 138
+    }
+  ],
+  "dogs": [
+    {
+      "id": "clawd",
+      "x": 201,
+      "y": 92
+    }
+  ],
+  "hives": [
+    {
+      "x": 40,
+      "y": 660,
+      "count": 8,
+      "delay": 1
+    },
+    {
+      "x": 362,
+      "y": 660,
+      "count": 8,
+      "delay": 1
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            150,
+            123
+          ],
+          [
+            250,
+            123
+          ],
+          [
+            250,
+            87
+          ],
+          [
+            280,
+            87
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 14
+  }
+}

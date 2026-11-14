@@ -4,8 +4,8 @@
   "hint": "No ink in the band. Draw low and tight.",
   "inkBudget": 300,
   "stars": [
-    200,
-    260
+    182,
+    221
   ],
   "statics": [
     {
@@ -35,8 +35,9 @@
   "hives": [
     {
       "x": 201,
-      "y": 700,
-      "count": 14
+      "y": 660,
+      "count": 14,
+      "delay": 0.9
     }
   ],
   "solution": {

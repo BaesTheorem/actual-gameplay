@@ -36,6 +36,39 @@ export const nearest = (solid: Solid, p: Vec): { point: Vec; distance: number } 
   }
 };
 
+/// How far apart two line segments are. 0 when they cross.
+const segmentGap = (a: Vec, b: Vec, c: Vec, d: Vec): number => {
+  const side = (p: Vec, q: Vec, r: Vec) => (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x);
+  if (side(a, b, c) * side(a, b, d) < 0 && side(c, d, a) * side(c, d, b) < 0) return 0;
+  return Math.min(distanceToSegment(a, c, d), distanceToSegment(b, c, d), distanceToSegment(c, a, b), distanceToSegment(d, a, b));
+};
+
+/// Whether the straight line from `a` to `b` passes through the shape itself, with nothing added
+/// to it. A line that only touches its edge does not.
+export const cuts = (solid: Solid, a: Vec, b: Vec): boolean => {
+  switch (solid.kind) {
+    case "segment":
+      return segmentGap(a, b, solid.a, solid.b) < solid.radius;
+    case "circle":
+      return distanceToSegment(solid.center, a, b) < solid.radius;
+    case "rect": {
+      // The stretch of the line that lies between the rectangle's four sides, if there is one.
+      const r = solid.rect, dx = b.x - a.x, dy = b.y - a.y;
+      let from = 0, to = 1;
+      for (const [step, room] of [[-dx, a.x - r.x], [dx, r.x + r.w - a.x], [-dy, a.y - r.y], [dy, r.y + r.h - a.y]]) {
+        if (step === 0) {
+          if (room <= 0) return false;
+        } else if (step < 0) {
+          from = Math.max(from, room / step);
+        } else {
+          to = Math.min(to, room / step);
+        }
+      }
+      return from < to;
+    }
+  }
+};
+
 const FOUR: readonly [number, number][] = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 
 /// A coarse distance map from the dogs through the open space of the level. Bees follow it
@@ -86,7 +119,13 @@ export class FlowField {
   }
 
   /// Rasterize the solids (inflated by the bee radius), then flood from the targets.
-  rebuild(solids: Solid[], targets: { center: Vec; radius: number }[], clearance: number) {
+  ///
+  /// A target's own cells are open whatever is drawn over them, so that a dog pressed against a
+  /// shield can still be reached from inside it. `ground` is the fixed part of the level, and a
+  /// cell on the far side of that is not his: a dog standing on a plank 6 points thick would
+  /// otherwise own the cells just under it, and those open onto the air below, which gave every
+  /// bee a way in through the wood that none of them could fly.
+  rebuild(solids: Solid[], targets: { center: Vec; radius: number }[], clearance: number, ground: Solid[] = []) {
     this.blocked.fill(0);
     this.distance.fill(-1);
     // The playfield edges: a bee cannot center itself closer than its radius to a wall.
@@ -125,7 +164,9 @@ export class FlowField {
       const reach = target.radius + clearance;
       const box = { x: target.center.x - reach, y: target.center.y - reach, w: 2 * reach, h: 2 * reach };
       this.forEachCell(box, (c, r) => {
-        if (distance(this.center(c, r), target.center) > reach) return;
+        const at = this.center(c, r);
+        if (distance(at, target.center) > reach) return;
+        if (ground.some((solid) => cuts(solid, target.center, at))) return;
         const i = this.index(c, r);
         this.blocked[i] = 0;
         if (this.distance[i] !== 0) {

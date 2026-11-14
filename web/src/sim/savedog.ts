@@ -587,8 +587,9 @@ export class DogSim {
     return out;
   }
 
-  /// Every solid a bee has to get around, in canvas coordinates, wherever it has ended up.
-  solids(): Solid[] {
+  /// The part of the level that never moves, as the bees' map sees it: the terrain, the spike
+  /// strips and the saws.
+  private ground(): Solid[] {
     const out: Solid[] = [];
     for (const item of this.terrain) {
       if (!item.solid) continue;
@@ -598,6 +599,12 @@ export class DogSim {
     }
     for (const r of this.spikes) out.push(rect(r));
     for (const saw of this.saws) out.push(circle({ x: saw.x, y: saw.y }, saw.r));
+    return out;
+  }
+
+  /// Every solid a bee has to get around, in canvas coordinates, wherever it has ended up.
+  solids(): Solid[] {
+    const out = this.ground();
     // A flame is a wall to a bee, and a little more: the bee keeps a berth from it. Boulders are
     // not here at all, because bees fly through them.
     for (const flame of this.flames) out.push(rect(inset(flame, -FLAME_BERTH, -FLAME_BERTH)));
@@ -669,7 +676,7 @@ export class DogSim {
   /// route re-plan their crew work on the same map.
   private rebuildField() {
     const dogs = this.dogs.map((dog) => dog.position);
-    this.field.rebuild(this.solids(), dogs.map((center) => ({ center, radius: DOG_RADIUS })), BEE_RADIUS);
+    this.field.rebuild(this.solids(), dogs.map((center) => ({ center, radius: DOG_RADIUS })), BEE_RADIUS, this.ground());
     this.routeOpen = this.swarm.bees.some((bee) => this.field.nearbyDirection(bee.position) !== null);
     const { bodies, anchors } = this.crewSurvey();
     this.swarm.survey(bodies, anchors, dogs, this.field);

@@ -1,0 +1,92 @@
+{
+  "id": "low-fire",
+  "name": "Low fire",
+  "hint": "Three flames overhead. Keep the roof under them.",
+  "inkBudget": 225,
+  "stars": [
+    180,
+    219
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 34,
+      "w": 402,
+      "h": 40,
+      "skin": "grass"
+    }
+  ],
+  "fires": [
+    {
+      "x": 149,
+      "y": 136
+    },
+    {
+      "x": 201,
+      "y": 136
+    },
+    {
+      "x": 253,
+      "y": 136
+    }
+  ],
+  "dogs": [
+    {
+      "id": "clawd",
+      "x": 201,
+      "y": 92
+    }
+  ],
+  "hives": [
+    {
+      "x": 40,
+      "y": 660,
+      "count": 8,
+      "delay": 1
+    },
+    {
+      "x": 362,
+      "y": 660,
+      "count": 8,
+      "delay": 1
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            151,
+            78
+          ],
+          [
+            154,
+            104
+          ],
+          [
+            172,
+            118
+          ],
+          [
+            201,
+            122
+          ],
+          [
+            230,
+            118
+          ],
+          [
+            248,
+            104
+          ],
+          [
+            251,
+            78
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 14
+  }
+}

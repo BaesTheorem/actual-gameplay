@@ -1,0 +1,22 @@
+{
+  "id": "the-door",
+  "name": "The door",
+  "hint": "One pin is a door. The other holds fire.",
+  "parPins": 1,
+  "winWhen": "treasureReachesHero",
+  "walls": [
+    {"x": 276, "y": 300, "w": 14, "h": 70}
+  ],
+  "pins": [
+    {"id": "p1", "x": 160, "y": 82, "w": 40, "side": "right", "angle": 90},
+    {"id": "p2", "x": 290, "y": 300, "w": 74, "side": "right"}
+  ],
+  "pools": [
+    {"liquid": "lava", "x": 292, "y": 314, "w": 70, "h": 30, "count": 26}
+  ],
+  "actors": {
+    "hero": {"x": 80, "y": 84},
+    "treasure": {"x": 327, "y": 79}
+  },
+  "solution": ["p1"]
+}

@@ -1,0 +1,128 @@
+{
+  "id": "two-fires",
+  "name": "Two fires",
+  "hint": "A fire at each end of the stone. Ink that touches one burns away.",
+  "inkBudget": 260,
+  "stars": [
+    205,
+    249
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 111,
+      "y": 34,
+      "w": 180,
+      "h": 40,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 115,
+      "y": 74,
+      "w": 24,
+      "h": 6,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 263,
+      "y": 74,
+      "w": 24,
+      "h": 6,
+      "skin": "stone"
+    }
+  ],
+  "killers": [
+    {
+      "x": 0,
+      "y": 34,
+      "w": 111,
+      "h": 26,
+      "kind": "water"
+    },
+    {
+      "x": 291,
+      "y": 34,
+      "w": 111,
+      "h": 26,
+      "kind": "water"
+    }
+  ],
+  "fires": [
+    {
+      "x": 127,
+      "y": 80
+    },
+    {
+      "x": 275,
+      "y": 80
+    }
+  ],
+  "dogs": [
+    {
+      "id": "clawd",
+      "x": 201,
+      "y": 92
+    }
+  ],
+  "hives": [
+    {
+      "x": 40,
+      "y": 660,
+      "count": 8,
+      "delay": 1
+    },
+    {
+      "x": 362,
+      "y": 660,
+      "count": 8,
+      "delay": 1
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            161,
+            78
+          ],
+          [
+            161,
+            108
+          ],
+          [
+            166.4,
+            126
+          ],
+          [
+            181,
+            139.2
+          ],
+          [
+            201,
+            144
+          ],
+          [
+            221,
+            139.2
+          ],
+          [
+            235.6,
+            126
+          ],
+          [
+            241,
+            108
+          ],
+          [
+            241,
+            78
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 14
+  }
+}

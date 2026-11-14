@@ -1,0 +1,51 @@
+{
+  "id": "the-works",
+  "name": "The works",
+  "hint": "Everything is in here. He goes last.",
+  "parPins": 3,
+  "winWhen": "heroReachesGoal",
+  "walls": [
+    {"x": 98, "y": 140, "w": 14, "h": 480},
+    {"x": 212, "y": 140, "w": 14, "h": 480},
+    {"x": 238, "y": 108, "w": 14, "h": 150},
+    {"x": 276, "y": 108, "w": 14, "h": 150}
+  ],
+  "grates": [
+    {"x": 212, "y": 68, "w": 80, "h": 12}
+  ],
+  "vents": [
+    {"x": 112, "y": 360, "w": 100, "h": 14}
+  ],
+  "doors": [
+    {"id": "d", "x": 294, "y": 68, "w": 14, "h": 60, "slide": "up"}
+  ],
+  "plates": [
+    {"id": "a", "x": 44, "y": 68, "w": 40, "opens": ["d"]}
+  ],
+  "pins": [
+    {"id": "a1", "x": 112, "y": 250, "w": 100, "side": "left", "group": "a"},
+    {"id": "a2", "x": 252, "y": 108, "w": 24, "side": "left", "group": "a"},
+    {"id": "p2", "x": 38, "y": 330, "w": 60, "side": "left"},
+    {"id": "p3", "x": 112, "y": 460, "w": 100, "side": "right"},
+    {"id": "p4", "x": 252, "y": 190, "w": 24, "side": "right"},
+    {"id": "p5", "x": 112, "y": 560, "w": 100, "side": "right"}
+  ],
+  "boulders": [
+    {"x": 64, "y": 362}
+  ],
+  "bombs": [
+    {"x": 264, "y": 80}
+  ],
+  "pools": [
+    {"liquid": "gas", "x": 112, "y": 204, "w": 100, "h": 46, "count": 45},
+    {"liquid": "lava", "x": 254, "y": 122, "w": 20, "h": 30, "count": 6},
+    {"liquid": "water", "x": 254, "y": 204, "w": 20, "h": 40, "count": 12},
+    {"liquid": "lava", "x": 114, "y": 574, "w": 96, "h": 30, "count": 24}
+  ],
+  "actors": {
+    "hero": {"x": 162, "y": 490},
+    "foes": [{"x": 162, "y": 280}, {"x": 326, "y": 84}],
+    "goal": {"x": 316, "y": 68, "w": 48, "h": 56}
+  },
+  "solution": ["p2", "a1", "p3"]
+}

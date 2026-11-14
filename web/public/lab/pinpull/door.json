@@ -1,7 +1,6 @@
 {
   "id": "door",
   "name": "Dead weight",
-  "rules": 2,
   "hint": "The door opens for anything heavy. The goblin is behind it.",
   "parPins": 2,
   "winWhen": "treasureReachesHero",

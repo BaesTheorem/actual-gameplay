@@ -14,26 +14,32 @@ fits through. Bees with no way in work as a crew: they pick the least secure loo
 the shield they can reach, line up along it, wind up, and heave on it together, alternating
 the middle and the far end, straight and tilted up, and move on to the next weakest part
 when one will not budge. Footing and mass decide what survives, so a bar balanced on a
-point or a lid resting on him goes, and a shape that stands on its own feet holds. Sixteen levels,
-each a different problem: a lid over a pit, a plinth in the water with a socket to fit, a hole in a
-roof and only enough ink to plug it, one open side of a low cave, two of them on facing cliffs
-over lava, a step beside a moat with the far bank as the only other footing, blades at his feet
-with posts beyond them, saws either side of a slope, a no-ink zone right over his head, bees
-rising through the floor, a boulder to route into a gap, a plinth in the moat. Water and lava
-are real hazards: ink that lands in them sinks, and so does he. Three stars for a low-ink clear.
+point or a lid resting on him goes, and a shape that stands on its own feet holds. Thirty levels
+in six chapters of five. First shields is the roof and what it needs: ground under both feet,
+enough ink for two of them, and the fact that ink falls. Bad ground takes the footing away: a
+plinth in the water, a far bank, three stones in a moat, bees rising through the floor, two cliffs
+over lava. Tight spots has little ink and places it cannot go: a door that has to stand in a
+doorway, a hole in a roof to plug, a boulder to stop over a gap. Blades has saws, which take any
+stroke that touches one. Fire burns ink away at 40 points a second and is a wall to the bees.
+Things fall has boulders and bombs on timers, and ice that nothing grips. Water and lava are real
+hazards: ink that lands in them sinks, and so does he. Three stars for a low-ink clear.
 
-**Pull the Pin.** Chambers of water and lava held up by pins. Tap a pin to slide it out.
-Water and lava cancel each other, lava ends the hero and melts the gem, drains swallow
-whatever reaches them, and grates take the liquid while anything solid drops through.
-Seven of the twelve levels are towers: the hero starts on an upper floor and comes down as
-pins go, goblins wait in the chambers and have to be flooded, burned or dropped into a pit
-before he passes, slabs and tilted pins pour a chamber sideways through a side door, and a
-gem sometimes rides the water. Each level has exactly one pull order that wins: every other
-order burns the hero, melts the gem, hands him to a goblin, or throws away the water you
-needed. The pull count stays low on purpose. Water and lava cancel one for one no matter
-what order they meet in, so a level that needs two fires put out has two answers, not one;
-the forcing always comes from a victim in the way, and the difficulty is in which pin, not
-how many.
+**Pull the Pin.** Chambers of water, lava and gas held up by pins. Tap a pin to slide it out.
+The hero walks to the gem, the exit or his friend as soon as the way is clear, and he will
+not set out while lava, gas, a lit crate or a living goblin is on his road. Goblins have no
+such care: they run at whoever they can reach. Water and lava cancel each other, lava ends
+the hero and melts the gem, drains swallow whatever reaches them, and grates take the liquid
+while anything solid drops through. Thirty levels in six chapters of five, and each chapter
+adds a family of pieces: fire and water; goblins and the friend; boulders and slopes; crates
+of powder and cracked walls; linked pins, plates and stone doors; gas and vents, and then a
+last level with all of it. Each level has exactly one pull order that wins in par: every
+other order burns the hero, melts the gem, hands him or his friend to a goblin, flattens
+him, blows him up, gasses him, or leaves him with no way on. The pull count stays low on
+purpose: par is three at most and no level has more than six pins. Water and lava cancel
+one for one no matter what order they meet in, so a level that needs two fires put out has
+two answers, not one; the forcing always comes from a victim in the way, and the difficulty
+is in which pin, not how many. The iPhone app has the twelve levels of the first version, in
+which nobody walks.
 
 **Crowd Run.** Drag to steer a crowd down a road. Green gates grow it, red ones shrink it,
 walls and blades and spikes thin it, and whatever is left fights a crowd or a boss at the
@@ -85,8 +91,8 @@ Node with no simulator:
 ### Levels and chapters
 
 A level is one file, `web/levels/<folder>/<id>.json`. The folder is `pinpull` or `savedog`, and
-the id is a kebab-case slug made from the level's name, such as `two-ways-down`. The id is the
-file's name, it is what a save and a route use (`#/pinPull/two-ways-down`), and it never changes.
+the id is a kebab-case slug made from the level's name, such as `down-and-out`. The id is the
+file's name, it is what a save and a route use (`#/pinPull/down-and-out`), and it never changes.
 `chapters.json` in the same folder puts the levels in play order: a list of chapters, each with
 an `id`, a `title`, a one-line `blurb` and its `levels` by id. The label a player sees, "1-3", is
 the chapter's id and the level's place in that chapter. It is worked out from the chapter list
@@ -140,20 +146,22 @@ level the card also offers "Hint (no ad)": Pull the Pin rings the pins of the st
 the order to pull them, one pin more with each hint taken, and Save the Clawd shows the stored
 strokes as a dotted ghost. Both last four seconds. A level with no stored solution offers nothing.
 
-### Pull the Pin's walking rules
+### Pull the Pin's rules
 
-A Pull the Pin level that says `"rules": 2` plays by the walking rules. A level without it plays
-exactly as it always did, and every newer field in it is ignored. Under the walking rules:
+Every Pull the Pin level plays by the same rules:
 
 - **Characters walk.** The hero goes for the gem, the exit, the gem and then the exit, or the
-  friend, by the level's `winWhen` (`heroReachesFriend` is new). A goblin goes for the hero or the
-  friend, the nearer one if it can reach both. The friend (`actors.friend`) never walks. A walker
+  friend, by the level's `winWhen` (`treasureReachesHero`, `heroReachesGoal`, `both`,
+  `heroReachesFriend`). A goblin goes for the hero or the friend, the nearer one if it can
+  reach both. The friend (`actors.friend`) never walks. A walker
   needs a route: a probe steps along the floor six points at a time, sixty steps at most, and
   stops at anything solid at body height, at a ceiling less than 34 points up, and at a floor
   that rises or falls more than 8 points in one step. So a slope of up to 53 degrees is a road
   and a ledge is not. The hero walks at 70 points a second and a goblin at 55. The hero will not
   set out on a route with lava, gas, a lit bomb or a living goblin on it. Water does not stop
-  him, and nothing stops a goblin.
+  him, and nothing stops a goblin. He has the gem, or has met his friend, when the gap between
+  the two is 8 points or less with nothing solid in it, so water he pushes ahead of him cannot
+  hold them apart.
 - **Boulders** (`boulders: [{x, y, r?}]`) roll. One that meets a character at 120 points a second
   or more, measured between the two of them, flattens him.
 - **Bombs and cracked walls** (`bombs: [{x, y}]`, `cracked: [rect]`). Lava lights a dry bomb and
@@ -170,14 +178,36 @@ exactly as it always did, and every newer field in it is ignored. Under the walk
 Every number is a named constant in `web/src/sim/pinpull/level.ts` or `route.ts`, with the rule
 it belongs to written beside it. Three tools go with the rules:
 
-    npx tsx scripts/film.ts pinPull <level id | file.json> [--pins p1,p2]         a run as one picture, a frame every half second
-    npx tsx scripts/pin-suite.ts play|audit|odds <level id | file.json> [p1,p2]   one level: a pull order, the audit, the odds
-    #/pinPull/~<name>                                                             web/public/lab/pinpull/<name>.json, in the game
+    npx tsx scripts/film.ts pinPull <level id | file.json> [--pins p1,p2] [--noise 3]   a run as one picture, a frame every half second
+    npx tsx scripts/pin-suite.ts play|audit|odds <level id | file.json> [p1,p2]         one level: a pull order, the audit, the odds
+    npx tsx scripts/pin-suite.ts check <level id | file.json>                           everything a level has to pass, below
+    npx tsx scripts/pin-suite.ts soak <level id | file.json>                            the stored solution over many waits and noisy starts
+    #/pinPull/~<name>                                                                   web/public/lab/pinpull/<name>.json, in the game
 
 The film needs no browser and writes `build/film/<level>-<pins>.png`. The lab route plays a level
 file that is in no chapter, with no sticker and nothing saved, under the title "Lab: <name>". It
-reads `public/lab/<mode folder>/`, so any mode with levels can be looked at the same way. Seven
-small levels are in the lab, one for each of the newer pieces.
+reads `public/lab/<mode folder>/`, so any mode with levels can be looked at the same way. Four
+small levels are in the lab: `bomb`, `door`, `gas` and `linked`.
+
+`check` is what every level of the campaign passed, and each part is a verb of its own:
+
+- `still`: with no pin pulled, nothing happens for six seconds.
+- `tree` and `audit`: every pull order is played, and exactly one wins in par (UNIQUE). Each
+  wrong first move ends in a loss or with nothing left that wins.
+- `odds`: the share of random play that wins, which falls from the first level of a chapter to
+  the last.
+- `delayed`: the stored solution still wins when every pull after the first waits 1.5 seconds
+  and 4 seconds longer than it had to, so the answer does not hang on fast fingers.
+- `noise`: the stored solution is played eight times, each with every body that can move
+  started up to 0.05 points off its place, from seeds 1 to 8. All eight have to win, because
+  the same simulation does not give quite the same run on every processor, and an answer that
+  sits on an edge would fail on someone's phone. `film.ts --noise 3` films one of those starts.
+- No more than six pins (a group counts once) and 420 particles.
+
+`soak` is the same two tests made wide: 61 waits from 0 to 6 seconds and 96 noisy starts. It
+takes a minute or more a level, so it is no part of `check`. Two waits and eight seeds can miss
+a solution that fails one time in ten, and two levels of the campaign did pass `check` and lose
+here before they were changed. Run it on a new level before it ships.
 
 ### Save the Clawd's hazards
 
@@ -219,12 +249,27 @@ won by its stored stroke, by at least seven of that stroke's eight shifted and s
 no naive stroke, and by 0 to 2 of 48 random strokes. With its hazard taken out each is won by 7 to
 29 of the same 48.
 
+The campaign's last two chapters are built on them: five levels of fire, then boulders, bombs and
+ice. Each of those ten was measured the same two ways. With its hazard, 0 to 2 of 48 random
+strokes survive. With the fires, boulders and bombs taken out and the ice turned to grass, 5 to 24
+of the same 48 do.
+
+Every level of the campaign is held to one bar, and `npm run audit -- saveDog --random 16` and
+`npm run stats` are how it is read. The stored stroke wins, and so do at least six of its eight
+shifted and scaled copies (seven or eight on all but one level). No naive stroke wins. Of 48
+random strokes, 32 survive the first level, 3 or less every other level of chapter 1, 2 or less
+every level after that, and none the last level of chapters 2 to 6. Inside a chapter the number
+never rises. Every hive waits long enough that the first bee reaches him no sooner than three
+seconds after the release, so a wrong answer is seen to fail. Three stars are the stored stroke's
+ink and 15 percent, two stars 40 percent, and the budget is over that.
+
 The bees are as strong here as in the iPhone build, and `web/tests/dog-v2-bees.test.ts` holds
 them there three ways. Bees pushing a bar along grass speed it up by what the constants give by
 hand, to within a twentieth. The old Holes below, where the iPhone build tuned its heave, holds
 and loses its bars at the same strengths it did there. And the iPhone build's first audit with
-random strokes, played here with its own seeds on the levels that have not changed since, counts
-10 of 16 on First shield, where the iPhone counted 10, and is within two of its count on the others.
+random strokes, played here with its own seeds on First shield, Lid and Roll it in as that build
+had them (`attic/dog-v2`), counts 10 of 16 on First shield, where the iPhone counted 10, and is
+within two of its count on the others.
 
 What the levels of this mode have taught, for whoever writes the next ones:
 
@@ -240,7 +285,9 @@ What the levels of this mode have taught, for whoever writes the next ones:
   0.52 for each point of ink. Twelve bees slide nothing heavier than 90 points of ink along
   grass, and lift nothing heavier than 71. So the crew wins by tipping what is balanced and by
   getting under what is light, and never by moving a dome that stands on its feet. It slides a
-  light dome off a narrow plinth, and two small studs on the rim turn that into a fitting puzzle.
+  light dome off a narrow plinth. Studs on the rim stop that, and they also give a wide arc
+  something to hook: a tall plinth with studs lost to 8 of 48 random strokes that hung on its
+  corners. Keep the water close under the rim, so that whatever hangs over it sinks.
 - The crew lines up above the end of a bar that lies on the ground, not behind it, so it cannot
   push such a bar along.
 - The audit draws its random strokes around the first character only, so two characters defeat
@@ -252,6 +299,23 @@ What the levels of this mode have taught, for whoever writes the next ones:
   it. A boulder matters where it can reach him, where a stroke would have to pass through it, and
   as a weight on whatever it comes to rest on. A blast kills through air and only nudges a dome,
   which takes him along. On ice a dome that has nothing to catch on slides off with him inside it.
+- A random bar is held to the canvas, so a long one ends 4 points from a side wall and seals
+  against it. Where the far footing is level with his head, a bar from the wall to that footing
+  is a lid. Keep 0.95 of the budget under the distance from the wall to the footing, and under
+  386 where he stands at the middle.
+- Stone beside him fits a stroke to itself. An arc drawn through a wall, a post or a shelf is
+  trimmed 6 points short of it and leans there, sealed. Fire does not trim, it burns, so a level
+  about fire wants open ground, with nothing but flames near the places the ink must end.
+- A stroke that ends up between him and a low roof jams there and counts as a door. A floor that
+  is higher under him than at the doorway leaves air over the junk.
+- Bars that rest on his head fail slowly or not at all, by the tenth of a second the bees come
+  out. Do not leave a level's answer to that: give such a bar water to tip into, or no way to
+  reach him.
+- A wrong answer needs three seconds to fail in. Bees fly 260 points a second, so a hive closer
+  than about 750 points opens late (`delay`). On ice, stand him against a held boulder: a stroke
+  that lands on him cannot send him off the edge before the boulder is let go.
+- On ice, things that are free to run meet hard. A roof that leaves a boulder and him 50 points
+  of plank lets the boulder stop first and him reach it at more than 120 points a second.
 
 ### Checks and deploys
 

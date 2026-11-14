@@ -2,19 +2,35 @@
   "id": "lid",
   "name": "Lid",
   "hint": "He is already in a pit. Put a lid on it.",
-  "inkBudget": 180,
+  "inkBudget": 185,
   "stars": [
-    140,
-    160
+    150,
+    182
   ],
   "statics": [
     {
       "type": "rect",
       "x": 0,
       "y": 34,
-      "w": 402,
+      "w": 150,
       "h": 40,
       "skin": "grass"
+    },
+    {
+      "type": "rect",
+      "x": 252,
+      "y": 34,
+      "w": 150,
+      "h": 40,
+      "skin": "grass"
+    },
+    {
+      "type": "rect",
+      "x": 150,
+      "y": 34,
+      "w": 46,
+      "h": 40,
+      "skin": "stone"
     },
     {
       "type": "rect",
@@ -33,6 +49,15 @@
       "skin": "stone"
     }
   ],
+  "killers": [
+    {
+      "x": 196,
+      "y": 34,
+      "w": 56,
+      "h": 28,
+      "kind": "water"
+    }
+  ],
   "decor": [
     {
       "sprite": "rock",
@@ -45,20 +70,22 @@
   "dogs": [
     {
       "id": "clawd",
-      "x": 201,
+      "x": 176,
       "y": 92
     }
   ],
   "hives": [
     {
-      "x": 30,
-      "y": 400,
-      "count": 7
+      "x": 40,
+      "y": 660,
+      "count": 7,
+      "delay": 0.8
     },
     {
-      "x": 372,
-      "y": 400,
-      "count": 7
+      "x": 362,
+      "y": 660,
+      "count": 7,
+      "delay": 0.8
     }
   ],
   "solution": {

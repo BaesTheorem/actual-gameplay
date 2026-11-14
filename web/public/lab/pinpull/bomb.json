@@ -1,7 +1,6 @@
 {
   "id": "bomb",
   "name": "Dry powder",
-  "rules": 2,
   "hint": "Lava lights it. Water ruins it. Both are up there.",
   "parPins": 2,
   "winWhen": "treasureReachesHero",

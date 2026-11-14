@@ -1,7 +1,6 @@
 {
   "id": "gas",
   "name": "Bad air",
-  "rules": 2,
   "hint": "It goes up. So wait until it has gone.",
   "parPins": 2,
   "winWhen": "heroReachesFriend",

@@ -142,14 +142,10 @@ export const applyTransform = (t: StrokeTransform, points: Vec[]): Vec[] => {
 
 /// Stored solutions that need a nudge in this engine, as a shift of the level file's strokes, by level id.
 ///
-/// roll-it-in: the boulder meets the pinned wall at 200 pt/s, comes back at 10 pt/s, and lands
-/// 0.65 pt past the corner of the lip it has to lean on, so it rolls away from the wall. Measured
-/// by moving the wall: the pass boundary is 0.2 pt right of the stored position, which is less
-/// than the 0.75 pt the engine keeps between touching shapes. One point right wins, and so does
-/// every quarter point from +0.25 to +6, so the shifted wall is not on an edge of its own.
-export const WEB_SOLUTIONS: Record<string, StrokeTransform> = {
-  "roll-it-in": { dx: 1, dy: 0, scale: 1 },
-};
+/// The table is empty. Its one entry was for the first Roll it in, a level made for the iPhone
+/// build, whose wall sat 0.2 pt on the wrong side of an edge here. That level was rebuilt for this
+/// engine and its stored wall is replayed where it is drawn.
+export const WEB_SOLUTIONS: Record<string, StrokeTransform> = {};
 
 /// The solution this engine replays for a level: the stored one, moved when the table says so.
 export const baseTransform = (level: DogLevel): StrokeTransform => WEB_SOLUTIONS[level.id] ?? IDENTITY;

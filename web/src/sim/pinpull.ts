@@ -8,31 +8,15 @@ import {
 } from "./sk";
 import {
   BLAST_KICK, BLAST_RADIUS, BOMB_FUSE, BOMB_SIZE, BOULDER_RADIUS, CRUSH_SPEED, Cat, DOOR_SECONDS, FOE_WALK, FRAME_THICKNESS,
-  FRIEND_RADIUS, HERO_RADIUS, HERO_WALK, KNOB_OFFSET, LIQUID_RADIUS, PIN_THICKNESS, PLATE_HEIGHT, segmentQuad, stars,
+  FRIEND_RADIUS, GEM_REACH, HERO_RADIUS, HERO_REACH, HERO_WALK, KNOB_OFFSET, LIQUID_RADIUS, PIN_THICKNESS, PLATE_HEIGHT, segmentQuad, stars,
   type DoorSpec, type PinLevel, type PinSpec, type PlateSpec, type Rect,
 } from "./pinpull/level";
-import { ROUTE_EVERY, findRoute, floorUnder, inCorridor } from "./pinpull/route";
+import { FOOTING, ROUTE_EVERY, findRoute, floorUnder, inCorridor } from "./pinpull/route";
 
 export * from "./pinpull/level";
 export * from "./pinpull/route";
 
 const LIQUID_MAX_SPEED = 700;
-
-/// The rules a level asks for with `"rules": 2`: characters walk, and the level can carry
-/// boulders, bombs, cracked walls, linked pins, plates, doors, gas, vents and a friend.
-const WALKING_RULES = 2;
-/// Whether a level plays by the walking rules. This is the one place the flag is read.
-export const walks = (level: PinLevel): boolean => level.rules === WALKING_RULES;
-
-/// A level that did not ask for the walking rules, with every field those rules added taken out
-/// of it, so it plays exactly as it did before they existed.
-const firstRules = (level: PinLevel): PinLevel => ({
-  ...level,
-  pins: level.pins.map(({ group: _, ...pin }) => pin),
-  pools: level.pools?.map((pool) => (pool.liquid === "gas" ? { ...pool, liquid: "water" } : pool)),
-  actors: { ...level.actors, friend: undefined },
-  cracked: undefined, boulders: undefined, bombs: undefined, plates: undefined, doors: undefined, vents: undefined,
-});
 
 // A boulder is heavy and rolls. The damping is what stops it on a flat floor: with none it would
 // roll for twenty seconds and the world would never be calm.
@@ -122,9 +106,6 @@ const gap = (p: Vec, r: Rect) => Math.hypot(Math.max(r.x - p.x, 0, p.x - r.x - r
 export class PinSim {
   readonly sk = new SKWorld(-6);
   readonly clock = new Clock();
-  /// The level as it is played: the file itself under the walking rules, and otherwise the file
-  /// with everything those rules added left out.
-  readonly level: PinLevel;
   readonly pins: Pin[] = [];
   readonly pulled: string[] = [];
   particles: Particle[] = [];
@@ -150,13 +131,14 @@ export class PinSim {
   winLatchedAt: number | null = null;
   elapsed = 0;
 
-  /// True under the walking rules. The constructor sets it and tick() reads it, and nothing else in here asks.
-  private readonly walkingRules: boolean;
   private latched = new Set<string>();
   private calmFrames = 0;
   private lastPullTime = -10;
   private replayArmed = false;
   private replayQueue: string[] = [];
+  private replayHold = 0;
+  /// When the world first let the next replayed pull go, or null while it has not.
+  private replayReadyAt: number | null = null;
   private steamBudget = 0;
   private splashArmed = false;
   private lastSizzle = -10;
@@ -167,9 +149,7 @@ export class PinSim {
   private before = new Map<planck.Body, Vec>();
   private doorsMoved = false;
 
-  constructor(level: PinLevel, private emit: Emit = () => {}) {
-    this.walkingRules = walks(level);
-    this.level = this.walkingRules ? level : firstRules(level);
+  constructor(readonly level: PinLevel, private emit: Emit = () => {}) {
     this.build();
   }
 
@@ -185,10 +165,12 @@ export class PinSim {
     return single + groups.size;
   }
 
-  /// Pull these pins in order as the world allows.
-  replay(pins: string[]) {
+  /// Pull these pins in order as the world allows. `hold` makes every pull after the first wait
+  /// that many seconds longer than it had to, which is how a slow player is tried.
+  replay(pins: string[], hold = 0) {
     this.replayArmed = true;
     this.replayQueue = [...pins];
+    this.replayHold = hold;
   }
 
   // MARK: build
@@ -273,8 +255,8 @@ export class PinSim {
       this.foes.push(foe);
     }
 
-    // The newer pieces name the older ones in their own masks, and a pair meets when either side
-    // lists the other. So nothing above had to change for them.
+    // The friend, the boulders and the crates name the bodies above in their own masks, and a
+    // pair meets when either side lists the other.
     const bodies = Cat.hero | Cat.treasure | Cat.foe | Cat.friend | Cat.boulder | Cat.bomb;
     if (level.actors.friend) {
       this.friend = sk.circle({
@@ -308,9 +290,7 @@ export class PinSim {
   /// Every wall rectangle, the standard frame included.
   walls(): Rect[] {
     const t = FRAME_THICKNESS;
-    const frame = this.level.frame ?? true
-      ? [{ x: 24, y: 54, w: t, h: 660 }, { x: 364, y: 54, w: t, h: 660 }, { x: 24, y: 54, w: 354, h: t }]
-      : [];
+    const frame = [{ x: 24, y: 54, w: t, h: 660 }, { x: 364, y: 54, w: t, h: 660 }, { x: 24, y: 54, w: 354, h: t }];
     return [...frame, ...(this.level.walls ?? [])];
   }
 
@@ -439,9 +419,10 @@ export class PinSim {
     // 6 pt/s: a settled pile reads below it, a treasure creeping down a slab reads above it.
     this.calmFrames = fastest < 6 && !pending ? this.calmFrames + 1 : 0;
 
-    if (this.walkingRules) this.walk();
+    this.walk();
     this.ticks += 1;
     if (this.finished || this.dying) return;
+    this.reach();
     // The goal is met, but lava may still be on its way. The win lands when the world has
     // settled, or after a few seconds if it never quite does. Lava that arrives first still
     // ends him. This comes before any replayed pull so a settled win is not undone by the next tap.
@@ -452,7 +433,12 @@ export class PinSim {
     if (this.replayArmed && this.replayQueue.length > 0) {
       const since = this.elapsed - this.lastPullTime;
       const ready = this.pulled.length === 0 ? this.elapsed >= 0.8 : since >= 1.0 && (this.calmFrames >= 30 || since >= 8.0);
-      if (ready) this.pull(this.replayQueue.shift()!);
+      if (ready && this.replayReadyAt === null) this.replayReadyAt = this.elapsed;
+      const held = this.pulled.length === 0 ? 0 : this.replayHold;
+      if (this.replayReadyAt !== null && this.elapsed - this.replayReadyAt >= held - 1e-9) {
+        this.replayReadyAt = null;
+        this.pull(this.replayQueue.shift()!);
+      }
     }
     const settled = this.calmFrames >= 45 && this.elapsed - this.lastPullTime > 1.5;
     if (this.pins.length > 0 && this.pins.every((p) => p.pulled) && settled) {
@@ -556,6 +542,26 @@ export class PinSim {
     if (!was) this.emit({ type: "fx", name: "walk", x: at.x, y: at.y - HERO_RADIUS });
     if (floorUnder(this.sk, at, HERO_RADIUS) === null) return;
     setVelocity(body, { x: dir * pace, y: velocity(body).y });
+  }
+
+  /// The hero has the gem, and has met his friend, from a drop's width away. Touching is the
+  /// usual way and is seen as a contact. This is for the water he pushes ahead of him as he wades:
+  /// it is caught between him and what he came for, and holds the two apart for good.
+  private reach() {
+    const hero = this.hero;
+    if (!hero || tagOf(hero).removed) return;
+    const at = position(hero);
+    const within = (body: planck.Body | null, radius: number): boolean => {
+      if (!body || tagOf(body).removed) return false;
+      const to = position(body);
+      return Math.hypot(to.x - at.x, to.y - at.y) <= HERO_RADIUS + radius + HERO_REACH && !this.sk.rayCast(at, to, FOOTING);
+    };
+    if (!this.latched.has("treasureHero") && within(this.treasure, GEM_REACH)) this.latch("treasureHero");
+    if (!this.latched.has("heroFriend") && within(this.friend, FRIEND_RADIUS)) this.reachFriend();
+    if (this.winConditionMet && this.winLatchedAt === null) {
+      this.winLatchedAt = this.elapsed;
+      this.calmFrames = 0;
+    }
   }
 
   /// What the hero is after now, as a rectangle: the gem, the exit or the friend, by the level's
@@ -920,10 +926,11 @@ const inset = (r: Rect, by: number): Rect => {
   return { x: r.x + dx, y: r.y + dy, w: r.w - 2 * dx, h: r.h - 2 * dy };
 };
 
-/// Step a level until it ends, with the given pins pulled in order. The replay suite and the audit both use this.
-export const playOut = (level: PinLevel, pins: string[], maxSeconds = 120): { outcome: Outcome | null; seconds: number; pulled: number } => {
+/// Step a level until it ends, with the given pins pulled in order. The replay suite and the audit
+/// both use this. `hold` is the extra wait before every pull after the first, in seconds.
+export const playOut = (level: PinLevel, pins: string[], maxSeconds = 120, hold = 0): { outcome: Outcome | null; seconds: number; pulled: number } => {
   const sim = new PinSim(level);
-  sim.replay(pins);
+  sim.replay(pins, hold);
   const frames = Math.ceil(maxSeconds / STEP);
   for (let i = 0; i < frames && !sim.finished; i++) sim.frame();
   return { outcome: sim.outcome, seconds: sim.elapsed, pulled: sim.pulled.length };

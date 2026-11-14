@@ -109,7 +109,7 @@ lava), the gem throws ochre sparks, steam is cream, ink is ink, a gain is sap an
 
 ## Pull the Pin's pieces
 
-What the walking rules added is drawn with what was already here.
+Every piece is drawn with what the rest of the game already had.
 
 - Pins that are pulled together share a colour: a disc of it on the knob and a 6 pt band of it
   across the bar at the knob's end, both with an ink line. The first group in a level is ochre,
@@ -146,6 +146,17 @@ What the walking rules added is drawn with what was already here.
   dust and shakes the level 3 pt.
 - Ice is the terrain skin `ice`. A branch of ice is the pale blue of those tiles, `#BBD7E4`, on
   the branch's ink line.
+
+## Save the Clawd's levels
+
+- The top 150 pt of the canvas belong to the HUD and the hint plate. A hint is two lines at most.
+- A hive at the top of a level sits at y 660, under a two-line plate, with its count under it.
+  A hive that is part of the level (in a hole in the floor, beside a door) sits where it is.
+- A flame can stand on the ground, on a stone, or in the air. One that has to come no higher
+  than his head stands in a dip 6 pt deep with a stone floor.
+- Where a stroke that lands on him could shove him into a fire, he stands in a dip 6 pt deep on
+  a stone of his own width.
+- Decor is two or three pieces at most, and none where the ink has to go.
 
 ## Number Tower's pieces
 

@@ -4,8 +4,8 @@
   "hint": "Draw a roof over him. Then the bees come.",
   "inkBudget": 500,
   "stars": [
-    300,
-    400
+    272,
+    331
   ],
   "statics": [
     {
@@ -43,8 +43,9 @@
   "hives": [
     {
       "x": 201,
-      "y": 700,
-      "count": 12
+      "y": 660,
+      "count": 12,
+      "delay": 0.9
     }
   ],
   "solution": {

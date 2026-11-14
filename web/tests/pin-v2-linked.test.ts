@@ -48,13 +48,6 @@ describe("linked pins", () => {
     expect(moveOf(linked, "p2")).toBe("p1");
     expect(moveOf(linked, "p3")).toBe("p3");
   });
-
-  it("are ignored in a level that does not ask for the walking rules", () => {
-    const sim = new PinSim({ ...linked, rules: undefined });
-    sim.pull("p2");
-    expect(sim.pins.map((pin) => pin.pulled)).toEqual([false, true, false]);
-    expect(sim.remaining).toBe(2);
-  });
 });
 
 describe("the audit and the odds on a level with a group", () => {

@@ -1,4 +1,4 @@
-// What the tests of the walking rules share: a small level to build on and a way to play one.
+// What the tests of Pull the Pin's pieces share: a small level to build on and a way to play one.
 // Every level here has the standard frame, so its floor's top is at y 68 and the room runs from
 // x 38 to x 364. A hero standing on that floor has his middle at y 84, the gem at y 79.
 import type { Cue } from "../src/sim/clock";
@@ -7,9 +7,9 @@ import { STEP } from "../src/sim/sk";
 
 export const FLOOR = 68;
 
-/// A level under the walking rules. `parts` adds to it or replaces what is here.
+/// An empty level. `parts` adds to it or replaces what is here.
 export const level = (parts: Partial<PinLevel>): PinLevel =>
-  ({ id: "a-level", name: "A level", rules: 2, parPins: 1, winWhen: "treasureReachesHero", pins: [], actors: {}, ...parts });
+  ({ id: "a-level", name: "A level", parPins: 1, winWhen: "treasureReachesHero", pins: [], actors: {}, ...parts });
 
 /// A pin stood on end on the floor at x, to be a door: 40 points tall, and it slides up and out.
 export const doorPin = (id: string, x: number, group?: string) =>

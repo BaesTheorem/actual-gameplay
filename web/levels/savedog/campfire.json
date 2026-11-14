@@ -1,0 +1,116 @@
+{
+  "id": "campfire",
+  "name": "Campfire",
+  "hint": "The fire is on his island too. Roof them both, and keep the ink off the flame.",
+  "inkBudget": 345,
+  "stars": [
+    281,
+    342
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 136,
+      "y": 34,
+      "w": 160,
+      "h": 40,
+      "skin": "stone"
+    },
+    {
+      "type": "rect",
+      "x": 239,
+      "y": 74,
+      "w": 24,
+      "h": 6,
+      "skin": "stone"
+    }
+  ],
+  "killers": [
+    {
+      "x": 0,
+      "y": 34,
+      "w": 136,
+      "h": 26,
+      "kind": "water"
+    },
+    {
+      "x": 296,
+      "y": 34,
+      "w": 106,
+      "h": 26,
+      "kind": "water"
+    }
+  ],
+  "fires": [
+    {
+      "x": 251,
+      "y": 80
+    }
+  ],
+  "dogs": [
+    {
+      "id": "clawd",
+      "x": 201,
+      "y": 92
+    }
+  ],
+  "hives": [
+    {
+      "x": 40,
+      "y": 660,
+      "count": 8,
+      "delay": 1
+    },
+    {
+      "x": 362,
+      "y": 660,
+      "count": 8,
+      "delay": 1
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            148,
+            78
+          ],
+          [
+            148,
+            108
+          ],
+          [
+            157.1,
+            133
+          ],
+          [
+            182,
+            151.3
+          ],
+          [
+            216,
+            158
+          ],
+          [
+            250,
+            151.3
+          ],
+          [
+            274.9,
+            133
+          ],
+          [
+            284,
+            108
+          ],
+          [
+            284,
+            78
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 14
+  }
+}

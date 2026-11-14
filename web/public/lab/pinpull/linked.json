@@ -1,7 +1,6 @@
 {
   "id": "linked",
   "name": "Both at once",
-  "rules": 2,
   "hint": "Two pins share a colour. They also share a moment.",
   "parPins": 2,
   "winWhen": "treasureReachesHero",

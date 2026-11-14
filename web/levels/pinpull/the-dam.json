@@ -1,0 +1,31 @@
+{
+  "id": "the-dam",
+  "name": "The dam",
+  "hint": "The lava is leaning on the door.",
+  "parPins": 2,
+  "winWhen": "treasureReachesHero",
+  "walls": [
+    {"x": 38, "y": 68, "w": 80, "h": 100},
+    {"x": 122, "y": 250, "w": 14, "h": 60},
+    {"x": 192, "y": 250, "w": 14, "h": 60},
+    {"x": 118, "y": 340, "w": 14, "h": 60}
+  ],
+  "slabs": [
+    {"x1": 114.1, "y1": 162.2, "x2": 264.1, "y2": 62.2, "t": 14}
+  ],
+  "pins": [
+    {"id": "p1", "x": 178, "y": 127, "w": 44, "side": "right", "angle": 90},
+    {"id": "p2", "x": 136, "y": 250, "w": 56, "side": "left"},
+    {"id": "p3", "x": 38, "y": 340, "w": 80, "side": "left"}
+  ],
+  "pools": [
+    {"liquid": "lava", "x": 150, "y": 150, "w": 42, "h": 14, "count": 20},
+    {"liquid": "water", "x": 138, "y": 264, "w": 52, "h": 40, "count": 36},
+    {"liquid": "lava", "x": 40, "y": 354, "w": 76, "h": 24, "count": 22}
+  ],
+  "actors": {
+    "hero": {"x": 332, "y": 84},
+    "treasure": {"x": 70, "y": 179}
+  },
+  "solution": ["p2", "p1"]
+}

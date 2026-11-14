@@ -1,0 +1,26 @@
+{
+  "id": "knock-first",
+  "name": "Knock first",
+  "hint": "Goblins charge. Wet goblins do not.",
+  "parPins": 2,
+  "winWhen": "treasureReachesHero",
+  "walls": [
+    {"x": 112, "y": 250, "w": 14, "h": 70},
+    {"x": 196, "y": 250, "w": 14, "h": 70}
+  ],
+  "pins": [
+    {"id": "p1", "x": 230, "y": 82, "w": 40, "side": "right", "angle": 90},
+    {"id": "p2", "x": 126, "y": 250, "w": 70, "side": "right"},
+    {"id": "p3", "x": 38, "y": 250, "w": 74, "side": "left"}
+  ],
+  "pools": [
+    {"liquid": "water", "x": 128, "y": 264, "w": 66, "h": 40, "count": 32},
+    {"liquid": "lava", "x": 40, "y": 264, "w": 70, "h": 30, "count": 24}
+  ],
+  "actors": {
+    "hero": {"x": 330, "y": 84},
+    "treasure": {"x": 72, "y": 79},
+    "foes": [{"x": 161, "y": 84}]
+  },
+  "solution": ["p2", "p1"]
+}

@@ -4,25 +4,71 @@
     "title": "Fire and water",
     "blurb": "Water puts out lava. Lava puts out heroes.",
     "levels": [
-      "two-ways-down",
-      "wash-him-out",
-      "clear-the-landing",
-      "the-slide",
-      "down-the-chute",
-      "mind-the-hole"
+      "the-door",
+      "the-floor",
+      "the-dam",
+      "the-stack",
+      "down-and-out"
     ]
   },
   {
     "id": "2",
-    "title": "Towers",
-    "blurb": "More floors, more goblins. The only way out is down.",
+    "title": "Company",
+    "blurb": "Goblins run at whoever they can reach. Get them wet first.",
     "levels": [
-      "down-the-well",
-      "the-side-door",
-      "two-taps",
-      "gem-in-the-flood",
-      "ride-the-pin",
-      "the-whole-tower"
+      "knock-first",
+      "the-moat",
+      "down-the-drain",
+      "one-at-a-time",
+      "bait"
+    ]
+  },
+  {
+    "id": "3",
+    "title": "Heavy things",
+    "blurb": "Boulders flatten whoever is in the way. Ideally goblins.",
+    "levels": [
+      "rocks-fall",
+      "stand-clear",
+      "which-rock",
+      "doorstop",
+      "clear-the-road"
+    ]
+  },
+  {
+    "id": "4",
+    "title": "Demolition",
+    "blurb": "Crates of powder open walls. Keep them dry. Stand back.",
+    "levels": [
+      "short-fuse",
+      "wet-powder",
+      "two-birds",
+      "missing-link",
+      "fire-in-the-hole"
+    ]
+  },
+  {
+    "id": "5",
+    "title": "Strings attached",
+    "blurb": "Same colour, same tap. Doors open for anything heavy.",
+    "levels": [
+      "one-tap",
+      "doorman",
+      "two-colours",
+      "counterweight",
+      "after-you"
+    ]
+  },
+  {
+    "id": "6",
+    "title": "Bad air",
+    "blurb": "Gas goes up. Everything else still comes down.",
+    "levels": [
+      "bad-air",
+      "updraught",
+      "one-breath",
+      "last-one-down",
+      "the-works"
     ]
   }
 ]

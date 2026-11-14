@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Vec } from "../src/sim/sk";
-import { FlowField, rect, segment } from "../src/sim/savedog/flowfield";
+import { FlowField, circle, cuts, rect, segment } from "../src/sim/savedog/flowfield";
 import { contains, distance, inset } from "../src/sim/savedog/geometry";
 
 const bounds = { x: 0, y: 0, w: 300, h: 300 };
@@ -78,5 +78,48 @@ describe("FlowField", () => {
     }
     expect(crossedThroughWall).toBe(false);
     expect(distance(p, dog.center), "should still arrive, around the end of the wall").toBeLessThanOrEqual(dog.radius + 8);
+  });
+
+  it("gives a dog on a thin plank no cells on the far side of it", () => {
+    // A plank 6 points thick that falls 32 degrees, a dog standing on it, and a closed shield
+    // over him with both feet on the plank.
+    const fall = 0.625, top = (x: number) => 200 - fall * (x - 20);
+    const plank = segment({ x: 20, y: top(20) }, { x: 280, y: top(280) }, 3);
+    const lean = Math.atan(fall);
+    const on = { center: { x: 150 + 18 * Math.sin(lean), y: top(150) + 18 * Math.cos(lean) }, radius: 18 };
+    const { x, y } = on.center;
+    const left = { x: x - 44, y: top(x - 44) + 5 }, right = { x: x + 40, y: top(x + 40) + 5 };
+    const outline = [left, { x: left.x + 2, y: y + 30 }, { x: x - 20, y: y + 52 }, { x: x + 8, y: y + 50 }, { x: x + 34, y: y + 28 }, { x: right.x, y: y - 4 }, right];
+    const shield = outline.slice(1).map((p, i) => segment(outline[i], p, 4));
+    const under = { x: x + 14, y: y - 40 }, outside = { x: 40, y: 280 }, inside = { x, y: y + 26 };
+
+    // Told what the ground is, the map keeps his cells on his side of the plank: no way in.
+    const field = new FlowField(bounds);
+    field.rebuild([plank, ...shield], [on], 6, [plank]);
+    expect(field.direction(under), "under the plank").toBeNull();
+    expect(field.direction(outside), "outside the shield").toBeNull();
+    expect(field.direction(inside), "inside the shield").not.toBeNull();
+
+    // Not told, it opens the cells within reach of him on both sides of the wood, and the ones
+    // underneath lead out: every cell of the level then has a way in through the plank.
+    const leaky = new FlowField(bounds);
+    leaky.rebuild([plank, ...shield], [on], 6);
+    expect(leaky.direction(under)).not.toBeNull();
+    expect(leaky.direction(outside)).not.toBeNull();
+  });
+
+  it("knows when a line passes through a shape", () => {
+    const slab = rect({ x: 0, y: 0, w: 100, h: 20 });
+    // Down into it, along its top edge, and over it.
+    expect(cuts(slab, { x: 50, y: 40 }, { x: 50, y: 10 })).toBe(true);
+    expect(cuts(slab, { x: 10, y: 20 }, { x: 90, y: 20 })).toBe(false);
+    expect(cuts(slab, { x: 10, y: 30 }, { x: 90, y: 30 })).toBe(false);
+    const plank = segment({ x: 0, y: 0 }, { x: 100, y: 0 }, 3);
+    expect(cuts(plank, { x: 50, y: 20 }, { x: 50, y: -20 })).toBe(true);
+    expect(cuts(plank, { x: 50, y: 20 }, { x: 50, y: 4 })).toBe(false);
+    expect(cuts(plank, { x: 50, y: 20 }, { x: 50, y: 2 })).toBe(true);
+    const ball = circle({ x: 0, y: 0 }, 10);
+    expect(cuts(ball, { x: -20, y: 5 }, { x: 20, y: 5 })).toBe(true);
+    expect(cuts(ball, { x: -20, y: 12 }, { x: 20, y: 12 })).toBe(false);
   });
 });

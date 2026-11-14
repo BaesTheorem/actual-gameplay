@@ -2,10 +2,10 @@
   "id": "two-cliffs",
   "name": "Two cliffs",
   "hint": "Two of them, one on each cliff. A roof over one leaves the other to the bees.",
-  "inkBudget": 460,
+  "inkBudget": 480,
   "stars": [
-    430,
-    445
+    380,
+    462
   ],
   "statics": [
     {
@@ -49,15 +49,17 @@
   "hives": [
     {
       "x": 40,
-      "y": 720,
+      "y": 660,
       "count": 8,
-      "interval": 0.15
+      "interval": 0.15,
+      "delay": 1.5
     },
     {
       "x": 362,
-      "y": 720,
+      "y": 660,
       "count": 8,
-      "interval": 0.15
+      "interval": 0.15,
+      "delay": 1.5
     }
   ],
   "solution": {
@@ -65,16 +67,32 @@
       {
         "points": [
           [
-            40,
-            214
+            72,
+            204
+          ],
+          [
+            76,
+            240
+          ],
+          [
+            110,
+            256
           ],
           [
             201,
-            350
+            264
           ],
           [
-            362,
-            214
+            292,
+            256
+          ],
+          [
+            326,
+            240
+          ],
+          [
+            330,
+            204
           ]
         ]
       }

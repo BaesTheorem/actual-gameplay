@@ -1,0 +1,106 @@
+{
+  "id": "two-fuses",
+  "name": "Two fuses",
+  "hint": "A bomb on each side, and one fuse is shorter. Nothing in the roof but him.",
+  "inkBudget": 235,
+  "stars": [
+    188,
+    229
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 106,
+      "y": 34,
+      "w": 190,
+      "h": 40,
+      "skin": "stone"
+    }
+  ],
+  "killers": [
+    {
+      "x": 0,
+      "y": 34,
+      "w": 106,
+      "h": 26,
+      "kind": "lava"
+    },
+    {
+      "x": 296,
+      "y": 34,
+      "w": 106,
+      "h": 26,
+      "kind": "lava"
+    }
+  ],
+  "bombs": [
+    {
+      "x": 262,
+      "y": 86,
+      "at": 3.2
+    },
+    {
+      "x": 140,
+      "y": 86,
+      "at": 4.4
+    }
+  ],
+  "dogs": [
+    {
+      "id": "clawd",
+      "x": 201,
+      "y": 92
+    }
+  ],
+  "hives": [
+    {
+      "x": 60,
+      "y": 660,
+      "count": 6,
+      "delay": 1.1
+    },
+    {
+      "x": 342,
+      "y": 660,
+      "count": 6,
+      "delay": 1.1
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            170,
+            78
+          ],
+          [
+            172,
+            116
+          ],
+          [
+            184,
+            138
+          ],
+          [
+            201,
+            146
+          ],
+          [
+            218,
+            138
+          ],
+          [
+            230,
+            116
+          ],
+          [
+            232,
+            78
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 14
+  }
+}

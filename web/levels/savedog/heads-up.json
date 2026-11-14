@@ -1,0 +1,108 @@
+{
+  "id": "heads-up",
+  "name": "Heads up",
+  "hint": "Two boulders hang over him until their rings run out. Roof under them, not through them.",
+  "inkBudget": 300,
+  "stars": [
+    182,
+    221
+  ],
+  "statics": [
+    {
+      "type": "rect",
+      "x": 126,
+      "y": 34,
+      "w": 150,
+      "h": 40,
+      "skin": "stone"
+    }
+  ],
+  "killers": [
+    {
+      "x": 0,
+      "y": 34,
+      "w": 126,
+      "h": 26,
+      "kind": "water"
+    },
+    {
+      "x": 276,
+      "y": 34,
+      "w": 126,
+      "h": 26,
+      "kind": "water"
+    }
+  ],
+  "rocks": [
+    {
+      "x": 175,
+      "y": 160,
+      "r": 26,
+      "at": 3
+    },
+    {
+      "x": 227,
+      "y": 160,
+      "r": 26,
+      "at": 3.6
+    }
+  ],
+  "dogs": [
+    {
+      "id": "clawd",
+      "x": 201,
+      "y": 92
+    }
+  ],
+  "hives": [
+    {
+      "x": 60,
+      "y": 660,
+      "count": 6,
+      "delay": 0.9
+    },
+    {
+      "x": 342,
+      "y": 660,
+      "count": 6,
+      "delay": 0.9
+    }
+  ],
+  "solution": {
+    "strokes": [
+      {
+        "points": [
+          [
+            150,
+            78
+          ],
+          [
+            156,
+            104
+          ],
+          [
+            172,
+            120
+          ],
+          [
+            201,
+            126
+          ],
+          [
+            230,
+            120
+          ],
+          [
+            246,
+            104
+          ],
+          [
+            252,
+            78
+          ]
+        ]
+      }
+    ],
+    "waitSeconds": 14
+  }
+}

@@ -4,8 +4,8 @@
   "hint": "One hole in the roof and only enough ink to stop it. Anything else slides off.",
   "inkBudget": 80,
   "stars": [
-    56,
-    70
+    53,
+    64
   ],
   "statics": [
     {
@@ -80,9 +80,10 @@
   "hives": [
     {
       "x": 252,
-      "y": 700,
+      "y": 660,
       "count": 14,
-      "interval": 0.14
+      "interval": 0.14,
+      "delay": 0.7
     }
   ],
   "solution": {

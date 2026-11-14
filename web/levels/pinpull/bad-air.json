@@ -1,0 +1,27 @@
+{
+  "id": "bad-air",
+  "name": "Bad air",
+  "hint": "Gas goes up. One goblin is standing over it.",
+  "parPins": 1,
+  "winWhen": "treasureReachesHero",
+  "walls": [
+    {"x": 236, "y": 190, "w": 14, "h": 110},
+    {"x": 210, "y": 240, "w": 14, "h": 60},
+    {"x": 296, "y": 380, "w": 14, "h": 60}
+  ],
+  "pins": [
+    {"id": "p1", "x": 250, "y": 240, "w": 114, "side": "right"},
+    {"id": "p2", "x": 130, "y": 240, "w": 80, "side": "left"},
+    {"id": "p3", "x": 310, "y": 380, "w": 54, "side": "right"}
+  ],
+  "pools": [
+    {"liquid": "gas", "x": 250, "y": 194, "w": 114, "h": 46, "count": 45},
+    {"liquid": "lava", "x": 312, "y": 394, "w": 50, "h": 30, "count": 18}
+  ],
+  "actors": {
+    "hero": {"x": 70, "y": 84},
+    "treasure": {"x": 340, "y": 265},
+    "foes": [{"x": 290, "y": 270}, {"x": 170, "y": 270}]
+  },
+  "solution": ["p1"]
+}

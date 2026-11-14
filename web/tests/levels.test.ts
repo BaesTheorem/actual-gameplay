@@ -67,8 +67,8 @@ describe("the level loader", () => {
   });
 
   it("gives every id its own steady number", () => {
-    expect(idNumber("two-ways-down")).toBe(idNumber("two-ways-down"));
-    expect(idNumber("two-ways-down")).not.toBe(idNumber("two-taps"));
+    expect(idNumber("the-door")).toBe(idNumber("the-door"));
+    expect(idNumber("the-door")).not.toBe(idNumber("the-dam"));
     expect(Number.isInteger(idNumber("lid")) && idNumber("lid") >= 0).toBe(true);
   });
 });

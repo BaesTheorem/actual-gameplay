@@ -1,11 +1,11 @@
 {
   "id": "moat",
   "name": "Moat",
-  "hint": "A plinth in the moat with a socket on top. Make it fit; the water takes the rest.",
-  "inkBudget": 260,
+  "hint": "Three stones in the moat. He has one. The roof stands on the other two.",
+  "inkBudget": 335,
   "stars": [
-    190,
-    240
+    270,
+    329
   ],
   "statics": [
     {
@@ -18,34 +18,55 @@
     },
     {
       "type": "rect",
-      "x": 166,
-      "y": 200,
-      "w": 70,
+      "x": 195,
+      "y": 54,
+      "w": 40,
       "h": 30,
       "skin": "stone"
     },
     {
       "type": "rect",
-      "x": 166,
-      "y": 230,
-      "w": 6,
-      "h": 8,
+      "x": 163,
+      "y": 54,
+      "w": 24,
+      "h": 30,
       "skin": "stone"
     },
     {
       "type": "rect",
-      "x": 230,
-      "y": 230,
-      "w": 6,
-      "h": 8,
+      "x": 333,
+      "y": 54,
+      "w": 24,
+      "h": 30,
       "skin": "stone"
     }
   ],
   "killers": [
     {
-      "x": 20,
+      "x": 0,
       "y": 54,
-      "w": 362,
+      "w": 163,
+      "h": 16,
+      "kind": "water"
+    },
+    {
+      "x": 187,
+      "y": 54,
+      "w": 8,
+      "h": 16,
+      "kind": "water"
+    },
+    {
+      "x": 235,
+      "y": 54,
+      "w": 98,
+      "h": 16,
+      "kind": "water"
+    },
+    {
+      "x": 357,
+      "y": 54,
+      "w": 45,
       "h": 16,
       "kind": "water"
     }
@@ -53,15 +74,16 @@
   "dogs": [
     {
       "id": "clawd",
-      "x": 201,
-      "y": 248
+      "x": 215,
+      "y": 102
     }
   ],
   "hives": [
     {
       "x": 201,
-      "y": 700,
-      "count": 12
+      "y": 660,
+      "count": 12,
+      "delay": 1
     }
   ],
   "solution": {
@@ -69,40 +91,32 @@
       {
         "points": [
           [
-            174,
-            234
+            175,
+            88
           ],
           [
-            176,
-            260
+            178,
+            116
           ],
           [
-            182,
-            279
+            198,
+            134
           ],
           [
-            191,
-            292
+            260,
+            140
           ],
           [
-            201,
-            296
+            322,
+            134
           ],
           [
-            211,
-            292
+            342,
+            116
           ],
           [
-            220,
-            279
-          ],
-          [
-            226,
-            260
-          ],
-          [
-            228,
-            234
+            345,
+            88
           ]
         ]
       }

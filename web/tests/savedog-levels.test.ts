@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { load } from "../scripts/levels";
+import { load, loadSet } from "../scripts/levels";
 import { folderOf } from "../src/app/modetable";
 import { PLAYFIELD } from "../src/sim/sk";
 import { DRAW_AREA } from "../src/sim/savedog";
@@ -67,3 +67,61 @@ describe("Save the Clawd levels", () => {
     });
   });
 });
+
+/// The campaign as a whole: its shape, and the rules every level's words and numbers follow.
+describe("the Save the Clawd campaign", () => {
+  const { chapters, levels } = loadSet<DogLevel>(folderOf("saveDog"));
+  const ink = (level: DogLevel) => level.solution!.strokes.reduce((sum, stroke) => sum + polylineLength(strokePoints(stroke)), 0);
+
+  it("is six chapters of five levels", () => {
+    expect(chapters.map((chapter) => chapter.id)).toEqual(["1", "2", "3", "4", "5", "6"]);
+    for (const chapter of chapters) expect(chapter.levels.length, `chapter ${chapter.id}`).toBe(5);
+    expect(levels.length).toBe(30);
+    expect(new Set(levels.map((level) => level.name)).size).toBe(30);
+  });
+
+  it("speaks plainly: a hint ends with a full stop, never shouts, and fits two lines", () => {
+    for (const level of levels) {
+      expect(level.hint, level.id).toMatch(/\.$/);
+      expect(level.hint, level.id).not.toMatch(/!/);
+      // The plate wraps at 350 points, about 48 letters of the marker face at 13 points.
+      expect(level.hint!.length, level.id).toBeLessThanOrEqual(100);
+    }
+    for (const chapter of chapters) {
+      expect(chapter.blurb, chapter.id).toMatch(/\.$/);
+      expect(`${chapter.title} ${chapter.blurb}`, chapter.id).not.toMatch(/!/);
+    }
+  });
+
+  it("gives three stars at the stored ink and 15 percent, two at 40 percent, inside the budget", () => {
+    for (const level of levels) {
+      expect(level.stars[0], level.id).toBe(Math.round(ink(level) * 1.15));
+      expect(level.stars[1], level.id).toBe(Math.round(ink(level) * 1.4));
+      expect(level.inkBudget, level.id).toBeGreaterThanOrEqual(level.stars[1]);
+    }
+  });
+
+  it("keeps a hive at the top of a level under the hint plate, and makes a near one wait", () => {
+    for (const level of levels) {
+      for (const hive of level.hives) {
+        expect(hive.y, `${level.id}: a hive at ${hive.y} is behind the hint plate`).toBeLessThanOrEqual(660);
+        // A bee flies 260 points a second. One that could reach him in under three seconds
+        // comes out late enough that it does not.
+        const reach = Math.min(...level.dogs.map((dog) => Math.hypot(dog.x - hive.x, dog.y - hive.y)));
+        expect((hive.delay ?? 0) + (reach - 24) / 260, `${level.id}: the hive at ${hive.x},${hive.y}`).toBeGreaterThan(2.6);
+      }
+    }
+  });
+
+  it("uses fire in chapter 5 and boulders, bombs or ice in chapter 6, and none of them before", () => {
+    const hazards = (level: DogLevel) => ({
+      fire: (level.fires ?? []).length > 0,
+      falls: (level.rocks ?? []).length + (level.bombs ?? []).length > 0 || (level.statics ?? []).some((item) => item.skin === "ice"),
+    });
+    const of = (id: string) => chapters.find((chapter) => chapter.id === id)!.levels.map((slug) => levels.find((level) => level.id === slug)!);
+    for (const id of ["1", "2", "3", "4"]) for (const level of of(id)) expect(hazards(level), level.id).toEqual({ fire: false, falls: false });
+    for (const level of of("5")) expect(hazards(level), level.id).toEqual({ fire: true, falls: false });
+    for (const level of of("6")) expect(hazards(level).falls, level.id).toBe(true);
+  });
+});
+

@@ -1,57 +1,60 @@
 {
   "id": "across-the-water",
   "name": "Across the water",
-  "hint": "One foot on the low ground, one on the far bank. The water takes anything that lands in it.",
-  "inkBudget": 360,
+  "hint": "One foot beside him, one on the far bank. The water takes anything that lands in it.",
+  "inkBudget": 350,
   "stars": [
-    335,
-    350
+    285,
+    347
   ],
   "statics": [
     {
       "type": "rect",
       "x": 0,
       "y": 34,
-      "w": 402,
+      "w": 222,
       "h": 40,
       "skin": "grass"
     },
     {
       "type": "rect",
-      "x": 100,
-      "y": 74,
-      "w": 62,
-      "h": 40,
+      "x": 352,
+      "y": 34,
+      "w": 50,
+      "h": 96,
       "skin": "grass"
-    },
+    }
+  ],
+  "killers": [
     {
-      "type": "rect",
-      "x": 270,
-      "y": 74,
-      "w": 132,
-      "h": 80,
-      "skin": "grass"
+      "x": 222,
+      "y": 34,
+      "w": 130,
+      "h": 26,
+      "kind": "water"
     }
   ],
   "dogs": [
     {
       "id": "clawd",
-      "x": 140,
-      "y": 132
+      "x": 200,
+      "y": 92
     }
   ],
   "hives": [
     {
       "x": 40,
-      "y": 700,
+      "y": 660,
       "count": 8,
-      "interval": 0.15
+      "interval": 0.15,
+      "delay": 0.9
     },
     {
       "x": 362,
-      "y": 700,
+      "y": 660,
       "count": 8,
-      "interval": 0.15
+      "interval": 0.15,
+      "delay": 0.9
     }
   ],
   "solution": {
@@ -59,29 +62,24 @@
       {
         "points": [
           [
-            60,
+            160,
             78
           ],
           [
-            140,
-            210
+            172,
+            126
           ],
           [
-            296,
-            158
+            200,
+            142
+          ],
+          [
+            366,
+            134
           ]
         ]
       }
     ],
     "waitSeconds": 14
-  },
-  "killers": [
-    {
-      "x": 162,
-      "y": 74,
-      "w": 108,
-      "h": 40,
-      "kind": "water"
-    }
-  ]
+  }
 }

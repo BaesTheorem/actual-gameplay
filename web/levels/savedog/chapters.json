@@ -5,11 +5,10 @@
     "blurb": "Draw a roof. The bees will check your work.",
     "levels": [
       "first-shield",
+      "both-feet",
       "lid",
-      "pedestal",
-      "the-plug",
-      "side-door",
-      "roll-it-in"
+      "two-roofs",
+      "drop-it"
     ]
   },
   {
@@ -17,23 +16,59 @@
     "title": "Bad ground",
     "blurb": "Water, lava and holes. The ink has to stand on something.",
     "levels": [
-      "two-cliffs",
+      "pedestal",
       "across-the-water",
-      "between-the-blades",
-      "no-ink-overhead",
-      "holes-below"
+      "holes-below",
+      "moat",
+      "two-cliffs"
     ]
   },
   {
     "id": "3",
+    "title": "Tight spots",
+    "blurb": "Little ink, and places it cannot go.",
+    "levels": [
+      "side-door",
+      "low-ceiling",
+      "the-plug",
+      "roll-it-in",
+      "two-caves"
+    ]
+  },
+  {
+    "id": "4",
     "title": "Blades",
     "blurb": "Saws cut ink. Draw where they are not.",
     "levels": [
       "slope",
-      "moat",
-      "two-caves",
-      "low-ceiling",
+      "between-the-blades",
+      "thread-it",
+      "three-blades",
       "saws"
+    ]
+  },
+  {
+    "id": "5",
+    "title": "Fire",
+    "blurb": "Ink burns. Bees will not cross a flame.",
+    "levels": [
+      "campfire",
+      "hearth",
+      "two-fires",
+      "low-fire",
+      "wildfire"
+    ]
+  },
+  {
+    "id": "6",
+    "title": "Things fall",
+    "blurb": "Boulders, bombs and ice. Watch the rings.",
+    "levels": [
+      "blast",
+      "heads-up",
+      "thin-ice",
+      "two-fuses",
+      "the-lot"
     ]
   }
 ]

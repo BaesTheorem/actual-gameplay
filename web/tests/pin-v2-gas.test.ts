@@ -93,10 +93,3 @@ describe("gas", () => {
     for (const p of underGem.particles) expect(Math.abs(position(p.body).x - 150)).toBeGreaterThan(10);
   });
 });
-
-describe("gas in a level that does not ask for the walking rules", () => {
-  it("is water, as any liquid the first rules did not know was", () => {
-    const sim = new PinSim({ ...level({ walls: SHAFT, pins: [LID], pools: [GAS] }), rules: undefined });
-    expect(sim.particles.every((p) => p.kind === "water")).toBe(true);
-  });
-});

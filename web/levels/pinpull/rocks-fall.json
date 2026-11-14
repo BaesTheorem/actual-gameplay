@@ -1,0 +1,26 @@
+{
+  "id": "rocks-fall",
+  "name": "Rocks fall",
+  "hint": "Two rocks on two pins. Mind who is underneath.",
+  "parPins": 2,
+  "winWhen": "heroReachesGoal",
+  "walls": [
+    {"x": 276, "y": 240, "w": 14, "h": 70},
+    {"x": 110, "y": 240, "w": 14, "h": 70}
+  ],
+  "pins": [
+    {"id": "p1", "x": 290, "y": 240, "w": 74, "side": "right"},
+    {"id": "p2", "x": 110, "y": 82, "w": 40, "side": "right", "angle": 90},
+    {"id": "p3", "x": 38, "y": 240, "w": 72, "side": "left"}
+  ],
+  "boulders": [
+    {"x": 322, "y": 272},
+    {"x": 70, "y": 272}
+  ],
+  "actors": {
+    "hero": {"x": 70, "y": 84},
+    "foes": [{"x": 322, "y": 84}],
+    "goal": {"x": 250, "y": 68, "w": 114, "h": 56}
+  },
+  "solution": ["p1", "p2"]
+}

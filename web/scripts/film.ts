@@ -6,6 +6,7 @@
 //
 //   --solution     play the level's stored solution (this is what happens when nothing else is given)
 //   --pins a,b     pull these pins in this order instead; "--pins none" pulls nothing
+//   --noise 3      Pull the Pin: start every body a hair off its place, as seed 3 of the noise replay does
 //   --stroke "x,y;x,y"   draw this stroke instead, in canvas points; "|" between two strokes draws both, 0.4 s apart
 //   --random 3     draw the audit's random stroke number 3 (the one it calls random:03)
 //   --dumb bar     draw one of the audit's naive strokes: drop, bar, wall-left, wall-right or roof
@@ -51,7 +52,7 @@ import { DOG_RADIUS, BEE_RADIUS } from "../src/sim/savedog/beecrew";
 import { baseTransform } from "../src/sim/savedog/level";
 import { WIDTH as INK_WIDTH } from "../src/sim/savedog/stroke";
 import { STEP, position, tagOf, type Vec } from "../src/sim/sk";
-import { levelFrom } from "./pin-suite";
+import { levelFrom, nudge } from "./pin-suite";
 import { levelFrom as dogLevelFrom, randomStrokes, trials } from "./savedog-suite";
 
 const option = (name: string): string | undefined => {
@@ -320,6 +321,8 @@ const filmPin = (): Film => {
   // Play it. The moments the simulation reports are kept by name, to be written on the next frame.
   const moments: string[] = [], seen: Cue[] = [];
   const sim = new PinSim(level, (cue) => seen.push(cue));
+  const seed = option("noise");
+  if (seed !== undefined) nudge(sim, Number(seed));
   sim.replay(pins);
   const frames: string[] = [];
   let pulled = 0, verdict = "";
@@ -335,7 +338,7 @@ const filmPin = (): Film => {
   return {
     frames,
     title: `${level.name} (${level.id})   pins: ${pins.length > 0 ? pins.join(" > ") : "none"}   ${verdict}   ${sim.elapsed.toFixed(2)} s`,
-    name: `${level.id}-${pins.length > 0 ? pins.join("+") : "none"}`,
+    name: `${level.id}-${pins.length > 0 ? pins.join("+") : "none"}${seed === undefined ? "" : `-noise${seed}`}`,
   };
 };
 

@@ -33,7 +33,8 @@ const fresh = (): Progress => ({
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null && !Array.isArray(value);
 
 /// Version 1 kept one map of results per mode at the top of the file, keyed by the level's
-/// two-digit number. Each result moves to the level's id; a number the table does not know is dropped.
+/// two-digit number. Each result moves to the level's id. A number the table does not know is
+/// dropped, and so is every result of a mode that has no table.
 const levelsFromV1 = (data: Record<string, unknown>): Progress["levels"] => {
   const levels: Progress["levels"] = {};
   for (const [mode, ids] of Object.entries(V1_IDS)) {

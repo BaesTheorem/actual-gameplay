@@ -1,0 +1,44 @@
+{
+  "id": "after-you",
+  "name": "After you",
+  "hint": "He will open that door for you on his way over.",
+  "parPins": 3,
+  "winWhen": "treasureReachesHero",
+  "walls": [
+    {"x": 38, "y": 68, "w": 76, "h": 16},
+    {"x": 114, "y": 68, "w": 80, "h": 7},
+    {"x": 254, "y": 68, "w": 110, "h": 8},
+    {"x": 100, "y": 144, "w": 14, "h": 300},
+    {"x": 180, "y": 146, "w": 14, "h": 298},
+    {"x": 309, "y": 240, "w": 14, "h": 60}
+  ],
+  "slabs": [
+    {"x1": 113.22, "y1": 77.04, "x2": 193.22, "y2": 68.04, "t": 14}
+  ],
+  "grates": [
+    {"x": 256, "y": 76, "w": 53, "h": 12}
+  ],
+  "doors": [
+    {"id": "d", "x": 100, "y": 84, "w": 14, "h": 60, "slide": "up", "latch": true}
+  ],
+  "plates": [
+    {"id": "a", "x": 266, "y": 76, "w": 38, "opens": ["d"]}
+  ],
+  "pins": [
+    {"id": "p1", "x": 114, "y": 320, "w": 66, "side": "left"},
+    {"id": "p2", "x": 114, "y": 220, "w": 66, "side": "left"},
+    {"id": "p3", "x": 296, "y": 90, "w": 40, "side": "right", "angle": 90},
+    {"id": "p4", "x": 323, "y": 240, "w": 41, "side": "right"}
+  ],
+  "pools": [
+    {"liquid": "water", "x": 116, "y": 334, "w": 62, "h": 60, "count": 44},
+    {"liquid": "lava", "x": 116, "y": 234, "w": 62, "h": 40, "count": 20},
+    {"liquid": "water", "x": 325, "y": 254, "w": 37, "h": 40, "count": 16}
+  ],
+  "actors": {
+    "hero": {"x": 150, "y": 97},
+    "treasure": {"x": 62, "y": 95},
+    "foes": [{"x": 344, "y": 92}]
+  },
+  "solution": ["p1", "p2", "p3"]
+}

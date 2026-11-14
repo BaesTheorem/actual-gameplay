@@ -1,0 +1,40 @@
+{
+  "id": "two-birds",
+  "name": "Two birds",
+  "hint": "One blast for the goblin and the wall. Keep it dry.",
+  "parPins": 2,
+  "winWhen": "treasureReachesHero",
+  "walls": [
+    {"x": 196, "y": 108, "w": 14, "h": 60},
+    {"x": 234, "y": 108, "w": 14, "h": 60},
+    {"x": 136, "y": 260, "w": 14, "h": 70},
+    {"x": 248, "y": 260, "w": 14, "h": 70},
+    {"x": 300, "y": 250, "w": 14, "h": 60}
+  ],
+  "cracked": [
+    {"x": 250, "y": 68, "w": 14, "h": 40}
+  ],
+  "grates": [
+    {"x": 176, "y": 68, "w": 104, "h": 12}
+  ],
+  "pins": [
+    {"id": "p1", "x": 210, "y": 108, "w": 24, "side": "left"},
+    {"id": "p2", "x": 90, "y": 82, "w": 40, "side": "right", "angle": 90},
+    {"id": "p3", "x": 150, "y": 260, "w": 98, "side": "left"},
+    {"id": "p4", "x": 314, "y": 250, "w": 50, "side": "right"}
+  ],
+  "pools": [
+    {"liquid": "lava", "x": 212, "y": 122, "w": 20, "h": 30, "count": 6},
+    {"liquid": "water", "x": 152, "y": 274, "w": 94, "h": 50, "count": 60},
+    {"liquid": "lava", "x": 316, "y": 264, "w": 46, "h": 30, "count": 18}
+  ],
+  "bombs": [
+    {"x": 222, "y": 80}
+  ],
+  "actors": {
+    "hero": {"x": 60, "y": 84},
+    "treasure": {"x": 338, "y": 79},
+    "foes": [{"x": 170, "y": 84}]
+  },
+  "solution": ["p1", "p2"]
+}

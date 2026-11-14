@@ -1,0 +1,28 @@
+{
+  "id": "two-colours",
+  "name": "Two colours",
+  "hint": "Each door is tied to a shelf. One shelf is fire.",
+  "parPins": 2,
+  "winWhen": "treasureReachesHero",
+  "walls": [
+    {"x": 286, "y": 230, "w": 14, "h": 170},
+    {"x": 100, "y": 250, "w": 14, "h": 60}
+  ],
+  "pins": [
+    {"id": "a1", "x": 150, "y": 82, "w": 40, "side": "right", "angle": 90, "group": "a"},
+    {"id": "a2", "x": 300, "y": 320, "w": 64, "side": "right", "group": "a"},
+    {"id": "b1", "x": 90, "y": 82, "w": 40, "side": "right", "angle": 90, "group": "b"},
+    {"id": "b2", "x": 300, "y": 230, "w": 64, "side": "right", "group": "b"},
+    {"id": "p3", "x": 38, "y": 250, "w": 62, "side": "left"}
+  ],
+  "pools": [
+    {"liquid": "water", "x": 302, "y": 334, "w": 60, "h": 50, "count": 32},
+    {"liquid": "lava", "x": 302, "y": 244, "w": 60, "h": 30, "count": 16},
+    {"liquid": "lava", "x": 40, "y": 264, "w": 58, "h": 30, "count": 20}
+  ],
+  "actors": {
+    "hero": {"x": 60, "y": 84},
+    "treasure": {"x": 332, "y": 79}
+  },
+  "solution": ["a1", "b1"]
+}

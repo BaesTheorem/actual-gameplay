@@ -1,0 +1,34 @@
+{
+  "id": "stand-clear",
+  "name": "Stand clear",
+  "hint": "The rock is in his way. He would be in its way.",
+  "parPins": 2,
+  "winWhen": "treasureReachesHero",
+  "walls": [
+    {"x": 320, "y": 68, "w": 44, "h": 100},
+    {"x": 76, "y": 300, "w": 14, "h": 180},
+    {"x": 170, "y": 300, "w": 14, "h": 180},
+    {"x": 306, "y": 290, "w": 14, "h": 60}
+  ],
+  "slabs": [
+    {"x1": 173.88, "y1": 62.18, "x2": 323.88, "y2": 162.18, "t": 14}
+  ],
+  "pins": [
+    {"id": "p1", "x": 240, "y": 142, "w": 40, "side": "right", "angle": 90},
+    {"id": "p2", "x": 90, "y": 300, "w": 80, "side": "left"},
+    {"id": "p3", "x": 90, "y": 400, "w": 80, "side": "right"},
+    {"id": "p4", "x": 320, "y": 290, "w": 44, "side": "right"}
+  ],
+  "boulders": [
+    {"x": 286, "y": 167},
+    {"x": 130, "y": 432}
+  ],
+  "pools": [
+    {"liquid": "lava", "x": 322, "y": 304, "w": 40, "h": 30, "count": 18}
+  ],
+  "actors": {
+    "hero": {"x": 130, "y": 330},
+    "treasure": {"x": 344, "y": 179}
+  },
+  "solution": ["p1", "p2"]
+}
