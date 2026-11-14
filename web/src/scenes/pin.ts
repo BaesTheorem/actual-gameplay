@@ -3,8 +3,8 @@ import { Container, Filter, GlProgram, Graphics, Rectangle, Sprite, Text, Textur
 import * as art from "../app/art";
 import type { Cue } from "../sim/clock";
 import {
-  BOMB_SIZE, FRAME_THICKNESS, FRIEND_RADIUS, HERO_RADIUS, KNOB_OFFSET, LIQUID_RADIUS, PIN_THICKNESS, PinSim, doorRect, segmentQuad,
-  type Bomb, type Boulder, type Cracked, type Door, type Foe, type Particle, type PinLevel, type Pin, type Plate, type Rect,
+  BLAST_RADIUS, BOMB_SIZE, FRAME_THICKNESS, FRIEND_RADIUS, HERO_RADIUS, KNOB_OFFSET, LIQUID_RADIUS, PIN_THICKNESS, PinSim, doorRect, segmentQuad,
+  type Bomb, type Boulder, type Cracked, type Door, type Foe, type HeroMind, type Particle, type PinLevel, type Pin, type Plate, type Rect,
 } from "../sim/pinpull";
 import { position, tagOf, type Vec } from "../sim/sk";
 import {
@@ -17,7 +17,10 @@ export const PIN_ART = [
   "clawd_foe_idle", "clawd_foe_ko", "terrain_stone_block_center", "terrain_stone_block_top", "terrain_stone_block_left",
   "terrain_stone_block_right", "terrain_stone_block_top_left", "terrain_stone_block_top_right",
   "terrain_stone_horizontal_left", "terrain_stone_horizontal_middle", "terrain_stone_horizontal_right",
+  "hand_point", "hand_press", "torch_on_a", "torch_on_b",
 ];
+/// A door is wood, so it is laid from the brown tiles.
+const DOOR_ART = ["terrain_dirt_block_center", "terrain_dirt_horizontal_left", "terrain_dirt_horizontal_middle", "terrain_dirt_horizontal_right"];
 
 /// The art one level needs on top of PIN_ART: the clips of whoever walks in it, and the pieces
 /// it carries.
@@ -29,6 +32,7 @@ export const pinArt = (level: PinLevel): string[] => {
   if ((level.boulders ?? []).length > 0) names.push("rock_big");
   if ((level.bombs ?? []).length > 0) names.push("bomb", "bomb_lit_a", "bomb_lit_b", "bomb_wet");
   if ((level.plates ?? []).length > 0) names.push("plate_up", "plate_down");
+  if ((level.doors ?? []).length > 0) names.push(...DOOR_ART);
   return names;
 };
 
@@ -136,11 +140,22 @@ export class PinScene implements Scene {
   private clips: ClipSprite[] = [];
   private marks: { pin: Pin; node: Container; ring: Graphics }[] = [];
   private markAge = 0;
+  private bubble: Bubble | null = null;
+  /// The string drawn between the pins of each group, until the group is pulled.
+  private strings: { pin: Pin; node: Graphics }[] = [];
+  /// The dotted line from each plate to each door it opens, until the door is open for good.
+  private wires: { door: Door; node: Graphics }[] = [];
+  /// How far each bomb's blast reaches, as a ring round it.
+  private reaches = new Map<Bomb, { idle: Graphics; lit: Graphics }>();
+  /// The hand that shows the first pull of the first level, until the player makes a pull.
+  private coach: Coach | null = null;
+  private torches: Sprite[] = [];
+  private time = 0;
   /// Only a level that stores its solution can show the way.
   hint?: (step: number) => void;
 
   /// `label` is the level's place in its chapter, "1-3".
-  constructor(readonly level: PinLevel, label: string, private onCue: (cue: Cue) => void) {
+  constructor(readonly level: PinLevel, private label: string, private onCue: (cue: Cue) => void) {
     this.title = `${label} ${level.name}`;
     this.sim = new PinSim(level, (cue) => this.cues.push(cue));
     this.root.sortableChildren = true;
@@ -151,6 +166,7 @@ export class PinScene implements Scene {
   private build() {
     const { sim, root } = this, level = sim.level;
     root.addChild(paper("paper_cave"));
+    this.dress();
     for (const d of level.decor ?? []) {
       if (art.exists(d.sprite)) root.addChild(sprite(d.sprite, d.x, d.y, d.w, d.h, 1));
     }
@@ -213,6 +229,33 @@ export class PinScene implements Scene {
       this.pinNodes.set(pin, node);
       root.addChild(node);
     }
+    groups.forEach((group, i) => {
+      const tied = sim.pins.filter((pin) => pin.group === group).sort((a, b) => b.knob.y - a.knob.y);
+      if (tied.length < 2) return;
+      // From knob to knob, top to bottom, in the group's colour over a wider ink line.
+      const points = tied.map((pin) => [onCanvas(pin.knob.x), Y(pin.knob.y)] as [number, number]);
+      const node = new Graphics();
+      dashes(node, points, 7, 5);
+      node.stroke({ color: Pigment.ink, width: 5, cap: "round" });
+      dashes(node, points, 7, 5);
+      node.stroke({ color: GROUP_COLOURS[i % GROUP_COLOURS.length], width: 2.5, cap: "round" });
+      node.zIndex = 3.5;
+      this.strings.push({ pin: tied[0], node });
+      root.addChild(node);
+    });
+    for (const door of sim.doors) {
+      for (const plate of door.plates) {
+        const from: [number, number] = [plate.spec.x + plate.spec.w / 2, Y(plate.spec.y + 4)];
+        const to: [number, number] = [door.spec.x + door.spec.w / 2, Y(door.spec.y + door.spec.h / 2)];
+        const node = new Graphics();
+        dashes(node, [from, to], 1, 6);
+        node.stroke({ color: Pigment.ink, width: 2.5, cap: "round", alpha: 0.55 });
+        node.circle(...from, 3).circle(...to, 3).fill({ color: Pigment.ink, alpha: 0.55 });
+        node.zIndex = 3.2;
+        this.wires.push({ door, node });
+        root.addChild(node);
+      }
+    }
     // Water under lava, as they have always been drawn. Gas goes over both, and its surface is
     // only made in a level that has gas, so no other level pays for the pass.
     this.liquidLayer.zIndex = 5;
@@ -255,11 +298,89 @@ export class PinScene implements Scene {
       const node = sprite("bomb", 0, 0, BOMB_SIZE * 4 / 3, BOMB_SIZE * 4 / 3, 6);
       this.bombs.set(bomb, node);
       root.addChild(node);
+      // How far its blast will reach: a faint dotted ring while it waits, and a bold one once it is lit.
+      const circle: [number, number][] = [];
+      for (let i = 0; i <= 72; i++) circle.push([BLAST_RADIUS * Math.cos((i / 72) * 2 * Math.PI), BLAST_RADIUS * Math.sin((i / 72) * 2 * Math.PI)]);
+      const idle = new Graphics();
+      dashes(idle, circle, 1, 7);
+      idle.stroke({ color: Pigment.ink, width: 2, cap: "round", alpha: 0.32 });
+      const lit = new Graphics();
+      dashes(lit, circle, 6, 5);
+      lit.stroke({ color: Pigment.ink, width: 5, cap: "round" });
+      dashes(lit, circle, 6, 5);
+      lit.stroke({ color: Pigment.ochre, width: 2.5, cap: "round" });
+      idle.zIndex = lit.zIndex = 3.1;
+      lit.visible = false;
+      this.reaches.set(bomb, { idle, lit });
+      root.addChild(idle, lit);
+    }
+    if (sim.hero) {
+      this.bubble = new Bubble();
+      this.bubble.zIndex = 31;
+      root.addChild(this.bubble);
+    }
+    // The first level of the campaign shows its first pull.
+    const first = sim.pins.find((pin) => pin.id === (level.solution ?? [])[0]);
+    if (this.label === "1-1" && first) {
+      this.coach = new Coach(onCanvas(first.knob.x), Y(first.knob.y));
+      this.coach.zIndex = 33;
+      root.addChild(this.coach);
     }
     root.addChild(this.puffs.layer, this.fx.layer);
     const hint = hintLabel(level.hint);
     if (hint) root.addChild(hint);
     this.draw(0);
+  }
+
+  /// The room itself, behind everything: a wash over the inside of the frame, a few bricks, and
+  /// in the part of the room the level does not use, a window with its light and two torches.
+  /// None of it is in the simulation. It is drawn from the level's own numbers, so a level looks
+  /// the same every time.
+  private dress() {
+    const level = this.level, floor = ROOM.y, back = new Graphics();
+    back.rect(ROOM.x, Y(ROOM.y + ROOM.h), ROOM.w, ROOM.h).fill({ color: Pigment.ink, alpha: 0.05 });
+    let seed = 2166136261;
+    for (const c of level.id) seed = Math.imul(seed ^ c.charCodeAt(0), 16777619) >>> 0;
+    const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296; };
+    // Bricks in small groups, as a wall is drawn when only some of it is drawn.
+    for (let i = 0; i < 9; i++) {
+      const x = ROOM.x + 14 + random() * (ROOM.w - 100), y = ROOM.y + 30 + (i + random()) * (ROOM.h - 60) / 9;
+      const rows = 2 + Math.floor(random() * 2);
+      for (let row = 0; row < rows; row++) {
+        const count = 2 + Math.floor(random() * 2), shift = row % 2 === 0 ? 0 : 13;
+        for (let n = 0; n < count; n++) back.roundRect(x + shift + n * 26, Y(y) + row * 13, 24, 11, 2);
+      }
+    }
+    back.stroke({ color: Pigment.ink, width: 1.3, alpha: 0.12 });
+    back.zIndex = -50;
+    this.root.addChild(back);
+
+    // The empty part of the room runs from over the highest piece to under the hint.
+    const bottom = contentTop(level) + 30, top = 664;
+    if (top - bottom < 120) return;
+    const tall = Math.min(92, top - bottom - 20), wide = 52, cx = ROOM.x + ROOM.w / 2;
+    const y0 = Math.min(top - tall - 8, bottom + (top - bottom) * 0.62 - tall / 2), r = wide / 2;
+    const sill = Y(y0), arch = Y(y0 + tall) + r, drop = y0 - floor;
+    const light = new Graphics()
+      .poly([cx - r, sill, cx + r, sill, Math.max(ROOM.x + 60, cx + r - drop * 0.22), Y(floor), Math.max(ROOM.x + 2, cx - r - drop * 0.34), Y(floor)])
+      .fill({ color: Pigment.cream, alpha: 0.16 });
+    const opening = new Graphics()
+      .moveTo(cx - r, sill).lineTo(cx - r, arch).arc(cx, arch, r, Math.PI, 0).lineTo(cx + r, sill).closePath()
+      .fill({ color: Pigment.sky, alpha: 0.55 }).stroke({ color: Pigment.ink, width: 2.5, alpha: 0.75 });
+    opening.moveTo(cx, arch - r).lineTo(cx, sill).moveTo(cx - r, arch + 6).lineTo(cx + r, arch + 6).stroke({ color: Pigment.ink, width: 2, alpha: 0.75 });
+    opening.roundRect(cx - r - 7, sill, wide + 14, 7, 2).fill(Pigment.stone).stroke({ color: Pigment.ink, width: 2, alpha: 0.75 });
+    light.zIndex = opening.zIndex = -49;
+    this.root.addChild(light, opening);
+    for (const x of [ROOM.x + 46, ROOM.x + ROOM.w - 46]) {
+      const y = y0 + tall * 0.3;
+      const glow = new Graphics().circle(x, Y(y + 8), 42).fill({ color: Pigment.ochre, alpha: 0.07 }).circle(x, Y(y + 8), 24).fill({ color: Pigment.ochre, alpha: 0.1 });
+      // A bracket holds it to the wall behind.
+      const bracket = new Graphics().moveTo(x - 7, Y(y - 14)).lineTo(x + 7, Y(y - 14)).moveTo(x, Y(y - 14)).lineTo(x, Y(y - 24)).stroke({ color: Pigment.ink, width: 2.5, cap: "round", alpha: 0.75 });
+      const torch = sprite("torch_on_a", x, y, 27, 36, -48);
+      glow.zIndex = bracket.zIndex = -49;
+      this.torches.push(torch);
+      this.root.addChild(glow, bracket, torch);
+    }
   }
 
   /// A bar with a knob outside the chamber wall. The knob stays upright on a tilted pin. A pin of
@@ -287,10 +408,12 @@ export class PinScene implements Scene {
     return node;
   }
 
-  /// A wall that a blast can take out: the same stone as the others, with cracks inked across it
-  /// from end to end so it reads as the one that will break.
+  /// A wall that a blast can take out: the same stone as the others but paler, with cracks inked
+  /// across it from end to end, a chip out of two corners and rubble at its foot, so it reads as
+  /// the one that will break.
   private crackedNode(rect: Rect): Container {
-    const node = terrain(rect, "stone");
+    const node = new Container(), stone = terrain(rect, "stone");
+    stone.alpha = 0.72;
     const along = rect.w >= rect.h, length = Math.max(rect.w, rect.h), across = Math.min(rect.w, rect.h);
     // In the wall's own frame: u runs along its length and v across it, both from 0.
     const at = (u: number, v: number): [number, number] => (along ? [rect.x + u, Y(rect.y + v)] : [rect.x + v, Y(rect.y + u)]);
@@ -307,26 +430,34 @@ export class PinScene implements Scene {
       const edge = i % 2 === 0 ? 0 : across;
       g.moveTo(...at(u, v)).lineTo(...at(u + 3 + 3 * random(), edge + (v - edge) * 0.15));
     });
-    g.stroke({ color: Pigment.ink, width: 1.4, cap: "round", join: "round" });
+    g.stroke({ color: Pigment.ink, width: 2, cap: "round", join: "round" });
     g.rect(rect.x, Y(rect.y + rect.h), rect.w, rect.h).stroke({ color: Pigment.ink, width: 2 });
-    node.addChild(g);
+    // A chip gone from the far corner on each side, down to the paper.
+    const chip = Math.min(5, across * 0.4);
+    g.poly([...at(length, 0), ...at(length - chip, 0), ...at(length, chip)]).poly([...at(length, across), ...at(length - chip * 0.8, across), ...at(length, across - chip * 0.8)])
+      .fill(Pigment.paper).stroke({ color: Pigment.ink, width: 1.5, join: "round" });
+    // What has already come off it lies at its foot.
+    for (const [dx, r] of [[-7, 2.6], [-3, 1.8], [rect.w + 4, 2.2], [rect.w + 8.5, 1.6]]) g.circle(rect.x + dx, Y(rect.y) - r, r);
+    g.fill(Pigment.stone).stroke({ color: Pigment.ink, width: 1.2 });
+    node.addChild(stone, g);
     node.zIndex = 2;
     return node;
   }
 
-  /// A door: stone like the walls, inked round its edge and banded like a gate, so it reads as
-  /// the part of the wall that moves.
+  /// A door: wood where the walls are stone, inked round its edge, banded like a gate and with a
+  /// ring to pull it by, so it reads as the part of the wall that moves.
   private doorNode(door: Door): Container {
     const rect: Rect = door.spec, node = new Container();
-    const g = new Graphics().rect(rect.x, Y(rect.y + rect.h), rect.w, rect.h).stroke({ color: Pigment.ink, width: 2 });
-    // Two bands across it, a quarter of the way in from each end.
+    const g = new Graphics().rect(rect.x, Y(rect.y + rect.h), rect.w, rect.h).stroke({ color: Pigment.ink, width: 2.5 });
+    // Two iron bands across it, a quarter of the way in from each end.
     const tall = rect.h >= rect.w;
     for (const t of [0.25, 0.75]) {
-      if (tall) g.rect(rect.x, Y(rect.y + rect.h * t) - 2, rect.w, 4);
-      else g.rect(rect.x + rect.w * t - 2, Y(rect.y + rect.h), 4, rect.h);
+      if (tall) g.rect(rect.x, Y(rect.y + rect.h * t) - 2.5, rect.w, 5);
+      else g.rect(rect.x + rect.w * t - 2.5, Y(rect.y + rect.h), 5, rect.h);
     }
-    g.fill(Pigment.cream).stroke({ color: Pigment.ink, width: 1.5 });
-    node.addChild(terrain(rect, "stone"), g);
+    g.fill(Pigment.night).stroke({ color: Pigment.ink, width: 1.5 });
+    g.circle(rect.x + rect.w / 2, Y(rect.y + rect.h / 2), Math.min(4, Math.min(rect.w, rect.h) / 2 - 2.5)).stroke({ color: Pigment.ink, width: 2 });
+    node.addChild(terrain(rect, "dirt"), g);
     node.zIndex = 1.5;
     return node;
   }
@@ -360,6 +491,7 @@ export class PinScene implements Scene {
 
   pointer(type: "down" | "move" | "up", point: Vec) {
     if (type !== "down") return;
+    this.coach?.leave();
     const pin = this.sim.pinAt(point);
     if (pin) this.sim.pull(pin.id);
   }
@@ -420,7 +552,7 @@ export class PinScene implements Scene {
         tag.position.set(-pin.direction * 16, -18);
         node.addChild(ring, tag);
         // A knob sits half off the edge of the canvas. The ring keeps to the canvas, so all of it shows.
-        node.position.set(Math.min(W - 24, Math.max(24, at.x)), Y(at.y));
+        node.position.set(onCanvas(at.x), Y(at.y));
         node.zIndex = 32;
         this.root.addChild(node);
         this.marks.push({ pin, node, ring });
@@ -478,6 +610,22 @@ export class PinScene implements Scene {
       const flicker = short || Math.floor((sim.elapsed - bomb.since) * 12) % 2 === 0 ? "bomb_lit_a" : "bomb_lit_b";
       node.texture = art.texture(bomb.state === "lit" ? flicker : bomb.state === "wet" ? "bomb_wet" : "bomb");
     }
+    for (const [bomb, ring] of this.reaches) {
+      // A bomb that is wet or gone reaches nothing.
+      ring.idle.visible = bomb.state === "dry";
+      ring.lit.visible = bomb.state === "lit";
+      if (bomb.state !== "dry" && bomb.state !== "lit") continue;
+      const at = position(bomb.body);
+      ring.idle.position.set(at.x, Y(at.y));
+      ring.lit.position.set(at.x, Y(at.y));
+      ring.lit.scale.set(short ? 1 : 1 + 0.03 * Math.sin((sim.elapsed - bomb.since) * 2 * Math.PI * 5));
+    }
+    this.strings = this.strings.filter(({ pin, node }) => {
+      if (!pin.pulled) return true;
+      node.destroy();
+      return false;
+    });
+    for (const wire of this.wires) wire.node.visible = !wire.door.latched;
     if (this.hero && sim.hero) {
       const at = position(sim.hero), since = sim.elapsed - sim.heroStateSince;
       this.hero.position.set(at.x, Y(at.y - HERO_RADIUS));
@@ -497,6 +645,13 @@ export class PinScene implements Scene {
         this.hero.facing = sim.heroFacing;
       }
       this.hero.fit(stretch);
+      if (this.bubble) {
+        // Over his head, on the side with more room.
+        this.bubble.position.set(at.x, Y(at.y - HERO_RADIUS + HERO_HEIGHT));
+        this.bubble.side = at.x > W - 90 ? -1 : 1;
+        const live = !sim.finished && !sim.dying && sim.heroState === "idle";
+        this.bubble.think(live ? thoughtOf(sim.heroMind) : null, dt, short);
+      }
     }
     if (this.friend && sim.friend) {
       const at = position(sim.friend), since = sim.elapsed - sim.friendStateSince;
@@ -547,6 +702,13 @@ export class PinScene implements Scene {
       node.fit();
     }
     for (const c of this.clips) c.tick(dt);
+    this.time += dt;
+    // A flame is two pictures, and each torch is half a beat off the other.
+    if (!short) this.torches.forEach((torch, i) => { torch.texture = art.texture(Math.floor(this.time * 7 + i * 0.5) % 2 === 0 ? "torch_on_a" : "torch_on_b"); });
+    if (this.coach) {
+      if (sim.pulled.length > 0) this.coach.leave();
+      if (this.coach.tick(dt, short)) this.coach = null;
+    }
     this.puffs.tick(dt, short ? 0.1 : 0.45);
     this.fx.tick(dt);
     this.root.position.set(this.fx.offset.x, this.fx.offset.y);
@@ -579,13 +741,193 @@ const barred = (r: Rect, color: number): Graphics => {
   return g;
 };
 
-/// A dashed rectangle outline, as line segments on `g`.
-const dashedRect = (g: Graphics, x: number, y: number, w: number, h: number, on: number, off: number) => {
-  const corners = [[x, y], [x + w, y], [x + w, y + h], [x, y + h], [x, y]];
+/// The inside of the standard frame: between the two side walls, from the floor's top to the walls' tops.
+const ROOM: Rect = { x: 38, y: 68, w: 326, h: 646 };
+
+/// The height the level's own pieces reach. The room above it is empty.
+const contentTop = (level: PinLevel): number => {
+  let top = ROOM.y;
+  const raise = (y: number) => { top = Math.max(top, y); };
+  const rects: Rect[] = [level.walls, level.cracked, level.doors, level.drains, level.grates, level.vents, level.pools].flatMap((list) => list ?? []);
+  for (const r of rects) raise(r.y + r.h);
+  for (const slab of level.slabs ?? []) raise(Math.max(slab.y1, slab.y2) + FRAME_THICKNESS / 2);
+  for (const pin of level.pins) {
+    // A tilted pin stands up by half its length, and its knob stands past its end.
+    const lean = Math.abs(Math.sin(((pin.angle ?? 0) * Math.PI) / 180));
+    raise(pin.y + PIN_THICKNESS / 2 + 15 + lean * (pin.w / 2 + KNOB_OFFSET));
+  }
+  const { hero, treasure, friend, foes, goal } = level.actors;
+  // The hero's bubble opens over his head.
+  if (hero) raise(hero.y + 96);
+  for (const actor of [treasure, friend, ...(foes ?? [])]) if (actor) raise(actor.y + 36);
+  if (goal) raise(goal.y + goal.h);
+  for (const boulder of level.boulders ?? []) raise(boulder.y + (boulder.r ?? 18));
+  for (const bomb of level.bombs ?? []) raise(bomb.y + BLAST_RADIUS);
+  for (const plate of level.plates ?? []) raise(plate.y + 10);
+  return top;
+};
+
+/// A knob sits half off the edge of the canvas. What is drawn on one keeps to the canvas, so all of it shows.
+const onCanvas = (x: number) => Math.min(W - 24, Math.max(24, x));
+
+/// What stands in the bubble: the thing he is after, or the thing he is afraid of.
+interface Thought { icon: string; afraid: boolean }
+const thoughtOf = (mind: HeroMind): Thought | null => {
+  if (mind.held === "no" || mind.wants === null) return null;
+  return mind.held === "noWay" ? { icon: mind.wants, afraid: false } : { icon: mind.held, afraid: true };
+};
+
+/// A picture that does not move, with its middle at the origin.
+const still = (name: string, w: number, h: number): Sprite => {
+  const s = new Sprite(art.texture(name));
+  s.anchor.set(0.5);
+  s.width = w;
+  s.height = h;
+  return s;
+};
+
+/// A character's first frame at `height` points, with its middle at the origin.
+const face = (name: string, height: number): Container => {
+  const clip = new ClipSprite(name, height);
+  clip.position.set(0, height / 2);
+  const node = new Container();
+  node.addChild(clip);
+  return node;
+};
+
+/// A soft lump of liquid or gas, inked round its edge: three discs that overlap.
+const lump = (core: number, rim: number): Graphics => {
+  const discs: [number, number, number][] = [[-5, 3, 6], [5, 3.5, 6], [0, -3, 6.5]];
+  const g = new Graphics();
+  for (const [x, y, r] of discs) g.circle(x, y, r + 1.6);
+  g.fill(Pigment.ink);
+  for (const [x, y, r] of discs) g.circle(x, y, r);
+  g.fill(rim);
+  for (const [x, y, r] of discs) g.circle(x, y + 0.8, r - 2.2);
+  g.fill(core);
+  return g;
+};
+
+/// The bubble over the hero's head. While he cannot walk to what he is after, it shows that
+/// thing. While a danger on his way holds him, it shows the danger, edged in rose with a mark
+/// beside it. While he walks, and once the level is over, it is away.
+class Bubble extends Container {
+  /// 1 puts the bubble up and to his right, -1 up and to his left.
+  side = 1;
+  private plate = new Graphics();
+  private holder = new Container();
+  private icons = new Map<string, Container>();
+  private mark: Text;
+  private shown: Thought | null = null;
+  private wanted: Thought | null = null;
+  /// Seconds the wanted thought has been the same, and how far the bubble is open, 0 to 1.
+  private steady = 0;
+  private open = 0;
+
+  constructor() {
+    super();
+    this.mark = new Text({ text: "!", style: { fontFamily: MARKER, fontSize: 17, fill: Pigment.rose, stroke: { color: Pigment.ink, width: 2.5 } }, resolution: 3 });
+    this.mark.anchor.set(0.5);
+    this.addChild(this.plate, this.holder, this.mark);
+    this.visible = false;
+  }
+
+  private icon(name: string): Container {
+    let node = this.icons.get(name);
+    if (node) return node;
+    if (name === "gem") node = still("gem_yellow", 22, 19);
+    else if (name === "exit") node = still("sign_exit", 25, 25);
+    else if (name === "friend") node = face("clawd_friend_idle", 29);
+    else if (name === "goblin") node = face("clawd_foe_idle", 29);
+    else if (name === "bomb") node = still("bomb_lit_a", 25, 25);
+    else if (name === "gas") node = lump(Pigment.sap, Pigment.cream);
+    else node = lump(Pigment.clay, Pigment.ochre);
+    this.icons.set(name, node);
+    this.holder.addChild(node);
+    return node;
+  }
+
+  private paint(thought: Thought) {
+    const w = thought.afraid ? 50 : 40, h = 36, x = 26, y = -38;
+    this.plate.clear();
+    // Two small circles lead from his head up to the plate.
+    this.plate.circle(7, -4, 2.4).circle(13, -11, 3.6).roundRect(x - w / 2, y - h / 2, w, h, 12)
+      .fill(Pigment.cream).stroke({ color: thought.afraid ? Pigment.rose : Pigment.ink, width: thought.afraid ? 3 : 2 });
+    if (thought.afraid) this.plate.roundRect(x - w / 2 - 1.5, y - h / 2 - 1.5, w + 3, h + 3, 13).stroke({ color: Pigment.ink, width: 1.2 });
+    for (const node of this.icons.values()) node.visible = false;
+    const icon = this.icon(thought.icon);
+    icon.visible = true;
+    this.holder.position.set(thought.afraid ? x - 6 : x, y);
+    this.mark.visible = thought.afraid;
+    this.mark.position.set(x + 16, y);
+  }
+
+  /// `thought` is what he thinks now, or null for nothing. A thought has to hold for a quarter of
+  /// a second before it shows, so one that comes and goes between two looks is never drawn.
+  think(thought: Thought | null, dt: number, short: boolean) {
+    const same = (a: Thought | null, b: Thought | null) => a?.icon === b?.icon && a?.afraid === b?.afraid;
+    this.steady = same(thought, this.wanted) ? this.steady + dt : 0;
+    this.wanted = thought;
+    if (this.steady >= 0.25 && !same(thought, this.shown)) {
+      this.shown = thought;
+      if (thought) { this.paint(thought); this.open = 0; }
+    }
+    const target = this.shown ? 1 : 0;
+    this.open = short ? target : Math.min(1, Math.max(0, this.open + (target ? dt / 0.16 : -dt / 0.12)));
+    this.visible = this.open > 0;
+    // It pops a little past its size and settles.
+    const pop = this.open < 0.7 ? this.open / 0.7 * 1.12 : 1.12 - 0.12 * (this.open - 0.7) / 0.3;
+    this.scale.set(this.side * (target ? pop : 1), target ? pop : 1);
+    this.alpha = target ? 1 : this.open;
+    // The pictures are not mirrored when the bubble is on his left.
+    this.holder.scale.x = this.mark.scale.x = this.side;
+  }
+}
+
+/// The hand that shows a pull: it comes down on a knob, presses, and lifts, over and over.
+class Coach extends Container {
+  private hand: Sprite;
+  private age = 0;
+  private leaving = -1;
+
+  constructor(x: number, y: number) {
+    super();
+    this.hand = new Sprite(art.texture("hand_point"));
+    // The painted hand points with its fingertip, which the manifest gives as the anchor.
+    const anchor = art.entry("hand_point")?.anchor ?? [0.25, 0.78];
+    this.hand.anchor.set(anchor[0], 1 - anchor[1]);
+    this.hand.width = this.hand.height = 54;
+    this.addChild(this.hand);
+    this.position.set(x, y);
+  }
+
+  leave() { if (this.leaving < 0) this.leaving = 0; }
+
+  /// True once it has gone, and has destroyed itself.
+  tick(dt: number, short: boolean): boolean {
+    this.age += dt;
+    // One second a tap: down for the first part, pressed for a beat, then up and away.
+    const t = this.age % 1.1, down = t < 0.35 ? t / 0.35 : t < 0.6 ? 1 : Math.max(0, 1 - (t - 0.6) / 0.3);
+    const lift = short ? 0 : (1 - down) * 16;
+    this.hand.position.set(lift * 0.6, lift);
+    this.hand.texture = art.texture(t >= 0.3 && t < 0.62 ? "hand_press" : "hand_point");
+    if (this.leaving >= 0) {
+      this.leaving += dt;
+      this.alpha = Math.max(0, 1 - this.leaving / (short ? 0.05 : 0.2));
+      if (this.alpha <= 0) { this.destroy({ children: true }); return true; }
+    }
+    return false;
+  }
+}
+
+/// Dashes along a line through `points`, as segments on `g`: `on` drawn, `off` skipped.
+const dashes = (g: Graphics, points: [number, number][], on: number, off: number) => {
   let carry = 0, drawing = true;
-  for (let i = 0; i < 4; i++) {
-    const [ax, ay] = corners[i], [bx, by] = corners[i + 1];
-    const len = Math.hypot(bx - ax, by - ay), ux = (bx - ax) / len, uy = (by - ay) / len;
+  for (let i = 0; i + 1 < points.length; i++) {
+    const [ax, ay] = points[i], [bx, by] = points[i + 1];
+    const len = Math.hypot(bx - ax, by - ay);
+    if (len === 0) continue;
+    const ux = (bx - ax) / len, uy = (by - ay) / len;
     let d = 0;
     while (d < len) {
       const run = Math.min((drawing ? on : off) - carry, len - d);
@@ -596,3 +938,7 @@ const dashedRect = (g: Graphics, x: number, y: number, w: number, h: number, on:
     }
   }
 };
+
+/// A dashed rectangle outline, as line segments on `g`.
+const dashedRect = (g: Graphics, x: number, y: number, w: number, h: number, on: number, off: number) =>
+  dashes(g, [[x, y], [x + w, y], [x + w, y + h], [x, y + h], [x, y]], on, off);

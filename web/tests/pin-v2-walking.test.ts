@@ -262,3 +262,50 @@ describe("goblins walk", () => {
     expect(run.reason).toBe("The goblin got your friend.");
   });
 });
+
+describe("the hero's mind", () => {
+  const behindADoor = level({ pins: [doorPin("p1", 200)], actors: { hero: HERO, treasure: GEM }, solution: ["p1"] });
+
+  it("is on the gem, with no way to it, while a pin stands between them", () => {
+    const run = play(behindADoor, [], { seconds: 1 });
+    expect(run.sim.heroMind).toEqual({ wants: "gem", held: "noWay" });
+  });
+
+  it("holds nothing back while he walks, and is empty once the level is won", () => {
+    const walking: unknown[] = [];
+    const run = play(behindADoor, ["p1"], { each: (sim) => { if (sim.heroWalking) walking.push(sim.heroMind); } });
+    expect(walking.length).toBeGreaterThan(0);
+    for (const mind of walking) expect(mind).toEqual({ wants: "gem", held: "no" });
+    expect(run.won).toBe(true);
+    expect(run.sim.heroMind).toEqual({ wants: null, held: "no" });
+  });
+
+  it("names the lava that lies on his way", () => {
+    const lvl = level({
+      walls: DIP, pools: [puddle("lava")],
+      actors: { hero: { x: 70, y: DIP_TOP + 16 }, treasure: { x: 330, y: DIP_TOP + 11 } },
+    });
+    const run = play(lvl, [], { seconds: 1 });
+    expect(run.sim.heroMind).toEqual({ wants: "gem", held: "lava" });
+  });
+
+  it("names the goblin who stands on his way", () => {
+    const lvl = level({ actors: { hero: HERO, treasure: GEM, foes: [{ x: 250, y: FLOOR + 16 }] } });
+    const run = play(lvl, [], { seconds: 0.2 });
+    expect(run.sim.heroMind).toEqual({ wants: "gem", held: "goblin" });
+  });
+
+  it("is on the exit in a level that is won at the exit, and on his friend in one that is won there", () => {
+    const door = [doorPin("p1", 200)];
+    const exit = play(level({ winWhen: "heroReachesGoal", pins: door, actors: { hero: HERO, goal: { x: 300, y: FLOOR, w: 60, h: 50 } } }), [], { seconds: 0.5 });
+    expect(exit.sim.heroMind).toEqual({ wants: "exit", held: "noWay" });
+    const friend = play(level({ winWhen: "heroReachesFriend", pins: door, actors: { hero: HERO, friend: { x: 320, y: FLOOR + 13 } } }), [], { seconds: 0.5 });
+    expect(friend.sim.heroMind).toEqual({ wants: "friend", held: "noWay" });
+  });
+
+  it("is empty in a level where the gem does the travelling", () => {
+    const lvl = level({ winWhen: "treasureReachesGoal", actors: { hero: HERO, treasure: GEM, goal: { x: 300, y: FLOOR, w: 60, h: 50 } } });
+    const run = play(lvl, [], { seconds: 0.2 });
+    expect(run.sim.heroMind).toEqual({ wants: null, held: "no" });
+  });
+});

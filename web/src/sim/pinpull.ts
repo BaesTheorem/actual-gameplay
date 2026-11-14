@@ -103,6 +103,14 @@ const middle = (r: Rect): Vec => ({ x: r.x + r.w / 2, y: r.y + r.h / 2 });
 /// How far a point is from the nearest point of a rectangle. 0 inside it.
 const gap = (p: Vec, r: Rect) => Math.hypot(Math.max(r.x - p.x, 0, p.x - r.x - r.w), Math.max(r.y - p.y, 0, p.y - r.y - r.h));
 
+/// What the hero can be after.
+export type HeroWant = "gem" | "exit" | "friend";
+/// What the hero is thinking. `held` says why he stands still: "no" when nothing holds him (he
+/// walks, he has arrived, or he wants nothing), "noWay" when no floor leads to what he wants, and
+/// otherwise the danger on his route that he will not walk into.
+export interface HeroMind { wants: HeroWant | null; held: "no" | "noWay" | "lava" | "gas" | "bomb" | "goblin" }
+const NO_MIND: HeroMind = { wants: null, held: "no" };
+
 export class PinSim {
   readonly sk = new SKWorld(-6);
   readonly clock = new Clock();
@@ -115,6 +123,8 @@ export class PinSim {
   /// Whether the hero is on his way somewhere, and which way he faces: 1 is toward the right of the canvas.
   heroWalking = false;
   heroFacing = 1;
+  /// What he is after and what holds him, as of his last look for a route.
+  heroMind: HeroMind = NO_MIND;
   treasure: planck.Body | null = null;
   treasureMelting = -1;
   foes: Foe[] = [];
@@ -506,7 +516,7 @@ export class PinSim {
   private walk() {
     const live = !this.finished && !this.dying, look = this.ticks % ROUTE_EVERY === 0;
     if (this.hero) {
-      if (!live) this.heading.set(this.hero, 0);
+      if (!live) { this.heading.set(this.hero, 0); this.heroMind = NO_MIND; }
       else if (look) this.heading.set(this.hero, this.heroRoute(this.hero));
       const dir = this.heading.get(this.hero) ?? 0;
       this.stride(this.hero, dir, HERO_WALK, this.heroWalking);
@@ -564,31 +574,39 @@ export class PinSim {
     }
   }
 
-  /// What the hero is after now, as a rectangle: the gem, the exit or the friend, by the level's
-  /// goal. Null once he has it, and in a level where the gem does the travelling.
-  private heroWants(): Rect | null {
+  /// What the hero is after now, and where it is as a rectangle: the gem, the exit or the friend,
+  /// by the level's goal. Null once he has it, and in a level where the gem does the travelling.
+  private heroWants(): { kind: HeroWant; rect: Rect } | null {
     const point = (body: planck.Body | null): Rect | null => (body && !tagOf(body).removed ? { ...position(body), w: 0, h: 0 } : null);
-    const gem = this.latched.has("treasureHero") ? null : point(this.treasure);
-    const exit = this.latched.has("heroGoal") ? null : this.level.actors.goal ?? null;
+    const as = (kind: HeroWant, rect: Rect | null) => (rect ? { kind, rect } : null);
+    const gem = as("gem", this.latched.has("treasureHero") ? null : point(this.treasure));
+    const exit = as("exit", this.latched.has("heroGoal") ? null : this.level.actors.goal ?? null);
     switch (this.level.winWhen) {
       case "heroReachesGoal": return exit;
       case "both": return gem ?? (this.latched.has("treasureHero") ? exit : null);
-      case "heroReachesFriend": return this.latched.has("heroFriend") ? null : point(this.friend);
+      case "heroReachesFriend": return this.latched.has("heroFriend") ? null : as("friend", point(this.friend));
       case "treasureReachesGoal": return null;
       default: return gem;
     }
   }
 
   /// Which way the hero should walk, or 0. He is careful: a route with lava or gas on it, a lit
-  /// bomb, or a goblin still on his feet is no route to him. Water does not stop him.
+  /// bomb, or a goblin still on his feet is no route to him. Water does not stop him. What he
+  /// made of it is kept in `heroMind`, for the scene to show over his head.
   private heroRoute(hero: planck.Body): number {
     const wants = this.heroWants();
-    const route = wants && findRoute(this.sk, position(hero), HERO_RADIUS, wants);
-    if (!route || route.dir === 0) return 0;
-    for (const p of this.particles) if (p.kind !== "water" && inCorridor(route, position(p.body), LIQUID_RADIUS)) return 0;
-    for (const bomb of this.bombs) if (bomb.state === "lit" && inCorridor(route, position(bomb.body), BOMB_SIZE / 2)) return 0;
-    for (const foe of this.foes) if (foe.active && inCorridor(route, position(foe.body), HERO_RADIUS)) return 0;
-    return route.dir;
+    const think = (held: HeroMind["held"], dir = 0): number => {
+      this.heroMind = { wants: wants?.kind ?? null, held };
+      return dir;
+    };
+    if (!wants) return think("no");
+    const route = findRoute(this.sk, position(hero), HERO_RADIUS, wants.rect);
+    if (!route) return think("noWay");
+    if (route.dir === 0) return think("no");
+    for (const p of this.particles) if (p.kind !== "water" && inCorridor(route, position(p.body), LIQUID_RADIUS)) return think(p.kind);
+    for (const bomb of this.bombs) if (bomb.state === "lit" && inCorridor(route, position(bomb.body), BOMB_SIZE / 2)) return think("bomb");
+    for (const foe of this.foes) if (foe.active && inCorridor(route, position(foe.body), HERO_RADIUS)) return think("goblin");
+    return think("no", route.dir);
   }
 
   /// Which way a goblin should walk, or 0. He wants the hero or the friend, whichever he has a
@@ -914,7 +932,8 @@ export class PinSim {
 
   /// The line under the title in the HUD.
   get readout(): string {
-    let text = `pins ${this.remaining} left   pulled ${this.pulled.length}   par ${this.level.parPins}`;
+    const par = this.level.parPins;
+    let text = `pulled ${this.pulled.length}   3 stars in ${par} ${par === 1 ? "pull" : "pulls"}`;
     if (this.winLatchedAt !== null && !this.finished) text += "   waiting for calm";
     return text;
   }

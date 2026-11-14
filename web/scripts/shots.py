@@ -4,6 +4,20 @@
 
 Screenshots land in build/webtest/. It is a look at the real pages under the same path prefix
 GitHub Pages uses, with page errors and failed requests printed.
+
+Each argument is one step, done in order:
+
+  go=#/pinPull/the-door     open a route, then wait 1.5 seconds
+  wait=1.2                  wait, in SECONDS (wait=1200 is twenty minutes)
+  tap=x,y                   click a canvas point, y up, as the levels are written
+  drag=x1,y1,x2,y2          press, move and lift
+  stroke=x1,y1;x2,y2;...    one finger through every point
+  until=<expression>        wait until a JavaScript expression is true
+  click=<selector>          click a page element
+  size=WxH                  set the window size
+  motion=reduce             ask for reduced motion
+  shot=name                 save build/webtest/name.png
+  eval=<expression>         print the value of a JavaScript expression
 """
 import functools
 import http.server
