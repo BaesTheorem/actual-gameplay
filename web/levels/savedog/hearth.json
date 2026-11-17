@@ -1,7 +1,7 @@
 {
   "id": "hearth",
   "name": "Hearth",
-  "hint": "Bees will not pass between two flames. Put the end of the roof there, and a leg on the other side.",
+  "hint": "Two flames, one over the other. Put the end of the roof between them and a leg on the other side.",
   "inkBudget": 235,
   "stars": [
     191,

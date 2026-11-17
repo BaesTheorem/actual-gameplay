@@ -3,11 +3,14 @@
 //   auditLevel()   the stored solution shifted and scaled eight ways, five naive strokes, and
 //                  (with `random`) that many plausible random strokes for a difficulty number
 //   odds()         the share of 48 plausible random strokes that survive, for the level statistics
+//   checkOf()      one level against the campaign's bar: all of the above, when each wrong stroke
+//                  loses, and the random strokes again with the level's hazards taken out
 //
 // Run as a script, it tries one level, from the campaign by id or from any level file:
 //   npx tsx scripts/savedog-suite.ts play  <level id | file.json>               the stored solution, and how it ends
 //   npx tsx scripts/savedog-suite.ts audit <level id | file.json> [--random N]  the audit's lines for this level
 //   npx tsx scripts/savedog-suite.ts odds  <level id | file.json>               the share of random strokes that survive
+//   npx tsx scripts/savedog-suite.ts check <level id | file.json>               the level against the campaign's bar
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -267,11 +270,64 @@ export const oddsOf = (level: DogLevel): { randomWin: number; sample: number; ex
 /// The same, by level id: the call a child process makes.
 export const odds = (id: string) => oddsOf(loadLevel<DogLevel>(FOLDER, id));
 
+// MARK: the bar
+
+/// The level with its fires, boulders and bombs taken out and its ice turned to grass, or null
+/// for a level that has none of them.
+export const withoutHazards = (level: DogLevel): DogLevel | null => {
+  const icy = (level.statics ?? []).some((item) => item.skin === "ice");
+  if ((level.fires ?? []).length + (level.rocks ?? []).length + (level.bombs ?? []).length === 0 && !icy) return null;
+  const bare = JSON.parse(JSON.stringify(level)) as DogLevel;
+  delete bare.fires;
+  delete bare.rocks;
+  delete bare.bombs;
+  for (const item of bare.statics ?? []) if (item.skin === "ice") item.skin = "grass";
+  return bare;
+};
+
+/// One level against the bar the campaign's levels are held to, as lines to print: whether the
+/// stored stroke wins, how many of its eight shifted and scaled copies do, what each naive stroke
+/// comes to and when, how many of 48 random strokes survive and how soon after the release the
+/// first of the others loses, and how many survive with the hazards taken out. Times are on
+/// the bees' clock. A stroke that was refused loses nothing, and is counted apart.
+export const checkOf = (level: DogLevel): string[] => {
+  const when = (clock: number | null) => (clock === null ? "before the release" : `at ${clock.toFixed(1)} s`);
+  const lines = [`${level.id}  ${level.name}  (budget ${level.inkBudget}, stars ${level.stars.join(" / ")})`];
+  const copies: string[] = [], naive: string[] = [];
+  let shifted = 0;
+  for (const [name, attempt] of trials(level)) {
+    const { outcome, ink, clock } = playOut(level, attempt);
+    const won = outcome?.won === true, how = outcome === null ? "refused" : won ? "wins" : `${outcome.reason} ${when(clock)}`;
+    if (name === "solution") lines.push(`  solution    ${won ? `wins, ${outcome.stars} stars, ink ${Math.round(ink)}` : how}`);
+    else if (name.startsWith("dumb:")) naive.push(`${name.slice(5)}: ${how}`);
+    else if (won) shifted += 1;
+    else copies.push(`${name.replace("jitter:", "").replace("scale:", "x")} (${how})`);
+  }
+  lines.push(`  shifted     ${shifted} of 8${copies.length > 0 ? `; lost: ${copies.join(", ")}` : ""}`);
+  lines.push(`  naive       ${naive.join("; ")}`);
+  const count = (of: DogLevel) => {
+    let survived = 0, refused = 0, earliest = Infinity;
+    for (const stroke of randomStrokes(of, DOODLES)) {
+      const { outcome, clock } = playOut(of, { strokes: [toVec(stroke)] });
+      if (outcome === null) refused += 1;
+      else if (outcome.won) survived += 1;
+      else earliest = Math.min(earliest, clock ?? -1);
+    }
+    return { survived, refused, earliest };
+  };
+  const found = count(level);
+  const first = found.earliest === Infinity ? "none lose" : found.earliest < 0 ? "the first loss is before the release" : `the first loss is ${found.earliest.toFixed(1)} s after the release`;
+  lines.push(`  random      ${found.survived} of ${DOODLES} survive; ${found.refused} refused; ${first}`);
+  const bare = withoutHazards(level);
+  if (bare) lines.push(`  no hazard   ${count(bare).survived} of ${DOODLES} survive`);
+  return lines;
+};
+
 // MARK: one level from the command line
 
 const run = (verb: string, ref: string) => {
-  if (!["play", "audit", "odds"].includes(verb) || !ref) {
-    console.error("usage: npx tsx scripts/savedog-suite.ts play|audit|odds <level id | file.json> [--random N]");
+  if (!["play", "audit", "odds", "check"].includes(verb) || !ref) {
+    console.error("usage: npx tsx scripts/savedog-suite.ts play|audit|odds|check <level id | file.json> [--random N]");
     process.exitCode = 1;
     return;
   }
@@ -283,6 +339,8 @@ const run = (verb: string, ref: string) => {
   } else if (verb === "audit") {
     const at = process.argv.indexOf("--random");
     console.log(auditOf(level, at > 0 ? Number(process.argv[at + 1]) : 0).line);
+  } else if (verb === "check") {
+    console.log(checkOf(level).join("\n"));
   } else {
     const found = oddsOf(level);
     console.log(`${level.id.padEnd(20)} ${(found.randomWin * 100).toFixed(1)}%  ${found.detail}`);

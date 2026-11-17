@@ -241,7 +241,7 @@ which is the clock that counts the ten seconds, and every number is a named cons
 The tools are the ones Pull the Pin has:
 
     npx tsx scripts/film.ts saveDog <level id | file.json> [--solution | --stroke "x,y;x,y" | --random N | --dumb name]
-    npx tsx scripts/savedog-suite.ts play|audit|odds <level id | file.json> [--random N]
+    npx tsx scripts/savedog-suite.ts play|audit|odds|check <level id | file.json> [--random N]
     #/saveDog/~<name>                                    web/public/lab/savedog/<name>.json, in the game
 
 Four small levels are in the lab, one for each hazard: `fire`, `rock`, `bomb` and `ice`. Each is
@@ -254,9 +254,11 @@ ice. Each of those ten was measured the same two ways. With its hazard, 0 to 2 o
 strokes survive. With the fires, boulders and bombs taken out and the ice turned to grass, 5 to 24
 of the same 48 do.
 
-Every level of the campaign is held to one bar, and `npm run audit -- saveDog --random 16` and
-`npm run stats` are how it is read. The stored stroke wins, and so do at least six of its eight
-shifted and scaled copies (seven or eight on all but one level). No naive stroke wins. Of 48
+Every level of the campaign is held to one bar. `npm run audit -- saveDog --random 16` and
+`npm run stats` read it for the whole campaign, and `savedog-suite.ts check` reads one level
+against all of it: when each wrong stroke loses, and the random strokes again with the hazards
+taken out. The stored stroke wins, and so do at least six of its eight shifted and scaled
+copies (seven or eight on all but one level). No naive stroke wins. Of 48
 random strokes, 32 survive the first level, 3 or less every other level of chapter 1, 2 or less
 every level after that, and none the last level of chapters 2 to 6. Inside a chapter the number
 never rises. Every hive waits long enough that the first bee reaches him no sooner than three

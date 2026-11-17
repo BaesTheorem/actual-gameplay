@@ -2,7 +2,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { trials } from "../scripts/savedog-suite";
+import { trials, withoutHazards } from "../scripts/savedog-suite";
 import { DRAW_AREA, playOut, type DogLevel } from "../src/sim/savedog";
 import { contains, inset, polylineLength } from "../src/sim/savedog/geometry";
 import { strokePoints } from "../src/sim/savedog/level";
@@ -44,6 +44,20 @@ describe("the lab levels", () => {
       expect(cost * 1.05, file).toBeLessThanOrEqual(level.inkBudget);
       expect(cost, file).toBeLessThanOrEqual(level.stars[0] + 0.01);
     }
+  });
+
+  it("can be read with their hazard taken out, which is how a hazard is shown to do the work", () => {
+    for (const { file, level } of levels) {
+      const bare = withoutHazards(level);
+      expect(bare, file).not.toBeNull();
+      expect(HAZARD[level.id](bare!), file).toBe(false);
+      // Everything else is as it was, and the level itself is not touched.
+      expect(bare!.dogs, file).toEqual(level.dogs);
+      expect(bare!.hives, file).toEqual(level.hives);
+      expect(HAZARD[level.id](level), file).toBe(true);
+    }
+    // A level with none of the four has nothing to take out.
+    expect(withoutHazards({ ...levels[0].level, fires: [], rocks: [], bombs: [], statics: [{ type: "rect", x: 0, y: 34, w: 402, h: 40, skin: "grass" }] })).toBeNull();
   });
 
   for (const { file, level } of levels) {

@@ -1062,11 +1062,12 @@ export class DogSim {
 export type Attempt = { transform?: StrokeTransform } | { strokes: Vec[][] };
 
 /// Step a level until it ends or its replay runs out of time. The replay suite and the audit both use this.
-export const playOut = (level: DogLevel, attempt: Attempt = {}): { outcome: Outcome | null; seconds: number; ink: number } => {
+/// `clock` is how long the bees had been out when it ended, or null when they never came out.
+export const playOut = (level: DogLevel, attempt: Attempt = {}): { outcome: Outcome | null; seconds: number; ink: number; clock: number | null } => {
   const sim = new DogSim(level);
   if ("strokes" in attempt) sim.replayStrokes(attempt.strokes);
   else if (level.solution) sim.replay(level.solution, attempt.transform ?? IDENTITY);
   const frames = Math.ceil((sim.replayWait + 2) / STEP);
   for (let i = 0; i < frames && !sim.finished; i++) sim.frame();
-  return { outcome: sim.outcome, seconds: sim.elapsed, ink: sim.inkUsed };
+  return { outcome: sim.outcome, seconds: sim.elapsed, ink: sim.inkUsed, clock: sim.launchedAt === null ? null : sim.elapsed - sim.launchedAt };
 };
