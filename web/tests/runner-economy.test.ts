@@ -1,9 +1,11 @@
-import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { baked, design, render } from "../scripts/runner-economy";
+import { decode } from "../src/app/store";
 import { FinaleFight, RunnerEconomy, Upgrade } from "../src/sim/runner";
 
 describe("runner economy", () => {
-  it("has a price for every level, and prices climb", () => {
+  it("has four upgrades, a price for every level, and prices that climb", () => {
+    expect(Upgrade.allCases).toEqual(["startCrowd", "memberPower", "fireRate", "coinMultiplier"]);
     for (const upgrade of Upgrade.allCases) {
       const tiers = Upgrade.tiers(upgrade);
       expect(tiers.length, upgrade).toBe(Upgrade.maxLevel(upgrade));
@@ -13,38 +15,45 @@ describe("runner economy", () => {
         expect(b.run, `${upgrade} is bought in order`).toBeGreaterThanOrEqual(a.run);
       }
       expect(tiers.every((t) => t.gain > 0), `${upgrade}: every level buys something`).toBe(true);
+      expect(Upgrade.cost(upgrade, 99)).toBe(tiers[tiers.length - 1]?.cost);
     }
   });
 
-  // A level costs a handful of three-star purses of the run it is meant for, never a fraction
-  // of one (the old curve) and never a grind.
+  // A level costs some wins' worth of the run it is meant for: never a fraction of one purse,
+  // and never a grind of a hundred.
   it("prices each level at a sane share of its run's income", () => {
     for (const upgrade of Upgrade.allCases) {
       Upgrade.tiers(upgrade).forEach((tier, level) => {
         const purses = tier.cost / RunnerEconomy.purse(tier.run - 1);
-        expect(purses, `${upgrade} level ${level + 1}`).toBeGreaterThanOrEqual(2);
-        expect(purses, `${upgrade} level ${level + 1}`).toBeLessThanOrEqual(40);
+        expect(purses, `${upgrade} level ${level + 1}`).toBeGreaterThanOrEqual(1.5);
+        expect(purses, `${upgrade} level ${level + 1}`).toBeLessThanOrEqual(80);
       });
     }
   });
 
-  it("keeps the total cost to max in range", () => {
-    const total = (u: Upgrade) => Upgrade.tiers(u).reduce((sum, t) => sum + t.cost, 0);
-    const within = (n: number, lo: number, hi: number) => n >= lo && n <= hi;
-    expect(within(total("startCrowd"), 20_000, 200_000), `${total("startCrowd")}`).toBe(true);
-    expect(within(total("memberPower"), 20_000, 200_000), `${total("memberPower")}`).toBe(true);
-    expect(within(total("coinMultiplier"), 10_000, 100_000), `${total("coinMultiplier")}`).toBe(true);
-    const tiers = Upgrade.tiers("startCrowd");
-    expect(Upgrade.cost("startCrowd", 99)).toBe(tiers[tiers.length - 1]?.cost);
+  it("follows the upgrade curves", () => {
+    const base = RunnerEconomy.base;
+    expect([base.startCrowd, base.memberPower, base.fireRate, base.coinMultiplier]).toEqual([5, 1, 1, 1]);
+    const maxed = new RunnerEconomy({ startCrowd: 20, memberPower: 10, coinMultiplier: 10, fireRate: 10 });
+    expect(maxed.startCrowd).toBe(45);
+    expect(maxed.memberPower).toBeCloseTo(2.5, 9);
+    expect(maxed.fireRate).toBeCloseTo(2, 9);
+    expect(maxed.coinMultiplier).toBeCloseTo(3, 9);
+    expect(Upgrade.maxLevel("fireRate")).toBe(10);
+    expect(Upgrade.effectText("fireRate", 3)).toBe("130% fire rate");
   });
 
-  it("pays coins by the run, the stars and the bonus", () => {
+  it("pays coins by the run, the stars, the crates and the bonus", () => {
     const base = RunnerEconomy.base;
     expect(base.coins(0, 3)).toBe(30);
     expect(base.coins(0, 1)).toBe(15);
     expect(base.coins(10, 2)).toBe(45);
+    expect(base.coins(0, 3, 12)).toBe(42);
+    expect(base.consolation(12)).toBe(12);
     const bonus = new RunnerEconomy({ coinMultiplier: 5 });
     expect(bonus.coins(10, 3)).toBe(120);
+    expect(bonus.consolation(12)).toBe(24);
+    expect(base.consolation(0)).toBe(0);
   });
 
   it("names what the next level buys", () => {
@@ -59,7 +68,6 @@ describe("runner economy", () => {
   });
 
   it("counts member strength in small fights", () => {
-    // The old fight rounded every tick's loss up to a whole runner, so 1.15x changed nothing here.
     expect(FinaleFight.survivors(25, 20, 1)).toBe(5);
     expect(FinaleFight.survivors(25, 20, 1.15)).toBe(8);
     expect(FinaleFight.survivors(80, 60, 1)).toBe(20);
@@ -67,36 +75,24 @@ describe("runner economy", () => {
     expect(FinaleFight.survivors(20, 25, 1)).toBe(0);
   });
 
-  it("fights by the old rule at power one", () => {
-    for (let mine = 1; mine <= 200; mine++) {
-      for (let theirs = 1; theirs <= 200; theirs += 7) {
-        let old = { mine, theirs };
-        let expected = 0;
-        for (;;) {
-          const slice = Math.max(1, Math.ceil(Math.max(old.mine, old.theirs) / 30));
-          const loss = slice;
-          const next = { mine: Math.max(0, old.mine - loss), theirs: Math.max(0, old.theirs - slice) };
-          if (next.theirs <= 0 && next.mine > 0) { expected = next.mine; break; }
-          if (next.mine <= 0 && next.theirs > 0) { expected = 0; break; }
-          if (next.mine <= 0 && next.theirs <= 0) { expected = old.mine >= old.theirs ? 1 : 0; break; }
-          old = next;
-        }
-        expect(FinaleFight.survivors(mine, theirs, 1), `${mine} v ${theirs}`).toBe(expected);
-      }
-    }
+  it("reads an old save with its coins, its run and its three upgrades, and the new one at 0", () => {
+    const old = { schemaVersion: 2, levels: {}, runner: { level: 41, bestLevel: 41, coins: 730, upgrades: { startCrowd: 4, memberPower: 2, coinMultiplier: 1 } } };
+    const runner = decode(JSON.stringify(old)).runner;
+    expect(runner).toEqual(old.runner);
+    const economy = new RunnerEconomy(runner.upgrades);
+    expect(Upgrade.allCases.map((upgrade) => economy.level(upgrade))).toEqual([4, 2, 0, 1]);
+    expect(economy.fireRate).toBe(1);
+    expect(economy.startCrowd).toBe(13);
+    // A version 1 file keeps them too.
+    const v1 = decode(JSON.stringify({ schemaVersion: 1, runner: old.runner })).runner;
+    expect(v1).toEqual(old.runner);
   });
 
-  // Not in the iPhone tests: the tables here are a copy, so read the Swift file and compare.
-  it("holds the same tier tables as RunnerEconomy.swift", () => {
-    const swift = readFileSync(new URL("../../ActualGameplay/Sources/Runner/RunnerEconomy.swift", import.meta.url), "utf8");
-    for (const upgrade of Upgrade.allCases) {
-      const start = swift.indexOf(`static let ${upgrade}Tiers`);
-      expect(start, upgrade).toBeGreaterThan(0);
-      const block = swift.slice(start, swift.indexOf("]", start + 40));
-      const rows = [...block.matchAll(/Tier\(cost: (\d+), run: (\d+), gain: ([\d.]+)\)/g)]
-        .map((m) => ({ cost: Number(m[1]), run: Number(m[2]), gain: Number(m[3]) }));
-      expect(rows.length, upgrade).toBe(Upgrade.maxLevel(upgrade));
-      expect(Upgrade.tiers(upgrade), upgrade).toEqual(rows);
-    }
+  // The script plays about 145000 runs, which takes 20 to 40 seconds. The simulation is the
+  // same arithmetic on every processor, so the tables are compared exactly.
+  it("holds the tier tables scripts/runner-economy.ts works out", { timeout: 600_000 }, () => {
+    const { tables } = design();
+    expect(render(baked())).toBe(render(tables));
+    for (const upgrade of Upgrade.allCases) expect(Upgrade.tiers(upgrade), upgrade).toEqual(tables[upgrade]);
   });
 });

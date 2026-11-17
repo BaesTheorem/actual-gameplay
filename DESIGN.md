@@ -158,6 +158,38 @@ Every piece is drawn with what the rest of the game already had.
   a stone of his own width.
 - Decor is two or three pieces at most, and none where the ink has to go.
 
+## Crowd Run's worlds and pieces
+
+Each world is flat washes: a verge, a road, hills and a pit for the gaps beside a bridge. The
+road is always pale enough for ink to read on it.
+
+| World | Verge | Road | Hills | Pit |
+| --- | --- | --- | --- | --- |
+| Meadow | `#A9C48F` | `#CDB894` | the painted hills | `teal` |
+| Dunes | sand `#E6CF9A` | track `#C99E6E` | dune `#D9B36A` behind `ochre` | clay dark `#A84D33` |
+| Snow | snow `#E6EFF2` | slush `#C4CFD8` | ice `#BBD7E4` behind `sky` | `teal` |
+| Night | indigo `#2F3C7A` | moonlit `#A5A2BD` | `#3A4580` behind indigo, a `night` sky, a cream moon | `night` |
+
+- A pellet is an ink dot with a cream core, 9 pt across as it leaves the crowd and 5 pt as it
+  lands 0.26 s later, with one fleck of ink where it lands. The stream gets denser with count
+  and rate, up to 44 a second and 48 on screen.
+- A crate is plank tiles with a 2.5 pt ink edge. Its hit points count down on a cream plate on
+  its face, and it cracks at each third lost. What it holds is a picture over it: a runner for
+  allies, the potion for a doubling, the coin, a pellet for fire rate. The number joins the
+  picture on a plate once the crate is within 10 lane units. Allies are drawn as the crowd's
+  own runner, never as the violet rival.
+- A barrel is the painted bomb, with its hit points on a plate and the reach of its blast as a
+  dashed ochre line on the road. Its blast is Pull the Pin's.
+- A squad is two rows of violet runners that thin as they are shot, under a plate with "×n".
+- A rate gate carries the word FIRE and the pellet; a range gate the word RANGE. Sap for a
+  gain and red for a loss, as the count gates are.
+- The hammer is a stone mallet on a post, drawn in code. It turns over the post in 0.16 s.
+- A bridge is plank brown over the road's middle third with the pit wash on both sides.
+- The slam is a rose wash at 60% on one half of the road, from the crowd to the boss, with an
+  ink edge. It beats four times in its second and holds still under reduced motion.
+- No text on the stage is under 13 pt. A label on something far up the road stops shrinking
+  there, and is left off when the thing is too small to carry it.
+
 ## Number Tower's pieces
 
 - The tower is a building in cutaway: stone walls with an ink outline, a flat wash inside each

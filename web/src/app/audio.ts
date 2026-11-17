@@ -24,6 +24,8 @@ const EVENTS: Record<string, SoundSpec> = {
   cooked: { files: ["cooked.wav"], volume: 0.6 },
   gateGood: { files: ["gate_good.wav"], volume: 0.2 },
   gateBad: { files: ["gate_bad.wav"], volume: 0.2 },
+  // Crowd Run's pellets landing: ink on wood, quiet, and heard a few times a second at most.
+  pellet: { files: ["ink_land_1.wav", "ink_land_2.wav", "ink_land_3.wav"], volume: 0.12, minGap: 0.12 },
   pop: { files: ["pop_1.wav", "pop_2.wav"], volume: 0.18 },
   coin: { files: ["coins.wav"], volume: 0.55, minGap: 0.25 },
   hit: { files: ["hit_1.wav", "hit_2.wav", "hit_3.wav"], volume: 0.4, minGap: 0.1 },

@@ -197,6 +197,12 @@ export class Game {
       }
     } else {
       card.append(h("div.muted", { style: { fontSize: "15px" } }, outcome.reason));
+      // A loss can still pay: the coins the run's crates gave are kept.
+      if (outcome.coins) {
+        const coin = h("div");
+        art.paint(coin, "coin_gold", 22);
+        card.append(h("div.row", { style: { gap: "6px" }, "aria-label": `${outcome.coins} coins` }, coin, h("span.marker", { style: { fontSize: "18px" } }, `+${outcome.coins}`)));
+      }
       if (measured) card.append(measured);
     }
     // Clay marks the obvious next step: Next after a win, Retry after a loss, Back after the last level.

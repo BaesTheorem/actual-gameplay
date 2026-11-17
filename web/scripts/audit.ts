@@ -1,7 +1,7 @@
 // Stress the levels with no browser.
 //   npm run audit -- pinPull     every pull sequence up to par, pruned at wins and deaths;
 //                                each level is UNIQUE or the other winning orders are listed
-//   npm run audit -- runner      greedy steering against never steering, always left, and random
+//   npm run audit -- runner      the skilled bot and three lazy ones on runs 1 to 20; a run a lazy bot wins is flagged
 //   npm run audit -- saveDog [--random N]   the solution shifted and scaled, naive strokes, N random strokes
 //   npm run audit -- tower       every level solved outright and held to its chapter's recipe; a level
 //                                is flagged when it breaks the recipe or its stored best is not the best

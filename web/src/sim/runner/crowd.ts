@@ -1,5 +1,6 @@
-// A crowd of runners as data. `count` is the truth; at most 150 of them are members with a place,
-// arranged on a sunflower spiral around the anchor so any number reads as one blob.
+// A crowd of runners as data. `count` is the truth; at most 150 of them have a place, arranged
+// on a sunflower spiral around the anchor so any number reads as one blob. A hazard takes the
+// runners whose places lie in its span, and the loss is scaled up to the true count.
 import type { Vec } from "../sk";
 import { Projection } from "./projection";
 import type { Span } from "./track";
@@ -30,47 +31,94 @@ export interface Leaver {
 
 export interface MemberPose { position: Vec; zPosition: number; xScale: number; yScale: number }
 
+const MAX_VISIBLE = 150;
+const SLOT_SPACING = 0.05;
+/// Cosine and sine of the golden angle, 2.399963 radians, written out so that every device
+/// starts from the same two numbers.
+const TURN_COS = -0.7373687228988248, TURN_SIN = 0.6754904636562651;
+
+/// Each slot's offset from the anchor in lane units. The spiral turns by multiplying with one
+/// fixed rotation, so a slot is the same double everywhere and so is every hazard's count.
+const SLOT_DX: number[] = [0], SLOT_DZ: number[] = [0];
+{
+  let c = 1, s = 0;
+  for (let i = 1; i < MAX_VISIBLE; i++) {
+    [c, s] = [c * TURN_COS - s * TURN_SIN, s * TURN_COS + c * TURN_SIN];
+    const r = SLOT_SPACING * Math.sqrt(i);
+    SLOT_DX.push(r * c);
+    SLOT_DZ.push(r * s * 0.6);
+  }
+}
+
 export class Crowd {
-  static readonly maxVisible = 150;
-  static readonly slotSpacing = 0.05;
+  static readonly maxVisible = MAX_VISIBLE;
+  static readonly slotSpacing = SLOT_SPACING;
 
   count = 0;
+  /// The runners that are drawn. Empty for a crowd nobody looks at.
   members: Member[] = [];
   leavers: Leaver[] = [];
   anchorX = 0;
   /// Game time and squash amount of the last update, kept so a pose can be read at any moment.
   time = 0;
   wobble = 0;
+  /// How wide the formation is drawn, 1 for its own width. A bridge narrows it and the runners
+  /// string out along the road by the same amount. It changes the drawing and nothing else.
+  squeeze = 1;
+  private squeezeTo = 1;
 
-  /// `facing` is 1 for a crowd that faces screen right, -1 for a mirrored one.
-  constructor(count: number, public anchorZ: number, readonly facing = 1) {
+  /// `facing` is 1 for a crowd that faces screen right, -1 for a mirrored one. A crowd with
+  /// `drawn` off keeps its count and its rules and no runners, for runs played with no screen.
+  constructor(count: number, public anchorZ: number, readonly facing = 1, readonly drawn = true) {
     this.setCount(count, false);
   }
 
   /// Formation slot i as an offset from the anchor, in lane units.
   static slot(i: number): { dx: number; dz: number } {
-    if (i <= 0) return { dx: 0, dz: 0 };
-    const r = Crowd.slotSpacing * Math.sqrt(i);
-    const angle = i * 2.399963;
-    return { dx: r * Math.cos(angle), dz: r * Math.sin(angle) * 0.6 };
+    const at = Math.min(Math.max(i, 0), MAX_VISIBLE - 1);
+    return { dx: SLOT_DX[at]!, dz: SLOT_DZ[at]! };
+  }
+
+  /// Radius of a formation of `count` runners in lane units.
+  static radiusOf(count: number): number { return SLOT_SPACING * Math.sqrt(Math.min(Math.max(count, 0), MAX_VISIBLE)); }
+
+  /// How many of a crowd's places lie in a span, or outside it, with the crowd centred on `anchorX`.
+  static placesIn(count: number, anchorX: number, span: Span, outside = false): number {
+    const places = Math.min(count, MAX_VISIBLE);
+    let hit = 0;
+    for (let i = 0; i < places; i++) {
+      const x = anchorX + SLOT_DX[i]!;
+      if ((x >= span.lo && x <= span.hi) !== outside) hit += 1;
+    }
+    return hit;
+  }
+
+  /// How many runners a span takes from a crowd of `count` centred on `anchorX`: the share of
+  /// its places in the span, scaled to the true count, and never less than the places themselves.
+  static losses(count: number, anchorX: number, span: Span, outside = false): number {
+    const places = Math.min(count, MAX_VISIBLE);
+    if (places === 0) return 0;
+    const hit = Crowd.placesIn(count, anchorX, span, outside);
+    if (hit === 0) return 0;
+    return Math.min(count, Math.max(hit, Math.round(count * (hit / places))));
   }
 
   /// Radius of the visible formation in lane units.
-  get radius(): number { return Crowd.slotSpacing * Math.sqrt(Math.min(this.count, Crowd.maxVisible)); }
+  get radius(): number { return Crowd.radiusOf(this.count); }
 
   setCount(newCount: number, animated = true) {
     this.count = Math.max(0, newCount);
-    const visible = Math.min(this.count, Crowd.maxVisible);
+    if (!this.drawn) return;
+    const visible = Math.min(this.count, MAX_VISIBLE);
     while (this.members.length < visible) this.addMember(this.members.length, animated);
     while (this.members.length > visible) this.removeLastMember(animated);
   }
 
   private addMember(index: number, animated: boolean) {
-    const slot = Crowd.slot(index);
     this.members.push({
       index,
-      x: this.anchorX + (animated ? 0 : slot.dx),
-      dz: animated ? 0 : slot.dz,
+      x: this.anchorX + (animated ? 0 : SLOT_DX[index]!),
+      dz: animated ? 0 : SLOT_DZ[index]!,
       phase: index * 0.7,
       age: 0,
       fadeIn: animated,
@@ -86,28 +134,40 @@ export class Crowd {
     this.leavers.push({ x: member.x, z: this.anchorZ + member.dz, phase: member.phase, age: 0, duration, drop });
   }
 
-  /// Kill the members inside `span` and scale the loss up to the true count.
-  kill(span: Span): number {
-    if (this.members.length === 0) return 0;
-    const hit = this.members.filter((m) => m.x >= span.lo && m.x <= span.hi);
-    if (hit.length === 0) return 0;
-    const fraction = hit.length / this.members.length;
-    const killed = Math.min(this.count, Math.max(hit.length, Math.round(this.count * fraction)));
-    for (const member of hit) this.leave(member, 0.2, 20);
-    this.members = this.members.filter((m) => !hit.includes(m));
+  /// Lose the runners whose places lie in `span`, or outside it. Returns how many were lost.
+  /// With `fall` the lost runners drop out of sight, as off a bridge, where the others fade
+  /// where they stood.
+  kill(span: Span, outside = false, fall = false): number {
+    const killed = Crowd.losses(this.count, this.anchorX, span, outside);
+    if (killed === 0) return 0;
+    if (this.drawn) {
+      const kept: Member[] = [];
+      this.members.forEach((member, i) => {
+        const x = this.anchorX + SLOT_DX[i]!;
+        if ((x >= span.lo && x <= span.hi) !== outside) this.leave(member, fall ? 0.4 : 0.2, fall ? 70 : 20);
+        else kept.push(member);
+      });
+      this.members = kept;
+    }
     this.count -= killed;
+    // The places that are left close up, so a big crowd that lost its edge shows runners again.
+    if (this.drawn) this.setCount(this.count);
     return killed;
   }
+
+  /// Draw the formation at this share of its width from now on. It eases there.
+  squeezeToward(share: number) { this.squeezeTo = share; }
 
   /// Ease every member toward its slot. A tenth of a second covers the whole distance.
   update(dt: number, time: number, wobble: number) {
     this.time = time;
     this.wobble = wobble;
     const k = Math.min(1, 10 * dt);
+    this.squeeze += (this.squeezeTo - this.squeeze) * Math.min(1, 6 * dt);
+    const across = this.squeeze, along = 1 / Math.max(0.25, this.squeeze);
     this.members.forEach((member, i) => {
-      const slot = Crowd.slot(i);
-      member.x += (this.anchorX + slot.dx - member.x) * k;
-      member.dz += (slot.dz - member.dz) * k;
+      member.x += (this.anchorX + SLOT_DX[i]! * across - member.x) * k;
+      member.dz += (SLOT_DZ[i]! * along - member.dz) * k;
       member.age += dt;
     });
     if (this.leavers.length > 0) {
@@ -124,7 +184,8 @@ export class Crowd {
       position: Projection.point(member.x, z),
       zPosition: 100 - z,
       xScale: scale * this.facing,
-      yScale: scale * (1 + this.wobble * Math.sin(this.time * 16 + member.phase)),
+      // The bob is drawing only: it decides nothing, so a true sine is fine here.
+      yScale: scale * (1 + this.wobble * Math.sin(this.time * 16 + member.phase)), // drawing only
     };
   }
 

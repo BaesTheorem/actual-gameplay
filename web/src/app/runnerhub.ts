@@ -1,5 +1,6 @@
-// Crowd Run between runs: the run counter, the coin purse, and the three upgrades.
+// Crowd Run between runs: the world and the run, the coin purse, and the four upgrades.
 import { RunnerEconomy, Upgrade } from "../sim/runner/economy";
+import { worldTitle } from "../sim/runner/worlds";
 import * as art from "./art";
 import * as audio from "./audio";
 import { button, h, iconButton } from "./dom";
@@ -62,10 +63,10 @@ export const showRunnerHub = (host: HTMLElement, opts: RunnerHubOptions) => {
   host.replaceChildren(
     h("div.row.hub-top", iconButton("arrowBack", "Back", opts.onBack),
       h("div.grow", h("div.marker", { style: { fontSize: "26px", lineHeight: "1.1" } }, "CROWD RUN"),
-        h("div.sub.mono.muted", `run ${runner.level + 1}   best ${runner.bestLevel}`)),
+        h("div.sub.mono.muted", worldTitle(runner.level))),
       coinCount(runner.coins)),
     art.frame(h("div.hub-card", figure,
-      h("p.muted", "Drag to steer. Green gates grow the crowd, red ones shrink it. Whatever is left fights at the end."),
+      h("p.muted", "Drag to steer. The crowd shoots what is ahead of it. Break crates, pick gates, and fight what is left at the end."),
       button(`RUN ${runner.level + 1}`, opts.onRun, { filled: true }))),
     h("div.marker.muted", { style: { fontSize: "15px", marginTop: "4px" } }, "UPGRADES"),
     ...Upgrade.allCases.map((u) => upgradeRow(u, economy.level(u), runner.coins, () => buy(u))),

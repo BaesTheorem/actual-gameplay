@@ -1,85 +1,113 @@
-// The three permanent upgrades and what they do to a run. The prices and the shop's odds line
-// come from scripts/economy.py, which plays the runs as arithmetic. The tier tables below are a
-// copy of the ones in RunnerEconomy.swift, and a test compares the two files.
-import { RunnerGenerator } from "./generator";
+// The four permanent upgrades and what they do to a run. The prices and the shop's odds line
+// come from scripts/runner-economy.ts, which plays the real simulation: a reference player (the
+// skilled bot, which takes the worse gate one time in five and misses a dodge one time in five)
+// walks runs 1 to 300 and buys every level in turn. Each level is priced in wins of income, and
+// the levels that buy win odds all cost the same number of wins for each point of odds at the
+// moment the player starts to save for them. The script writes the tier tables below between
+// the two markers, and a test runs it again and compares.
+import { RUNS_PER_WORLD } from "./worlds";
 
-/// One level of an upgrade: its price, and what it did for the model's reference player (the
-/// better gate and a clean dodge 80% of the time), who buys it just before `run`. `gain` is
-/// the win odds it adds there, in points over the next ten runs; for the coin bonus, coins a win.
+/// The crowd a run starts with before upgrades.
+export const BASE_CROWD = 5;
+
+/// What one level of each upgrade adds: runners, member power, the coin multiplier, fire rate.
+export const CROWD_STEP = 2, POWER_STEP = 0.15, COIN_STEP = 0.2, RATE_STEP = 0.1;
+
+/// One level of an upgrade: its price, and what it did for the reference player, who buys it
+/// just before `run`. `gain` is the win odds it adds, in points, over the thirty runs it was
+/// priced on; for the coin bonus, coins a win over the ten runs after it is bought.
 export interface Tier { cost: number; run: number; gain: number }
 
-export type Upgrade = "startCrowd" | "memberPower" | "coinMultiplier";
+export type Upgrade = "startCrowd" | "memberPower" | "coinMultiplier" | "fireRate";
+export type Levels = Partial<Record<Upgrade, number>>;
+export type TierTables = Record<Upgrade, Tier[]>;
 
 const tier = (cost: number, run: number, gain: number): Tier => ({ cost, run, gain });
 
+// BEGIN TIERS
 const startCrowdTiers: Tier[] = [
-  tier(110, 5, 2.8),
-  tier(280, 24, 1.2),
-  tier(300, 27, 0.8),
-  tier(570, 47, 1.6),
-  tier(600, 50, 0.9),
-  tier(1150, 70, 2.6),
-  tier(1200, 74, 1.5),
-  tier(1700, 96, 2.0),
-  tier(1800, 100, 1.4),
-  tier(2450, 122, 1.4),
-  tier(2700, 127, 1.3),
-  tier(3750, 151, 0.9),
-  tier(3950, 156, 0.9),
-  tier(5050, 180, 1.1),
-  tier(5300, 186, 1.1),
-  tier(6050, 211, 1.0),
-  tier(8000, 219, 1.6),
-  tier(8400, 246, 0.9),
-  tier(8800, 253, 0.7),
-  tier(9900, 279, 0.7),
+  tier(230, 8, 3.0),
+  tier(500, 24, 2.2),
+  tier(530, 28, 1.1),
+  tier(560, 57, 0.1),
+  tier(840, 59, 0.7),
+  tier(880, 78, 0.1),
+  tier(920, 81, 0.1),
+  tier(1400, 103, 0.3),
+  tier(3600, 106, 1.3),
+  tier(6050, 131, 3.0),
+  tier(6350, 138, 2.2),
+  tier(10000, 161, 1.7),
+  tier(10500, 167, 0.4),
+  tier(11000, 192, 1.6),
+  tier(11600, 199, 1.6),
+  tier(12200, 226, 0.7),
+  tier(12800, 230, 0.1),
+  tier(25100, 260, 2.7),
+  tier(26400, 269, 2.4),
+  tier(27700, 299, 0.3),
 ];
 const memberPowerTiers: Tier[] = [
-  tier(500, 16, 4.6),
-  tier(1250, 39, 5.1),
-  tier(2200, 61, 5.4),
-  tier(3550, 87, 5.2),
-  tier(5150, 113, 3.6),
-  tier(7450, 141, 3.1),
-  tier(9900, 170, 3.1),
-  tier(14400, 202, 2.3),
-  tier(20700, 236, 2.1),
-  tier(23200, 269, 1.4),
+  tier(370, 13, 1.7),
+  tier(2150, 39, 4.0),
+  tier(3250, 66, 2.3),
+  tier(4200, 88, 2.4),
+  tier(4950, 114, 2.8),
+  tier(5200, 143, 2.3),
+  tier(6600, 171, 1.7),
+  tier(11500, 205, 2.2),
+  tier(16100, 238, 1.8),
+  tier(28100, 279, 2.2),
 ];
 const coinMultiplierTiers: Tier[] = [
-  tier(340, 21, 16.3),
-  tier(640, 43, 25.0),
-  tier(960, 66, 34.3),
-  tier(1400, 91, 41.4),
-  tier(1850, 117, 50.4),
-  tier(2350, 145, 60.8),
-  tier(2800, 174, 70.3),
-  tier(3800, 205, 80.8),
-  tier(4400, 240, 97.5),
-  tier(5150, 273, 106.3),
+  tier(450, 21, 22.8),
+  tier(900, 55, 44.3),
+  tier(1300, 76, 53.7),
+  tier(2000, 101, 77.9),
+  tier(3450, 127, 85.3),
+  tier(3600, 154, 114.5),
+  tier(4950, 186, 121.5),
+  tier(5200, 221, 161.1),
+  tier(8650, 253, 173.4),
+  tier(17700, 292, 203.2),
 ];
+const fireRateTiers: Tier[] = [
+  tier(230, 16, 1.9),
+  tier(2400, 51, 2.7),
+  tier(2800, 72, 2.4),
+  tier(5300, 98, 3.7),
+  tier(9300, 123, 3.3),
+  tier(19200, 151, 4.8),
+  tier(30900, 183, 4.9),
+  tier(32700, 218, 4.9),
+  tier(34300, 250, 4.0),
+  tier(36000, 289, 2.3),
+];
+// END TIERS
+
+const TABLES: TierTables = {
+  startCrowd: startCrowdTiers,
+  memberPower: memberPowerTiers,
+  coinMultiplier: coinMultiplierTiers,
+  fireRate: fireRateTiers,
+};
 
 export const Upgrade = {
-  allCases: ["startCrowd", "memberPower", "coinMultiplier"] as Upgrade[],
+  allCases: ["startCrowd", "memberPower", "fireRate", "coinMultiplier"] as Upgrade[],
 
   title(upgrade: Upgrade): string {
     switch (upgrade) {
       case "startCrowd": return "Starting crowd";
       case "memberPower": return "Member strength";
       case "coinMultiplier": return "Coin bonus";
+      case "fireRate": return "Fire rate";
     }
   },
 
   maxLevel: (upgrade: Upgrade): number => (upgrade === "startCrowd" ? 20 : 10),
 
   /// Entry n is the step from level n to n + 1.
-  tiers(upgrade: Upgrade): Tier[] {
-    switch (upgrade) {
-      case "startCrowd": return startCrowdTiers;
-      case "memberPower": return memberPowerTiers;
-      case "coinMultiplier": return coinMultiplierTiers;
-    }
-  },
+  tiers: (upgrade: Upgrade): Tier[] => TABLES[upgrade],
 
   cost(upgrade: Upgrade, level: number): number {
     const tiers = Upgrade.tiers(upgrade);
@@ -88,9 +116,10 @@ export const Upgrade = {
 
   effectText(upgrade: Upgrade, level: number): string {
     switch (upgrade) {
-      case "startCrowd": return `${RunnerGenerator.baseCrowd + 2 * level} runners`;
-      case "memberPower": return `${(1 + 0.15 * level).toFixed(2)}x damage`;
-      case "coinMultiplier": return `${(1 + 0.2 * level).toFixed(1)}x coins`;
+      case "startCrowd": return `${BASE_CROWD + CROWD_STEP * level} runners`;
+      case "memberPower": return `${(1 + POWER_STEP * level).toFixed(2)}x damage`;
+      case "coinMultiplier": return `${(1 + COIN_STEP * level).toFixed(1)}x coins`;
+      case "fireRate": return `${Math.round(100 * (1 + RATE_STEP * level))}% fire rate`;
     }
   },
 
@@ -107,28 +136,44 @@ export const Upgrade = {
 export class RunnerEconomy {
   static readonly base = new RunnerEconomy();
 
-  static readonly startCrowdTiers = startCrowdTiers;
-  static readonly memberPowerTiers = memberPowerTiers;
-  static readonly coinMultiplierTiers = coinMultiplierTiers;
-
   /// Share of the purse by stars: a scrappy win pays half, a clean one all of it.
   static readonly starShare = [0, 0.5, 0.75, 1];
 
-  constructor(readonly levels: Partial<Record<Upgrade, number>> = {}) {}
+  constructor(readonly levels: Levels = {}) {}
 
   level(upgrade: Upgrade): number { return this.levels[upgrade] ?? 0; }
 
-  get startCrowd(): number { return RunnerGenerator.baseCrowd + 2 * this.level("startCrowd"); }
-  get memberPower(): number { return 1 + 0.15 * this.level("memberPower"); }
-  get coinMultiplier(): number { return 1 + 0.2 * this.level("coinMultiplier"); }
+  get startCrowd(): number { return BASE_CROWD + CROWD_STEP * this.level("startCrowd"); }
+  get memberPower(): number { return 1 + POWER_STEP * this.level("memberPower"); }
+  get coinMultiplier(): number { return 1 + COIN_STEP * this.level("coinMultiplier"); }
+  /// Pellets thrown at the start of a run, as a multiple of the base rate.
+  get fireRate(): number { return 1 + RATE_STEP * this.level("fireRate"); }
 
   /// A three-star win of 0-based run `level` pays this before the coin bonus. It follows the run,
   /// not the crowd: gates multiply a crowd, so paying per survivor made one lucky track worth a
   /// hundred others.
   static purse(level: number): number { return 30 + 3 * level; }
 
-  coins(level: number, stars: number): number {
+  /// What a win pays: the purse by stars, and the coins found in crates, both times the coin bonus.
+  coins(level: number, stars: number, found = 0): number {
     const share = RunnerEconomy.starShare[Math.min(Math.max(stars, 0), 3)]!;
-    return Math.round(RunnerEconomy.purse(level) * share * this.coinMultiplier);
+    return Math.round((RunnerEconomy.purse(level) * share + found) * this.coinMultiplier);
+  }
+
+  /// What a loss pays: the coins found in crates before it, times the coin bonus.
+  consolation(found: number): number { return Math.round(found * this.coinMultiplier); }
+
+  /// The upgrades a track is checked at when the reference player owns `owned`: none in the
+  /// first world, and after it the ones that change a run. The coin bonus changes none.
+  static assumed(level: number, owned: Levels): RunnerEconomy {
+    if (level < RUNS_PER_WORLD) return RunnerEconomy.base;
+    return new RunnerEconomy({ startCrowd: owned.startCrowd ?? 0, memberPower: owned.memberPower ?? 0, fireRate: owned.fireRate ?? 0 });
+  }
+
+  /// The upgrades the fairness check assumes for 0-based run `level`: what the reference player
+  /// owns by then, read from the `run` column of the tier tables.
+  static reference(level: number, tables: TierTables = TABLES): RunnerEconomy {
+    const owned = (upgrade: Upgrade) => tables[upgrade].filter((t) => t.run <= level + 1).length;
+    return RunnerEconomy.assumed(level, { startCrowd: owned("startCrowd"), memberPower: owned("memberPower"), fireRate: owned("fireRate") });
   }
 }

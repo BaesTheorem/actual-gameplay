@@ -41,14 +41,16 @@ two answers, not one; the forcing always comes from a victim in the way, and the
 is in which pin, not how many. The iPhone app has the twelve levels of the first version, in
 which nobody walks.
 
-**Crowd Run.** Drag to steer a crowd down a road. Green gates grow it, red ones shrink it,
-walls and blades and spikes thin it, and whatever is left fights a crowd or a boss at the
-end. Endless and procedural (the same run is the same track on every device), with coins
-that buy a bigger starting crowd, stronger runners, and a coin bonus between runs. Prices
-follow what each level buys: `scripts/economy.py` plays every run as a probability tree for an
-imperfect player and prices each upgrade level at the same number of wins per point of win
-odds, so the shop can say "+5% odds at run 16" next to the cost. Rivals are sized to the
-base crowd of five, so extra starting runners are a real edge rather than a bigger fight.
+**Crowd Run.** Drag to steer a crowd down a road. It throws ink pellets at whatever stands
+ahead of it: crates that hold allies, a doubling, fire rate or coins, barrels that blow up
+what is near them, and squads of rivals. Gates trade bodies against firepower, walls and blades
+and hammers thin the crowd, a bridge drops whoever is too far out, and whatever is left fights
+a rival crowd or a boss at the end. Endless and procedural (the same run is the same track on
+every device), in worlds of five runs with a boss at the end of each, and with coins that buy
+a bigger starting crowd, stronger runners, a faster fire rate and a coin bonus between runs.
+The web build is the second version, described under "Crowd Run, second version" below. The
+iPhone app has the first: gates, three hazards and the fight, with prices from
+`scripts/economy.py`. The two builds make different tracks on purpose.
 
 **Number Tower** (web build only). A hero with a number climbs a tower. He beats anything smaller
 and adds it to his own, and a tie is a loss. The first chapter plays as the ads show it: pick any
@@ -318,6 +320,64 @@ What the levels of this mode have taught, for whoever writes the next ones:
   that lands on him cannot send him off the edge before the boulder is let go.
 - On ice, things that are free to run meet hard. A roof that leaves a boulder and him 50 points
   of plank lets the boulder stop first and him reach it at more than 120 points a second.
+
+### Crowd Run, second version
+
+What people wanted from the fake ads, more than anything else in this genre, was "the walking
+forward, collecting guns and army men, levelling up game". So the crowd shoots as it runs.
+
+- **Shooting.** No pellet is tracked. Each step, the nearest live target ahead that is in range
+  (10 road units at first) and whose span overlaps the crowd's own width loses `count x fire
+  rate x PELLET x dt` hit points, with `PELLET` 4.8. A starting crowd of 5 breaks the first
+  run's crate of 30 in 1.25 s, and the crate is in range for 1.43 s. A bigger crowd is more
+  firepower, so a gate that adds bodies and a gate that adds rate answer the same question.
+- **Crates** show their hit points and what they hold. Broken, a crate gives it: allies, a
+  doubling, +25% fire rate, or coins, which are kept even if the run is lost. Reached unbroken
+  it is a wall. **Barrels** blow up when shot down and take every squad and crate within 4.5
+  lane units; a crate that goes that way gives nothing. **Squads** are rivals with one hit
+  point each. What pellets leave of a squad trades against the crowd, divided by member power.
+- **Gates** come in pairs: the old four, fire rate (+25%, +50%, -25%) and range (+2). From
+  world 2 some pairs slide from side to side. A run offers to multiply the crowd twice at most.
+- **Hazards**: wall, spikes, blade, a hammer that lies on one half of the road and changes
+  sides every 0.9 s, and a bridge, where runners outside the middle third fall at its start.
+- **The finale** stands on its line until the crowd is 12 lane units off and then comes at it
+  at 20 a second, so pellets soften it for about a third of a second and the rest is the old
+  fight. A boss, every fifth run, first shows a rose wash on one half of the road for a second;
+  runners on that half when the slam lands are lost.
+- **Worlds**: meadow, dunes, snow, night, and round again with bigger numbers. World 1 has
+  gates and crates. World 2 adds rate gates, sliding gates, squads, walls and spikes. World 3
+  adds barrels, hammers, bridges, blades and range gates.
+
+Every number is a named constant in `web/src/sim/runner/sim.ts` or `generator.ts`.
+
+**Fair by construction.** The generator lays a track out from the run's seed, sizes each crate
+and squad for the crowd a good player would have by there, and then plays it before accepting
+it (`web/src/sim/runner/bots.ts`). The skilled bot reads two segments ahead, takes the gate
+that leaves it with more firepower times count, aims at crates it can break in time, dodges,
+and steps off the slam. Its run sizes the finale: a share (0.6 rising to 0.84, 0.75 for a boss)
+of its crowd times member power plus what its pellets did. Then it has to win, and three lazy
+bots (never steer, keep left, a random side each segment) all have to lose, at the upgrades the
+economy's reference player owns by that run (none in world 1). A layout that fails is dropped
+and the next seed is tried, twelve at most, and if none passes the best is used. Over runs 1
+to 100, three needed a second seed or more and none fell back. A run generates in about 1 ms in
+Node (the worst of the first hundred took 7 ms). The check runs in the browser when a run
+starts, so the simulation uses only add, multiply, divide and square root, which every engine
+computes alike; a test keeps `Math.sin` and its kin out of it.
+
+**The economy** is `web/scripts/runner-economy.ts`. It plays the real simulation: a reference
+player, the skilled bot taking the worse gate one time in five and missing a hazard one time
+in five, walks runs 1 to 300 and buys all fifty levels in turn. Each level that buys win odds
+costs the same number of wins of income for each point of odds, measured over thirty runs at
+thirty plays each, and the shop quotes that same gain. It takes 20 to 40 seconds, writes the
+tier tables into `web/src/sim/runner/economy.ts`, and a test runs it again and compares.
+
+    npx tsx scripts/runner-economy.ts [--write]   the tables and a report; write them into economy.ts
+    npx tsx scripts/runner-fixture.ts             write tests/fixtures/runner-tracks-v2.json again (runs 1 to 30)
+    npx tsx scripts/runner-plan.ts 7              a steering plan for run 7, for shots.py follow=plan-7.json
+    npm run audit -- runner                       the skilled bot and the lazy three on runs 1 to 20
+
+The first version's fixture (`runner-tracks.json`) and the Python that wrote it described the
+iPhone generator, which the web build no longer matches. Both are gone.
 
 ### Checks and deploys
 

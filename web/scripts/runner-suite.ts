@@ -1,45 +1,45 @@
 // Crowd Run's replay and audit with no browser. Nothing runs when this file is imported.
-import { RunnerGenerator, RunnerSim, playRun, type SteerPolicy } from "../src/sim/runner";
+import {
+  LAZY, RunnerEconomy, RunnerGenerator, RunnerSim, Skilled, isFair, lazyPilot, playTrack, type LazyName,
+} from "../src/sim/runner";
 
-/// Play the first runs at base upgrades with the greedy autopilot, one PASS or FAIL line each.
+/// Play the first runs with the skilled bot at the upgrades the fairness check assumes, one
+/// PASS or FAIL line each.
 export const replay = (): { passed: number; total: number } => {
   let passed = 0, total = 0;
   for (let level = 0; level < RunnerGenerator.replayLevels; level++) {
     total += 1;
     const t0 = performance.now();
-    const run = playRun(level, "greedy");
+    const track = RunnerGenerator.makeTrack(level);
+    const run = playTrack(track, RunnerEconomy.reference(level), new Skilled(track));
     const ok = run.outcome?.won === true;
     if (ok) passed += 1;
     const detail = run.outcome === null ? "no result"
       : run.outcome.won ? `${run.outcome.stars} stars, ${RunnerSim.describe(run.outcome.score)}`
       : run.outcome.reason;
-    console.log(`${ok ? "PASS" : "FAIL"}  ${run.sim.levelID} ${run.sim.levelName.padEnd(22)} ${detail}  (${run.seconds.toFixed(1)} s game, ${(performance.now() - t0).toFixed(0)} ms)`);
+    console.log(`${ok ? "PASS" : "FAIL"}  ${run.levelID} ${run.levelName.padEnd(22)} ${detail}  (${run.elapsed.toFixed(1)} s game, ${(performance.now() - t0).toFixed(0)} ms)`);
   }
   return { passed, total };
 };
 
-const AUDIT_LEVELS = 8;
-const POLICIES: SteerPolicy[] = ["greedy", "straight", "left", "random"];
-const LAZY: SteerPolicy[] = ["straight", "left", "random"];
+const AUDIT_LEVELS = 20;
 
-/// Compare greedy steering against never steering, always-left, and random on the first eight
-/// runs. A run is flagged when greedy loses or when two of the lazy policies win. Returns the
-/// number of flagged runs.
+/// Play the three lazy bots and the skilled one on the first twenty runs, at the upgrades the
+/// fairness check assumes. A run is flagged when a lazy bot wins it or the skilled bot loses
+/// it. Returns the number of flagged runs.
 export const audit = (): number => {
   let flagged = 0;
   for (let level = 0; level < AUDIT_LEVELS; level++) {
-    const won = new Set<SteerPolicy>();
-    for (const policy of POLICIES) {
-      if (playRun(level, policy).outcome?.won === true) won.add(policy);
-    }
+    const track = RunnerGenerator.makeTrack(level), reference = RunnerEconomy.reference(level);
+    const skilled = playTrack(track, reference, new Skilled(track)).outcome?.won === true;
+    const won = new Set<LazyName>(LAZY.filter((name) => playTrack(track, reference, lazyPilot(name, track)).outcome?.won === true));
     const flags: string[] = [];
-    if (!won.has("greedy")) flags.push("BROKEN: greedy autopilot loses");
-    const lazy = LAZY.filter((p) => won.has(p)).map((p) => `policy:${p}`).sort();
-    if (lazy.length >= 2) flags.push(`TRIVIAL: lazy steering wins (${lazy.join(", ")})`);
+    if (!skilled) flags.push("BROKEN: the skilled bot loses");
+    if (won.size > 0) flags.push(`TRIVIAL: lazy steering wins (${[...won].join(", ")})`);
     if (flags.length > 0) flagged += 1;
     const status = flags.length === 0 ? "ok" : flags.join("; ");
-    const detail = [...POLICIES].sort().map((p) => `policy:${p}=${won.has(p) ? "W" : "x"}`).join(" ");
-    console.log(`${String(level + 1).padStart(2, "0")}  ${status}\n      ${detail}`);
+    const detail = `skilled=${skilled ? "W" : "x"} ${LAZY.map((name) => `${name}=${won.has(name) ? "W" : "x"}`).join(" ")}`;
+    console.log(`${String(level + 1).padStart(2, "0")}  ${status}${isFair(track) ? "" : "  (the generator's fallback)"}  seed ${track.attempt}\n      ${detail}`);
   }
   return flagged;
 };

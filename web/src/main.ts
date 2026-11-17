@@ -67,7 +67,7 @@ const screen = (paperName: string, ...children: (Node | string)[]) => {
 const summary = (m: ModeInfo): string => {
   if (m.kind === "runner") {
     const r = store.progress.runner;
-    return r.bestLevel === 0 && r.coins === 0 ? "Not started" : `Level ${r.level + 1}, ${r.coins} coins`;
+    return r.bestLevel === 0 && r.coins === 0 ? "Not started" : `Run ${r.level + 1}, ${r.coins} coins`;
   }
   const ids = levelIDs(m.id), saved = results(store.progress, m.id);
   const cleared = ids.filter((id) => saved[id]?.cleared).length;
@@ -241,7 +241,13 @@ const playRun = (m: ModeInfo) => {
     onExit: back(`/${m.id}`),
     onNext: route,
     onResult: (outcome) => {
-      if (!outcome.won || paid) return;
+      if (paid) return;
+      if (!outcome.won) {
+        // A loss keeps the coins its crates gave, and the run number stays.
+        const found = outcome.coins ?? 0;
+        if (found > 0) store.update((p) => { p.runner.coins += found; });
+        return;
+      }
       paid = true;
       store.update((p) => {
         p.runner.coins += outcome.coins;

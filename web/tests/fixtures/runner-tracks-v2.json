@@ -1,0 +1,5389 @@
+[
+ {
+  "level": 0,
+  "pieces": [
+   {
+    "kind": "crate",
+    "z": 14,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 30,
+    "holds": {
+     "kind": "allies",
+     "n": 8
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 22,
+    "left": {
+     "kind": "multiply",
+     "n": 2
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 5
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 30,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 110,
+    "holds": {
+     "kind": "allies",
+     "n": 13
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 38,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 220,
+    "holds": {
+     "kind": "times",
+     "n": 2
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 46,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 310,
+    "holds": {
+     "kind": "coins",
+     "n": 5
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 46,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 340,
+    "holds": {
+     "kind": "allies",
+     "n": 20
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 54,
+    "left": {
+     "kind": "subtract",
+     "n": 18
+    },
+    "right": {
+     "kind": "add",
+     "n": 10
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 62,
+    "left": {
+     "kind": "add",
+     "n": 9
+    },
+    "right": {
+     "kind": "add",
+     "n": 14
+    }
+   }
+  ],
+  "finaleZ": 76,
+  "speed": 7,
+  "attempt": 1,
+  "finale": {
+   "type": "crowd",
+   "count": 172
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 113
+ },
+ {
+  "level": 1,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "add",
+     "n": 7
+    },
+    "right": {
+     "kind": "divide",
+     "n": 2
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 22,
+    "left": {
+     "kind": "multiply",
+     "n": 2
+    },
+    "right": {
+     "kind": "divide",
+     "n": 3
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 30,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 85,
+    "holds": {
+     "kind": "allies",
+     "n": 9
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 38,
+    "lo": -0.9,
+    "hi": -0.32,
+    "hp": 90,
+    "holds": {
+     "kind": "allies",
+     "n": 10
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 38,
+    "lo": -0.29,
+    "hi": 0.29,
+    "hp": 70,
+    "holds": {
+     "kind": "coins",
+     "n": 5
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 38,
+    "lo": 0.32,
+    "hi": 0.9,
+    "hp": 70,
+    "holds": {
+     "kind": "coins",
+     "n": 10
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 46,
+    "left": {
+     "kind": "divide",
+     "n": 2
+    },
+    "right": {
+     "kind": "add",
+     "n": 7
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 54,
+    "left": {
+     "kind": "add",
+     "n": 8
+    },
+    "right": {
+     "kind": "add",
+     "n": 13
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 62,
+    "left": {
+     "kind": "multiply",
+     "n": 2
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 7
+    }
+   }
+  ],
+  "finaleZ": 76,
+  "speed": 7.15,
+  "attempt": 0,
+  "finale": {
+   "type": "crowd",
+   "count": 184
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 112
+ },
+ {
+  "level": 2,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "add",
+     "n": 3
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 4
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 22,
+    "left": {
+     "kind": "add",
+     "n": 7
+    },
+    "right": {
+     "kind": "add",
+     "n": 10
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 30,
+    "left": {
+     "kind": "add",
+     "n": 6
+    },
+    "right": {
+     "kind": "divide",
+     "n": 3
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 38,
+    "left": {
+     "kind": "multiply",
+     "n": 2
+    },
+    "right": {
+     "kind": "add",
+     "n": 9
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 46,
+    "left": {
+     "kind": "divide",
+     "n": 3
+    },
+    "right": {
+     "kind": "add",
+     "n": 12
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 54,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 270,
+    "holds": {
+     "kind": "allies",
+     "n": 13
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 62,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 240,
+    "holds": {
+     "kind": "allies",
+     "n": 17
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 62,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 250,
+    "holds": {
+     "kind": "coins",
+     "n": 10
+    }
+   }
+  ],
+  "finaleZ": 76,
+  "speed": 7.3,
+  "attempt": 2,
+  "finale": {
+   "type": "crowd",
+   "count": 135
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 75
+ },
+ {
+  "level": 3,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "subtract",
+     "n": 6
+    },
+    "right": {
+     "kind": "add",
+     "n": 3
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 22,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 30,
+    "holds": {
+     "kind": "coins",
+     "n": 5
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 22,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 35,
+    "holds": {
+     "kind": "allies",
+     "n": 8
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 30,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 55,
+    "holds": {
+     "kind": "allies",
+     "n": 12
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 38,
+    "left": {
+     "kind": "multiply",
+     "n": 2
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 7
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 46,
+    "left": {
+     "kind": "multiply",
+     "n": 2
+    },
+    "right": {
+     "kind": "add",
+     "n": 13
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 54,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 500,
+    "holds": {
+     "kind": "allies",
+     "n": 29
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 62,
+    "left": {
+     "kind": "add",
+     "n": 13
+    },
+    "right": {
+     "kind": "add",
+     "n": 17
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 70,
+    "left": {
+     "kind": "add",
+     "n": 20
+    },
+    "right": {
+     "kind": "add",
+     "n": 28
+    }
+   }
+  ],
+  "finaleZ": 84,
+  "speed": 7.45,
+  "attempt": 0,
+  "finale": {
+   "type": "crowd",
+   "count": 279
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 144
+ },
+ {
+  "level": 4,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "subtract",
+     "n": 2
+    },
+    "right": {
+     "kind": "add",
+     "n": 4
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 22,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 40,
+    "holds": {
+     "kind": "allies",
+     "n": 9
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 22,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 50,
+    "holds": {
+     "kind": "times",
+     "n": 2
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 30,
+    "left": {
+     "kind": "subtract",
+     "n": 4
+    },
+    "right": {
+     "kind": "add",
+     "n": 6
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 38,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 110,
+    "holds": {
+     "kind": "allies",
+     "n": 8
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 38,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 130,
+    "holds": {
+     "kind": "times",
+     "n": 2
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 46,
+    "left": {
+     "kind": "add",
+     "n": 9
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 4
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 54,
+    "left": {
+     "kind": "subtract",
+     "n": 6
+    },
+    "right": {
+     "kind": "add",
+     "n": 10
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 62,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 190,
+    "holds": {
+     "kind": "coins",
+     "n": 10
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 70,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 160,
+    "holds": {
+     "kind": "coins",
+     "n": 10
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 70,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 200,
+    "holds": {
+     "kind": "allies",
+     "n": 12
+    }
+   }
+  ],
+  "finaleZ": 92,
+  "speed": 7.6,
+  "attempt": 0,
+  "finale": {
+   "type": "boss",
+   "hp": 135,
+   "slam": 1
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 44
+ },
+ {
+  "level": 5,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "add",
+     "n": 8
+    },
+    "right": {
+     "kind": "rate",
+     "n": -25
+    }
+   },
+   {
+    "kind": "spikes",
+    "z": 22,
+    "lo": -0.6895904002381832,
+    "hi": -0.3695904002381831
+   },
+   {
+    "kind": "crate",
+    "z": 30,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 40,
+    "holds": {
+     "kind": "allies",
+     "n": 6
+    }
+   },
+   {
+    "kind": "wall",
+    "z": 38,
+    "lo": -0.5174293132228076,
+    "hi": 0.0625706867771923
+   },
+   {
+    "kind": "gates",
+    "z": 46,
+    "left": {
+     "kind": "subtract",
+     "n": 5
+    },
+    "right": {
+     "kind": "add",
+     "n": 5
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 54,
+    "left": {
+     "kind": "divide",
+     "n": 2
+    },
+    "right": {
+     "kind": "add",
+     "n": 17
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.4152400447338196,
+     "phase": 0.2609512527969352
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 62,
+    "lo": -0.95,
+    "hi": -0.08,
+    "count": 227
+   },
+   {
+    "kind": "gates",
+    "z": 70,
+    "left": {
+     "kind": "multiply",
+     "n": 2
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 8
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.7121175857563244,
+     "phase": 0.5472201759175642
+    }
+   }
+  ],
+  "finaleZ": 84,
+  "speed": 7.75,
+  "attempt": 0,
+  "finale": {
+   "type": "crowd",
+   "count": 130
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 56
+ },
+ {
+  "level": 6,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "multiply",
+     "n": 2
+    },
+    "right": {
+     "kind": "add",
+     "n": 12
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 22,
+    "lo": -0.9,
+    "hi": -0.32,
+    "hp": 35,
+    "holds": {
+     "kind": "allies",
+     "n": 10
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 22,
+    "lo": -0.29,
+    "hi": 0.29,
+    "hp": 55,
+    "holds": {
+     "kind": "times",
+     "n": 2
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 22,
+    "lo": 0.32,
+    "hi": 0.9,
+    "hp": 35,
+    "holds": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 30,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 110,
+    "holds": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 38,
+    "lo": 0.08,
+    "hi": 0.95,
+    "count": 158
+   },
+   {
+    "kind": "crate",
+    "z": 46,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 110,
+    "holds": {
+     "kind": "coins",
+     "n": 10
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 46,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 140,
+    "holds": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 54,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 200,
+    "holds": {
+     "kind": "allies",
+     "n": 15
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 62,
+    "left": {
+     "kind": "add",
+     "n": 9
+    },
+    "right": {
+     "kind": "add",
+     "n": 14
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 70,
+    "left": {
+     "kind": "add",
+     "n": 12
+    },
+    "right": {
+     "kind": "divide",
+     "n": 2
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 78,
+    "left": {
+     "kind": "add",
+     "n": 19
+    },
+    "right": {
+     "kind": "rate",
+     "n": 50
+    }
+   }
+  ],
+  "finaleZ": 92,
+  "speed": 7.9,
+  "attempt": 0,
+  "finale": {
+   "type": "crowd",
+   "count": 218
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 85
+ },
+ {
+  "level": 7,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "rate",
+     "n": -25
+    },
+    "right": {
+     "kind": "add",
+     "n": 10
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 22,
+    "left": {
+     "kind": "multiply",
+     "n": 2
+    },
+    "right": {
+     "kind": "divide",
+     "n": 2
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 30,
+    "left": {
+     "kind": "subtract",
+     "n": 12
+    },
+    "right": {
+     "kind": "add",
+     "n": 6
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 38,
+    "lo": -0.9,
+    "hi": -0.32,
+    "hp": 85,
+    "holds": {
+     "kind": "allies",
+     "n": 18
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 38,
+    "lo": -0.29,
+    "hi": 0.29,
+    "hp": 65,
+    "holds": {
+     "kind": "coins",
+     "n": 10
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 38,
+    "lo": 0.32,
+    "hi": 0.9,
+    "hp": 130,
+    "holds": {
+     "kind": "times",
+     "n": 2
+    }
+   },
+   {
+    "kind": "spikes",
+    "z": 46,
+    "lo": 0.07319795105959762,
+    "hi": 0.39319795105959765
+   },
+   {
+    "kind": "squad",
+    "z": 54,
+    "lo": -0.95,
+    "hi": -0.08,
+    "count": 386
+   },
+   {
+    "kind": "wall",
+    "z": 62,
+    "lo": -0.5416333149033359,
+    "hi": 0.03836668509666402
+   },
+   {
+    "kind": "squad",
+    "z": 70,
+    "lo": -0.95,
+    "hi": -0.08,
+    "count": 331
+   },
+   {
+    "kind": "gates",
+    "z": 78,
+    "left": {
+     "kind": "add",
+     "n": 21
+    },
+    "right": {
+     "kind": "add",
+     "n": 14
+    }
+   }
+  ],
+  "finaleZ": 92,
+  "speed": 8.05,
+  "attempt": 0,
+  "finale": {
+   "type": "crowd",
+   "count": 102
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 36
+ },
+ {
+  "level": 8,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "rate",
+     "n": 25
+    },
+    "right": {
+     "kind": "multiply",
+     "n": 2
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 22,
+    "left": {
+     "kind": "add",
+     "n": 15
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 10
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 30,
+    "left": {
+     "kind": "add",
+     "n": 15
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 6
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 3.056505604797376,
+     "phase": 0.9789429376187625
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 38,
+    "left": {
+     "kind": "rate",
+     "n": -25
+    },
+    "right": {
+     "kind": "add",
+     "n": 12
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 46,
+    "lo": -0.95,
+    "hi": -0.08,
+    "count": 210
+   },
+   {
+    "kind": "gates",
+    "z": 54,
+    "left": {
+     "kind": "subtract",
+     "n": 10
+    },
+    "right": {
+     "kind": "add",
+     "n": 21
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 3.0127863239513744,
+     "phase": 0.9253254733971322
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 62,
+    "lo": 0.21999999999999997,
+    "hi": 0.88,
+    "count": 129
+   },
+   {
+    "kind": "crate",
+    "z": 64.5,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 170,
+    "holds": {
+     "kind": "times",
+     "n": 2
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 70,
+    "left": {
+     "kind": "rate",
+     "n": 25
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 24
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 78,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 530,
+    "holds": {
+     "kind": "allies",
+     "n": 24
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 78,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 590,
+    "holds": {
+     "kind": "rate",
+     "n": 25
+    }
+   }
+  ],
+  "finaleZ": 92,
+  "speed": 8.2,
+  "attempt": 0,
+  "finale": {
+   "type": "crowd",
+   "count": 395
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 123
+ },
+ {
+  "level": 9,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "multiply",
+     "n": 2
+    },
+    "right": {
+     "kind": "add",
+     "n": 7
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 22,
+    "left": {
+     "kind": "subtract",
+     "n": 4
+    },
+    "right": {
+     "kind": "multiply",
+     "n": 2
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.499022934907922,
+     "phase": 0.7916010588433169
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 30,
+    "left": {
+     "kind": "add",
+     "n": 12
+    },
+    "right": {
+     "kind": "rate",
+     "n": -25
+    }
+   },
+   {
+    "kind": "wall",
+    "z": 38,
+    "lo": 0.04346252289761726,
+    "hi": 0.6234625228976172
+   },
+   {
+    "kind": "gates",
+    "z": 46,
+    "left": {
+     "kind": "subtract",
+     "n": 7
+    },
+    "right": {
+     "kind": "rate",
+     "n": 50
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 3.0400801239182096,
+     "phase": 0.9366691937003185
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 54,
+    "left": {
+     "kind": "add",
+     "n": 14
+    },
+    "right": {
+     "kind": "add",
+     "n": 17
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 62,
+    "left": {
+     "kind": "add",
+     "n": 21
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 6
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.254726028560695,
+     "phase": 0.7416941062515572
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 70,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 320,
+    "holds": {
+     "kind": "allies",
+     "n": 23
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 78,
+    "lo": -0.9,
+    "hi": -0.32,
+    "hp": 310,
+    "holds": {
+     "kind": "allies",
+     "n": 21
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 78,
+    "lo": -0.29,
+    "hi": 0.29,
+    "hp": 360,
+    "holds": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 78,
+    "lo": 0.32,
+    "hi": 0.9,
+    "hp": 240,
+    "holds": {
+     "kind": "coins",
+     "n": 15
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 86,
+    "left": {
+     "kind": "add",
+     "n": 18
+    },
+    "right": {
+     "kind": "add",
+     "n": 10
+    }
+   }
+  ],
+  "finaleZ": 109,
+  "speed": 8.35,
+  "attempt": 0,
+  "finale": {
+   "type": "boss",
+   "hp": 340,
+   "slam": 1
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 112
+ },
+ {
+  "level": 10,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "subtract",
+     "n": 6
+    },
+    "right": {
+     "kind": "add",
+     "n": 14
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 22,
+    "left": {
+     "kind": "multiply",
+     "n": 2
+    },
+    "right": {
+     "kind": "rate",
+     "n": -25
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 30,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 90,
+    "holds": {
+     "kind": "coins",
+     "n": 15
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 38,
+    "left": {
+     "kind": "add",
+     "n": 23
+    },
+    "right": {
+     "kind": "add",
+     "n": 17
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 46,
+    "left": {
+     "kind": "subtract",
+     "n": 10
+    },
+    "right": {
+     "kind": "add",
+     "n": 20
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.2361774029839454,
+     "phase": 0.076223610666307
+    }
+   },
+   {
+    "kind": "wall",
+    "z": 54,
+    "lo": -0.796693953561703,
+    "hi": -0.13669395356170294
+   },
+   {
+    "kind": "gates",
+    "z": 62,
+    "left": {
+     "kind": "subtract",
+     "n": 9
+    },
+    "right": {
+     "kind": "multiply",
+     "n": 2
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 70,
+    "left": {
+     "kind": "rate",
+     "n": 25
+    },
+    "right": {
+     "kind": "divide",
+     "n": 3
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.407666222277175,
+     "phase": 0.028007789472751066
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 78,
+    "lo": -0.95,
+    "hi": -0.08,
+    "count": 767
+   },
+   {
+    "kind": "squad",
+    "z": 86,
+    "lo": -0.95,
+    "hi": -0.08,
+    "count": 1094
+   }
+  ],
+  "finaleZ": 100,
+  "speed": 8.5,
+  "attempt": 0,
+  "finale": {
+   "type": "crowd",
+   "count": 367
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 92
+ },
+ {
+  "level": 11,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "divide",
+     "n": 3
+    },
+    "right": {
+     "kind": "multiply",
+     "n": 2
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.7670396578213836,
+     "phase": 0.7132954948019264
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 22,
+    "left": {
+     "kind": "divide",
+     "n": 2
+    },
+    "right": {
+     "kind": "rate",
+     "n": 25
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.8147369871266905,
+     "phase": 0.16863908978066933
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 30,
+    "left": {
+     "kind": "rate",
+     "n": 25
+    },
+    "right": {
+     "kind": "range",
+     "n": 2
+    }
+   },
+   {
+    "kind": "barrel",
+    "z": 38,
+    "lo": 0.42000000000000004,
+    "hi": 0.68,
+    "hp": 15
+   },
+   {
+    "kind": "crate",
+    "z": 38,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 55,
+    "holds": {
+     "kind": "allies",
+     "n": 11
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 41,
+    "lo": -0.95,
+    "hi": 0.95,
+    "count": 106
+   },
+   {
+    "kind": "gates",
+    "z": 46,
+    "left": {
+     "kind": "add",
+     "n": 14
+    },
+    "right": {
+     "kind": "add",
+     "n": 11
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 54,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 90,
+    "holds": {
+     "kind": "coins",
+     "n": 15
+    }
+   },
+   {
+    "kind": "spikes",
+    "z": 62,
+    "lo": -0.45734657823027625,
+    "hi": -0.13734657823027627
+   },
+   {
+    "kind": "squad",
+    "z": 70,
+    "lo": -0.33,
+    "hi": 0.33,
+    "count": 61
+   },
+   {
+    "kind": "crate",
+    "z": 72.5,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 90,
+    "holds": {
+     "kind": "times",
+     "n": 2
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 78,
+    "left": {
+     "kind": "rate",
+     "n": 25
+    },
+    "right": {
+     "kind": "add",
+     "n": 19
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 86,
+    "left": {
+     "kind": "divide",
+     "n": 3
+    },
+    "right": {
+     "kind": "add",
+     "n": 18
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.5848291273371036,
+     "phase": 0.9967242061120422
+    }
+   }
+  ],
+  "finaleZ": 100,
+  "speed": 8.65,
+  "attempt": 0,
+  "finale": {
+   "type": "crowd",
+   "count": 275
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 60
+ },
+ {
+  "level": 12,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "subtract",
+     "n": 12
+    },
+    "right": {
+     "kind": "add",
+     "n": 10
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.3566745587073914,
+     "phase": 0.26285980775809337
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 22,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 60,
+    "holds": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 22,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 50,
+    "holds": {
+     "kind": "coins",
+     "n": 15
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 30,
+    "left": {
+     "kind": "multiply",
+     "n": 2
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 8
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 38,
+    "lo": 0.21999999999999997,
+    "hi": 0.88,
+    "count": 74
+   },
+   {
+    "kind": "crate",
+    "z": 40.5,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 95,
+    "holds": {
+     "kind": "allies",
+     "n": 17
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 46,
+    "left": {
+     "kind": "add",
+     "n": 15
+    },
+    "right": {
+     "kind": "add",
+     "n": 18
+    }
+   },
+   {
+    "kind": "wall",
+    "z": 54,
+    "lo": -0.569897853312562,
+    "hi": 0.09010214668743805
+   },
+   {
+    "kind": "crate",
+    "z": 62,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 410,
+    "holds": {
+     "kind": "times",
+     "n": 2
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 70,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 480,
+    "holds": {
+     "kind": "allies",
+     "n": 24
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 70,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 640,
+    "holds": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 78,
+    "left": {
+     "kind": "subtract",
+     "n": 24
+    },
+    "right": {
+     "kind": "add",
+     "n": 29
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.246336376090769,
+     "phase": 0.06542397538607747
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 86,
+    "left": {
+     "kind": "add",
+     "n": 32
+    },
+    "right": {
+     "kind": "rate",
+     "n": -25
+    }
+   },
+   {
+    "kind": "barrel",
+    "z": 94,
+    "lo": 0.42000000000000004,
+    "hi": 0.68,
+    "hp": 180
+   },
+   {
+    "kind": "crate",
+    "z": 94,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 590,
+    "holds": {
+     "kind": "allies",
+     "n": 85
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 97,
+    "lo": -0.95,
+    "hi": 0.95,
+    "count": 1411
+   }
+  ],
+  "finaleZ": 108,
+  "speed": 8.8,
+  "attempt": 0,
+  "finale": {
+   "type": "crowd",
+   "count": 732
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 120
+ },
+ {
+  "level": 13,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "rate",
+     "n": -25
+    },
+    "right": {
+     "kind": "multiply",
+     "n": 2
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.7533257439523484,
+     "phase": 0.025788822925072563
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 22,
+    "left": {
+     "kind": "add",
+     "n": 14
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 4
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 30,
+    "left": {
+     "kind": "subtract",
+     "n": 10
+    },
+    "right": {
+     "kind": "add",
+     "n": 9
+    }
+   },
+   {
+    "kind": "barrel",
+    "z": 38,
+    "lo": 0.42000000000000004,
+    "hi": 0.68,
+    "hp": 25
+   },
+   {
+    "kind": "crate",
+    "z": 38,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 80,
+    "holds": {
+     "kind": "allies",
+     "n": 19
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 41,
+    "lo": -0.95,
+    "hi": 0.95,
+    "count": 188
+   },
+   {
+    "kind": "crate",
+    "z": 46,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 140,
+    "holds": {
+     "kind": "allies",
+     "n": 17
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 46,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 140,
+    "holds": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 54,
+    "left": {
+     "kind": "add",
+     "n": 20
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 10
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 62,
+    "left": {
+     "kind": "rate",
+     "n": -25
+    },
+    "right": {
+     "kind": "range",
+     "n": 2
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 70,
+    "left": {
+     "kind": "add",
+     "n": 24
+    },
+    "right": {
+     "kind": "multiply",
+     "n": 2
+    }
+   },
+   {
+    "kind": "wall",
+    "z": 78,
+    "lo": 0.11880674707303146,
+    "hi": 0.7788067470730315
+   },
+   {
+    "kind": "squad",
+    "z": 86,
+    "lo": 0.08,
+    "hi": 0.95,
+    "count": 624
+   },
+   {
+    "kind": "crate",
+    "z": 94,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 550,
+    "holds": {
+     "kind": "allies",
+     "n": 27
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 94,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 570,
+    "holds": {
+     "kind": "rate",
+     "n": 25
+    }
+   }
+  ],
+  "finaleZ": 108,
+  "speed": 8.95,
+  "attempt": 0,
+  "finale": {
+   "type": "crowd",
+   "count": 175
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 30
+ },
+ {
+  "level": 14,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "add",
+     "n": 21
+    },
+    "right": {
+     "kind": "add",
+     "n": 14
+    }
+   },
+   {
+    "kind": "hammer",
+    "z": 22,
+    "beat": 0.9,
+    "offset": 1.4935488408794482
+   },
+   {
+    "kind": "gates",
+    "z": 30,
+    "left": {
+     "kind": "add",
+     "n": 13
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 5
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.70282727799822,
+     "phase": 0.47892938570737453
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 38,
+    "lo": 0.08,
+    "hi": 0.95,
+    "count": 170
+   },
+   {
+    "kind": "gates",
+    "z": 46,
+    "left": {
+     "kind": "rate",
+     "n": 25
+    },
+    "right": {
+     "kind": "add",
+     "n": 26
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.323481821278831,
+     "phase": 0.9589108096380116
+    }
+   },
+   {
+    "kind": "spikes",
+    "z": 54,
+    "lo": -0.5407632606165593,
+    "hi": -0.2207632606165593
+   },
+   {
+    "kind": "squad",
+    "z": 62,
+    "lo": 0.08,
+    "hi": 0.95,
+    "count": 309
+   },
+   {
+    "kind": "bridge",
+    "z": 70,
+    "length": 10
+   },
+   {
+    "kind": "squad",
+    "z": 86,
+    "lo": -0.95,
+    "hi": 0.95,
+    "count": 149
+   },
+   {
+    "kind": "gates",
+    "z": 94,
+    "left": {
+     "kind": "divide",
+     "n": 2
+    },
+    "right": {
+     "kind": "add",
+     "n": 12
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 102,
+    "left": {
+     "kind": "add",
+     "n": 17
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 17
+    }
+   }
+  ],
+  "finaleZ": 126,
+  "speed": 9.1,
+  "attempt": 0,
+  "finale": {
+   "type": "boss",
+   "hp": 164,
+   "slam": 1
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 47
+ },
+ {
+  "level": 15,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "add",
+     "n": 11
+    },
+    "right": {
+     "kind": "add",
+     "n": 15
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 22,
+    "lo": -0.95,
+    "hi": 0.95,
+    "count": 41
+   },
+   {
+    "kind": "gates",
+    "z": 30,
+    "left": {
+     "kind": "add",
+     "n": 16
+    },
+    "right": {
+     "kind": "rate",
+     "n": 50
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.619996076957418,
+     "phase": 0.4913382255186515
+    }
+   },
+   {
+    "kind": "bridge",
+    "z": 38,
+    "length": 10
+   },
+   {
+    "kind": "gates",
+    "z": 54,
+    "left": {
+     "kind": "add",
+     "n": 24
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 16
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 62,
+    "lo": -0.9,
+    "hi": -0.32,
+    "hp": 150,
+    "holds": {
+     "kind": "allies",
+     "n": 15
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 62,
+    "lo": -0.29,
+    "hi": 0.29,
+    "hp": 130,
+    "holds": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 62,
+    "lo": 0.32,
+    "hi": 0.9,
+    "hp": 130,
+    "holds": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 70,
+    "left": {
+     "kind": "range",
+     "n": 2
+    },
+    "right": {
+     "kind": "add",
+     "n": 36
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.98226369004371,
+     "phase": 0.9158415751572656
+    }
+   },
+   {
+    "kind": "bridge",
+    "z": 78,
+    "length": 10
+   },
+   {
+    "kind": "squad",
+    "z": 94,
+    "lo": -0.95,
+    "hi": 0.95,
+    "count": 143
+   },
+   {
+    "kind": "barrel",
+    "z": 102,
+    "lo": -0.68,
+    "hi": -0.42000000000000004,
+    "hp": 55
+   },
+   {
+    "kind": "crate",
+    "z": 102,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 150,
+    "holds": {
+     "kind": "times",
+     "n": 2
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 105,
+    "lo": -0.95,
+    "hi": 0.95,
+    "count": 478
+   },
+   {
+    "kind": "gates",
+    "z": 110,
+    "left": {
+     "kind": "multiply",
+     "n": 3
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 13
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 118,
+    "left": {
+     "kind": "add",
+     "n": 43
+    },
+    "right": {
+     "kind": "divide",
+     "n": 2
+    }
+   }
+  ],
+  "finaleZ": 132,
+  "speed": 9.25,
+  "attempt": 0,
+  "finale": {
+   "type": "crowd",
+   "count": 1307
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 215
+ },
+ {
+  "level": 16,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "multiply",
+     "n": 3
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 10
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.777797262283129,
+     "phase": 0.3083637161032685
+    }
+   },
+   {
+    "kind": "wall",
+    "z": 22,
+    "lo": -0.782897696517549,
+    "hi": -0.042897696517549044
+   },
+   {
+    "kind": "squad",
+    "z": 30,
+    "lo": -0.95,
+    "hi": 0.95,
+    "count": 56
+   },
+   {
+    "kind": "crate",
+    "z": 38,
+    "lo": -0.9,
+    "hi": -0.32,
+    "hp": 60,
+    "holds": {
+     "kind": "times",
+     "n": 2
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 38,
+    "lo": -0.29,
+    "hi": 0.29,
+    "hp": 30,
+    "holds": {
+     "kind": "allies",
+     "n": 10
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 38,
+    "lo": 0.32,
+    "hi": 0.9,
+    "hp": 35,
+    "holds": {
+     "kind": "coins",
+     "n": 15
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 46,
+    "left": {
+     "kind": "subtract",
+     "n": 18
+    },
+    "right": {
+     "kind": "add",
+     "n": 22
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 54,
+    "left": {
+     "kind": "add",
+     "n": 31
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 10
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.4214245222079605,
+     "phase": 0.028154363864719922
+    }
+   },
+   {
+    "kind": "barrel",
+    "z": 62,
+    "lo": -0.68,
+    "hi": -0.42000000000000004,
+    "hp": 65
+   },
+   {
+    "kind": "crate",
+    "z": 62,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 210,
+    "holds": {
+     "kind": "allies",
+     "n": 38
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 65,
+    "lo": -0.95,
+    "hi": 0.95,
+    "count": 412
+   },
+   {
+    "kind": "barrel",
+    "z": 70,
+    "lo": -0.13,
+    "hi": 0.13,
+    "hp": 65
+   },
+   {
+    "kind": "squad",
+    "z": 72,
+    "lo": -0.95,
+    "hi": -0.2,
+    "count": 361
+   },
+   {
+    "kind": "squad",
+    "z": 72,
+    "lo": 0.2,
+    "hi": 0.95,
+    "count": 434
+   },
+   {
+    "kind": "squad",
+    "z": 78,
+    "lo": 0.08,
+    "hi": 0.95,
+    "count": 460
+   },
+   {
+    "kind": "bridge",
+    "z": 86,
+    "length": 10
+   },
+   {
+    "kind": "gates",
+    "z": 102,
+    "left": {
+     "kind": "add",
+     "n": 29
+    },
+    "right": {
+     "kind": "divide",
+     "n": 3
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 110,
+    "left": {
+     "kind": "divide",
+     "n": 2
+    },
+    "right": {
+     "kind": "add",
+     "n": 15
+    }
+   }
+  ],
+  "finaleZ": 124,
+  "speed": 9.4,
+  "attempt": 0,
+  "finale": {
+   "type": "crowd",
+   "count": 268
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 45
+ },
+ {
+  "level": 17,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "add",
+     "n": 20
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 6
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 3.0387578475588817,
+     "phase": 0.003928610348397976
+    }
+   },
+   {
+    "kind": "barrel",
+    "z": 22,
+    "lo": -0.13,
+    "hi": 0.13,
+    "hp": 20
+   },
+   {
+    "kind": "squad",
+    "z": 24,
+    "lo": -0.95,
+    "hi": -0.2,
+    "count": 96
+   },
+   {
+    "kind": "squad",
+    "z": 24,
+    "lo": 0.2,
+    "hi": 0.95,
+    "count": 154
+   },
+   {
+    "kind": "hammer",
+    "z": 30,
+    "beat": 0.9,
+    "offset": 0.5541498318127481
+   },
+   {
+    "kind": "barrel",
+    "z": 38,
+    "lo": -0.13,
+    "hi": 0.13,
+    "hp": 20
+   },
+   {
+    "kind": "squad",
+    "z": 40,
+    "lo": -0.95,
+    "hi": -0.2,
+    "count": 133
+   },
+   {
+    "kind": "squad",
+    "z": 40,
+    "lo": 0.2,
+    "hi": 0.95,
+    "count": 107
+   },
+   {
+    "kind": "barrel",
+    "z": 46,
+    "lo": -0.68,
+    "hi": -0.42000000000000004,
+    "hp": 20
+   },
+   {
+    "kind": "crate",
+    "z": 46,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 65,
+    "holds": {
+     "kind": "times",
+     "n": 2
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 49,
+    "lo": -0.95,
+    "hi": 0.95,
+    "count": 108
+   },
+   {
+    "kind": "gates",
+    "z": 54,
+    "left": {
+     "kind": "subtract",
+     "n": 6
+    },
+    "right": {
+     "kind": "rate",
+     "n": 50
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 62,
+    "left": {
+     "kind": "divide",
+     "n": 2
+    },
+    "right": {
+     "kind": "multiply",
+     "n": 3
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 70,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 310,
+    "holds": {
+     "kind": "allies",
+     "n": 25
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 70,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 300,
+    "holds": {
+     "kind": "coins",
+     "n": 25
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 78,
+    "left": {
+     "kind": "add",
+     "n": 19
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 13
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 86,
+    "left": {
+     "kind": "add",
+     "n": 40
+    },
+    "right": {
+     "kind": "add",
+     "n": 36
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 94,
+    "left": {
+     "kind": "add",
+     "n": 14
+    },
+    "right": {
+     "kind": "add",
+     "n": 45
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 102,
+    "left": {
+     "kind": "subtract",
+     "n": 33
+    },
+    "right": {
+     "kind": "add",
+     "n": 31
+    }
+   }
+  ],
+  "finaleZ": 116,
+  "speed": 9.55,
+  "attempt": 0,
+  "finale": {
+   "type": "crowd",
+   "count": 830
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 138
+ },
+ {
+  "level": 18,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "subtract",
+     "n": 15
+    },
+    "right": {
+     "kind": "add",
+     "n": 9
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 22,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 45,
+    "holds": {
+     "kind": "coins",
+     "n": 15
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 30,
+    "left": {
+     "kind": "add",
+     "n": 18
+    },
+    "right": {
+     "kind": "divide",
+     "n": 2
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 38,
+    "left": {
+     "kind": "rate",
+     "n": -25
+    },
+    "right": {
+     "kind": "add",
+     "n": 22
+    }
+   },
+   {
+    "kind": "wall",
+    "z": 46,
+    "lo": -0.8575884300968427,
+    "hi": -0.11758843009684272
+   },
+   {
+    "kind": "crate",
+    "z": 54,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 180,
+    "holds": {
+     "kind": "allies",
+     "n": 15
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 54,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 120,
+    "holds": {
+     "kind": "coins",
+     "n": 15
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 62,
+    "left": {
+     "kind": "multiply",
+     "n": 3
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 19
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 70,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 910,
+    "holds": {
+     "kind": "times",
+     "n": 2
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 70,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 580,
+    "holds": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "barrel",
+    "z": 78,
+    "lo": 0.42000000000000004,
+    "hi": 0.68,
+    "hp": 280
+   },
+   {
+    "kind": "crate",
+    "z": 78,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 830,
+    "holds": {
+     "kind": "allies",
+     "n": 155
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 81,
+    "lo": -0.95,
+    "hi": 0.95,
+    "count": 2251
+   },
+   {
+    "kind": "hammer",
+    "z": 86,
+    "beat": 0.9,
+    "offset": 0.3013218531830808
+   },
+   {
+    "kind": "crate",
+    "z": 94,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 1150,
+    "holds": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 102,
+    "left": {
+     "kind": "subtract",
+     "n": 64
+    },
+    "right": {
+     "kind": "rate",
+     "n": 50
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.8518125003778088,
+     "phase": 0.20504067937684778
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 110,
+    "left": {
+     "kind": "rate",
+     "n": 25
+    },
+    "right": {
+     "kind": "add",
+     "n": 68
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.3903071681264736,
+     "phase": 0.15135358545547417
+    }
+   }
+  ],
+  "finaleZ": 124,
+  "speed": 9.7,
+  "attempt": 0,
+  "finale": {
+   "type": "crowd",
+   "count": 1199
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 200
+ },
+ {
+  "level": 19,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "rate",
+     "n": 50
+    },
+    "right": {
+     "kind": "add",
+     "n": 11
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 22,
+    "left": {
+     "kind": "multiply",
+     "n": 3
+    },
+    "right": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 30,
+    "left": {
+     "kind": "subtract",
+     "n": 14
+    },
+    "right": {
+     "kind": "add",
+     "n": 24
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 38,
+    "left": {
+     "kind": "add",
+     "n": 28
+    },
+    "right": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "hammer",
+    "z": 46,
+    "beat": 0.9,
+    "offset": 1.686236429969202
+   },
+   {
+    "kind": "gates",
+    "z": 54,
+    "left": {
+     "kind": "add",
+     "n": 12
+    },
+    "right": {
+     "kind": "add",
+     "n": 25
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 3.0893407634665917,
+     "phase": 0.4004491399220903
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 62,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 380,
+    "holds": {
+     "kind": "coins",
+     "n": 25
+    }
+   },
+   {
+    "kind": "barrel",
+    "z": 70,
+    "lo": -0.13,
+    "hi": 0.13,
+    "hp": 85
+   },
+   {
+    "kind": "squad",
+    "z": 72,
+    "lo": -0.95,
+    "hi": -0.2,
+    "count": 670
+   },
+   {
+    "kind": "squad",
+    "z": 72,
+    "lo": 0.2,
+    "hi": 0.95,
+    "count": 715
+   },
+   {
+    "kind": "blade",
+    "z": 78,
+    "center": 0,
+    "halfWidth": 0.24,
+    "amplitude": 0.55,
+    "speed": 2
+   },
+   {
+    "kind": "gates",
+    "z": 86,
+    "left": {
+     "kind": "add",
+     "n": 29
+    },
+    "right": {
+     "kind": "divide",
+     "n": 3
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 3.3579616513914954,
+     "phase": 0.9150634330836666
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 94,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 750,
+    "holds": {
+     "kind": "times",
+     "n": 2
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 94,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 510,
+    "holds": {
+     "kind": "allies",
+     "n": 42
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 102,
+    "left": {
+     "kind": "add",
+     "n": 52
+    },
+    "right": {
+     "kind": "divide",
+     "n": 2
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 110,
+    "left": {
+     "kind": "add",
+     "n": 24
+    },
+    "right": {
+     "kind": "add",
+     "n": 65
+    }
+   }
+  ],
+  "finaleZ": 134,
+  "speed": 9.85,
+  "attempt": 0,
+  "finale": {
+   "type": "boss",
+   "hp": 809,
+   "slam": -1
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 229
+ },
+ {
+  "level": 20,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "add",
+     "n": 19
+    },
+    "right": {
+     "kind": "multiply",
+     "n": 2
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 3.1312622159624475,
+     "phase": 0.43109427139635503
+    }
+   },
+   {
+    "kind": "hammer",
+    "z": 22,
+    "beat": 0.9,
+    "offset": 0.6895535427209643
+   },
+   {
+    "kind": "gates",
+    "z": 30,
+    "left": {
+     "kind": "rate",
+     "n": 25
+    },
+    "right": {
+     "kind": "multiply",
+     "n": 3
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 38,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 250,
+    "holds": {
+     "kind": "allies",
+     "n": 15
+    }
+   },
+   {
+    "kind": "barrel",
+    "z": 46,
+    "lo": -0.13,
+    "hi": 0.13,
+    "hp": 60
+   },
+   {
+    "kind": "squad",
+    "z": 48,
+    "lo": -0.95,
+    "hi": -0.2,
+    "count": 340
+   },
+   {
+    "kind": "squad",
+    "z": 48,
+    "lo": 0.2,
+    "hi": 0.95,
+    "count": 407
+   },
+   {
+    "kind": "crate",
+    "z": 54,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 300,
+    "holds": {
+     "kind": "allies",
+     "n": 20
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 54,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 240,
+    "holds": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 62,
+    "left": {
+     "kind": "rate",
+     "n": 50
+    },
+    "right": {
+     "kind": "divide",
+     "n": 2
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 70,
+    "left": {
+     "kind": "add",
+     "n": 46
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 14
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.3888893282193826,
+     "phase": 0.6938571821631545
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 78,
+    "left": {
+     "kind": "subtract",
+     "n": 26
+    },
+    "right": {
+     "kind": "range",
+     "n": 2
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 3.3772364748915313,
+     "phase": 0.991328209569628
+    }
+   },
+   {
+    "kind": "spikes",
+    "z": 86,
+    "lo": 0.14622327872777632,
+    "hi": 0.46622327872777636
+   },
+   {
+    "kind": "gates",
+    "z": 94,
+    "left": {
+     "kind": "subtract",
+     "n": 27
+    },
+    "right": {
+     "kind": "add",
+     "n": 29
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 102,
+    "left": {
+     "kind": "range",
+     "n": 2
+    },
+    "right": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 110,
+    "left": {
+     "kind": "subtract",
+     "n": 12
+    },
+    "right": {
+     "kind": "add",
+     "n": 31
+    }
+   }
+  ],
+  "finaleZ": 124,
+  "speed": 10,
+  "attempt": 0,
+  "finale": {
+   "type": "crowd",
+   "count": 980
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 159
+ },
+ {
+  "level": 21,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "multiply",
+     "n": 2
+    },
+    "right": {
+     "kind": "rate",
+     "n": 25
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 3.0708871548587147,
+     "phase": 0.5973808177505303
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 22,
+    "left": {
+     "kind": "divide",
+     "n": 2
+    },
+    "right": {
+     "kind": "add",
+     "n": 27
+    }
+   },
+   {
+    "kind": "blade",
+    "z": 30,
+    "center": 0,
+    "halfWidth": 0.26,
+    "amplitude": 0.55,
+    "speed": 2.2
+   },
+   {
+    "kind": "gates",
+    "z": 38,
+    "left": {
+     "kind": "subtract",
+     "n": 16
+    },
+    "right": {
+     "kind": "multiply",
+     "n": 2
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 46,
+    "left": {
+     "kind": "add",
+     "n": 38
+    },
+    "right": {
+     "kind": "add",
+     "n": 21
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 54,
+    "left": {
+     "kind": "add",
+     "n": 34
+    },
+    "right": {
+     "kind": "add",
+     "n": 26
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.3903787290531584,
+     "phase": 0.1055146559869461
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 62,
+    "left": {
+     "kind": "divide",
+     "n": 2
+    },
+    "right": {
+     "kind": "add",
+     "n": 33
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 70,
+    "left": {
+     "kind": "rate",
+     "n": 25
+    },
+    "right": {
+     "kind": "add",
+     "n": 42
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 78,
+    "left": {
+     "kind": "rate",
+     "n": 25
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 42
+    }
+   },
+   {
+    "kind": "barrel",
+    "z": 86,
+    "lo": 0.42000000000000004,
+    "hi": 0.68,
+    "hp": 180
+   },
+   {
+    "kind": "crate",
+    "z": 86,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 600,
+    "holds": {
+     "kind": "allies",
+     "n": 86
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 89,
+    "lo": -0.95,
+    "hi": 0.95,
+    "count": 1313
+   },
+   {
+    "kind": "blade",
+    "z": 94,
+    "center": 0,
+    "halfWidth": 0.26,
+    "amplitude": 0.55,
+    "speed": 2.2
+   },
+   {
+    "kind": "gates",
+    "z": 102,
+    "left": {
+     "kind": "subtract",
+     "n": 38
+    },
+    "right": {
+     "kind": "rate",
+     "n": 50
+    }
+   },
+   {
+    "kind": "bridge",
+    "z": 110,
+    "length": 10
+   },
+   {
+    "kind": "gates",
+    "z": 126,
+    "left": {
+     "kind": "range",
+     "n": 2
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 31
+    }
+   }
+  ],
+  "finaleZ": 140,
+  "speed": 10.15,
+  "attempt": 0,
+  "finale": {
+   "type": "crowd",
+   "count": 497
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 82
+ },
+ {
+  "level": 22,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "add",
+     "n": 13
+    },
+    "right": {
+     "kind": "add",
+     "n": 30
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 22,
+    "left": {
+     "kind": "add",
+     "n": 24
+    },
+    "right": {
+     "kind": "add",
+     "n": 17
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.787699161436796,
+     "phase": 0.05290034305472391
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 30,
+    "left": {
+     "kind": "divide",
+     "n": 3
+    },
+    "right": {
+     "kind": "add",
+     "n": 21
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 38,
+    "lo": -0.9,
+    "hi": -0.32,
+    "hp": 150,
+    "holds": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 38,
+    "lo": -0.29,
+    "hi": 0.29,
+    "hp": 140,
+    "holds": {
+     "kind": "coins",
+     "n": 15
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 38,
+    "lo": 0.32,
+    "hi": 0.9,
+    "hp": 110,
+    "holds": {
+     "kind": "allies",
+     "n": 13
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 46,
+    "left": {
+     "kind": "add",
+     "n": 34
+    },
+    "right": {
+     "kind": "multiply",
+     "n": 2
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 54,
+    "left": {
+     "kind": "add",
+     "n": 30
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 32
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.699232255288028,
+     "phase": 0.7655937661563474
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 62,
+    "lo": 0.08,
+    "hi": 0.95,
+    "count": 861
+   },
+   {
+    "kind": "barrel",
+    "z": 70,
+    "lo": -0.13,
+    "hi": 0.13,
+    "hp": 140
+   },
+   {
+    "kind": "squad",
+    "z": 72,
+    "lo": -0.95,
+    "hi": -0.2,
+    "count": 1077
+   },
+   {
+    "kind": "squad",
+    "z": 72,
+    "lo": 0.2,
+    "hi": 0.95,
+    "count": 970
+   },
+   {
+    "kind": "crate",
+    "z": 78,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 790,
+    "holds": {
+     "kind": "allies",
+     "n": 38
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 78,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 630,
+    "holds": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 86,
+    "left": {
+     "kind": "subtract",
+     "n": 28
+    },
+    "right": {
+     "kind": "multiply",
+     "n": 3
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 3.372170476337251,
+     "phase": 0.9757466053962337
+    }
+   },
+   {
+    "kind": "bridge",
+    "z": 94,
+    "length": 10
+   },
+   {
+    "kind": "gates",
+    "z": 110,
+    "left": {
+     "kind": "subtract",
+     "n": 23
+    },
+    "right": {
+     "kind": "range",
+     "n": 2
+    }
+   },
+   {
+    "kind": "barrel",
+    "z": 118,
+    "lo": -0.68,
+    "hi": -0.42000000000000004,
+    "hp": 310
+   },
+   {
+    "kind": "crate",
+    "z": 118,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 950,
+    "holds": {
+     "kind": "allies",
+     "n": 180
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 121,
+    "lo": -0.95,
+    "hi": 0.95,
+    "count": 2250
+   },
+   {
+    "kind": "gates",
+    "z": 126,
+    "left": {
+     "kind": "add",
+     "n": 29
+    },
+    "right": {
+     "kind": "divide",
+     "n": 2
+    }
+   }
+  ],
+  "finaleZ": 140,
+  "speed": 10.3,
+  "attempt": 0,
+  "finale": {
+   "type": "crowd",
+   "count": 393
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 65
+ },
+ {
+  "level": 23,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "divide",
+     "n": 2
+    },
+    "right": {
+     "kind": "multiply",
+     "n": 2
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 22,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 55,
+    "holds": {
+     "kind": "allies",
+     "n": 11
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 22,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 40,
+    "holds": {
+     "kind": "coins",
+     "n": 20
+    }
+   },
+   {
+    "kind": "bridge",
+    "z": 30,
+    "length": 10
+   },
+   {
+    "kind": "gates",
+    "z": 46,
+    "left": {
+     "kind": "rate",
+     "n": 50
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 16
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 3.251206634142255,
+     "phase": 0.3909099284357711
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 54,
+    "left": {
+     "kind": "multiply",
+     "n": 2
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 20
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 62,
+    "left": {
+     "kind": "subtract",
+     "n": 9
+    },
+    "right": {
+     "kind": "add",
+     "n": 27
+    }
+   },
+   {
+    "kind": "wall",
+    "z": 70,
+    "lo": -0.7094628701158179,
+    "hi": 0.11053712988418218
+   },
+   {
+    "kind": "crate",
+    "z": 78,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 270,
+    "holds": {
+     "kind": "coins",
+     "n": 20
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 78,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 390,
+    "holds": {
+     "kind": "allies",
+     "n": 19
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 86,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 450,
+    "holds": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 86,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 410,
+    "holds": {
+     "kind": "allies",
+     "n": 23
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 94,
+    "left": {
+     "kind": "add",
+     "n": 29
+    },
+    "right": {
+     "kind": "add",
+     "n": 31
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 102,
+    "lo": -0.9,
+    "hi": -0.32,
+    "hp": 320,
+    "holds": {
+     "kind": "allies",
+     "n": 40
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 102,
+    "lo": -0.29,
+    "hi": 0.29,
+    "hp": 310,
+    "holds": {
+     "kind": "coins",
+     "n": 15
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 102,
+    "lo": 0.32,
+    "hi": 0.9,
+    "hp": 410,
+    "holds": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "wall",
+    "z": 110,
+    "lo": -0.1033349514345091,
+    "hi": 0.716665048565491
+   },
+   {
+    "kind": "squad",
+    "z": 118,
+    "lo": -0.95,
+    "hi": 0.95,
+    "count": 524
+   },
+   {
+    "kind": "gates",
+    "z": 126,
+    "left": {
+     "kind": "add",
+     "n": 26
+    },
+    "right": {
+     "kind": "rate",
+     "n": 25
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 3.1884701743024957,
+     "phase": 0.436325266657836
+    }
+   }
+  ],
+  "finaleZ": 140,
+  "speed": 10.45,
+  "attempt": 0,
+  "finale": {
+   "type": "crowd",
+   "count": 634
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 104
+ },
+ {
+  "level": 24,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "rate",
+     "n": -25
+    },
+    "right": {
+     "kind": "add",
+     "n": 20
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 22,
+    "left": {
+     "kind": "subtract",
+     "n": 10
+    },
+    "right": {
+     "kind": "add",
+     "n": 31
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.3909468433093015,
+     "phase": 0.12775594330886564
+    }
+   },
+   {
+    "kind": "wall",
+    "z": 30,
+    "lo": -0.04774804147771938,
+    "hi": 0.7722519585222807
+   },
+   {
+    "kind": "gates",
+    "z": 38,
+    "left": {
+     "kind": "add",
+     "n": 16
+    },
+    "right": {
+     "kind": "divide",
+     "n": 2
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.6117930908430815,
+     "phase": 0.6242278853289408
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 46,
+    "left": {
+     "kind": "subtract",
+     "n": 28
+    },
+    "right": {
+     "kind": "rate",
+     "n": 50
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 3.3738970652514215,
+     "phase": 0.2092588750670077
+    }
+   },
+   {
+    "kind": "barrel",
+    "z": 54,
+    "lo": -0.13,
+    "hi": 0.13,
+    "hp": 65
+   },
+   {
+    "kind": "squad",
+    "z": 56,
+    "lo": -0.95,
+    "hi": -0.2,
+    "count": 569
+   },
+   {
+    "kind": "squad",
+    "z": 56,
+    "lo": 0.2,
+    "hi": 0.95,
+    "count": 403
+   },
+   {
+    "kind": "gates",
+    "z": 62,
+    "left": {
+     "kind": "add",
+     "n": 25
+    },
+    "right": {
+     "kind": "rate",
+     "n": 50
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 70,
+    "left": {
+     "kind": "add",
+     "n": 26
+    },
+    "right": {
+     "kind": "rate",
+     "n": 25
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.3844057739172926,
+     "phase": 0.1939468724945247
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 78,
+    "left": {
+     "kind": "range",
+     "n": 2
+    },
+    "right": {
+     "kind": "multiply",
+     "n": 2
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 86,
+    "lo": -0.9,
+    "hi": -0.32,
+    "hp": 780,
+    "holds": {
+     "kind": "allies",
+     "n": 39
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 86,
+    "lo": -0.29,
+    "hi": 0.29,
+    "hp": 710,
+    "holds": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 86,
+    "lo": 0.32,
+    "hi": 0.9,
+    "hp": 1000,
+    "holds": {
+     "kind": "times",
+     "n": 2
+    }
+   },
+   {
+    "kind": "hammer",
+    "z": 94,
+    "beat": 0.9,
+    "offset": 1.5674562961863778
+   },
+   {
+    "kind": "gates",
+    "z": 102,
+    "left": {
+     "kind": "add",
+     "n": 38
+    },
+    "right": {
+     "kind": "add",
+     "n": 66
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.3787730104327878,
+     "phase": 0.3344617390230732
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 110,
+    "left": {
+     "kind": "add",
+     "n": 115
+    },
+    "right": {
+     "kind": "divide",
+     "n": 3
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 3.091514589744823,
+     "phase": 0.7927530156944399
+    }
+   },
+   {
+    "kind": "barrel",
+    "z": 118,
+    "lo": 0.42000000000000004,
+    "hi": 0.68,
+    "hp": 600
+   },
+   {
+    "kind": "crate",
+    "z": 118,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 2250,
+    "holds": {
+     "kind": "allies",
+     "n": 248
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 121,
+    "lo": -0.95,
+    "hi": 0.95,
+    "count": 4682
+   },
+   {
+    "kind": "gates",
+    "z": 126,
+    "left": {
+     "kind": "subtract",
+     "n": 32
+    },
+    "right": {
+     "kind": "range",
+     "n": 2
+    }
+   }
+  ],
+  "finaleZ": 151,
+  "speed": 10.6,
+  "attempt": 0,
+  "finale": {
+   "type": "boss",
+   "hp": 2784,
+   "slam": 1
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 807
+ },
+ {
+  "level": 25,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "range",
+     "n": 2
+    },
+    "right": {
+     "kind": "multiply",
+     "n": 2
+    }
+   },
+   {
+    "kind": "barrel",
+    "z": 22,
+    "lo": 0.42000000000000004,
+    "hi": 0.68,
+    "hp": 10
+   },
+   {
+    "kind": "crate",
+    "z": 22,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 40,
+    "holds": {
+     "kind": "allies",
+     "n": 12
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 25,
+    "lo": -0.95,
+    "hi": 0.95,
+    "count": 77
+   },
+   {
+    "kind": "squad",
+    "z": 30,
+    "lo": 0.08,
+    "hi": 0.95,
+    "count": 59
+   },
+   {
+    "kind": "gates",
+    "z": 38,
+    "left": {
+     "kind": "divide",
+     "n": 2
+    },
+    "right": {
+     "kind": "add",
+     "n": 21
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.429187287040083,
+     "phase": 0.5972675271176586
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 46,
+    "left": {
+     "kind": "rate",
+     "n": 50
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 14
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 54,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 150,
+    "holds": {
+     "kind": "allies",
+     "n": 14
+    }
+   },
+   {
+    "kind": "wall",
+    "z": 62,
+    "lo": -0.8575726103527284,
+    "hi": -0.0375726103527283
+   },
+   {
+    "kind": "gates",
+    "z": 70,
+    "left": {
+     "kind": "add",
+     "n": 29
+    },
+    "right": {
+     "kind": "add",
+     "n": 28
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.6748300491500343,
+     "phase": 0.44680803102109024
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 78,
+    "lo": -0.9,
+    "hi": -0.32,
+    "hp": 220,
+    "holds": {
+     "kind": "allies",
+     "n": 13
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 78,
+    "lo": -0.29,
+    "hi": 0.29,
+    "hp": 270,
+    "holds": {
+     "kind": "times",
+     "n": 2
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 78,
+    "lo": 0.32,
+    "hi": 0.9,
+    "hp": 190,
+    "holds": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 86,
+    "lo": -0.95,
+    "hi": 0.95,
+    "count": 413
+   },
+   {
+    "kind": "wall",
+    "z": 94,
+    "lo": -0.34551915042288694,
+    "hi": 0.4744808495771131
+   },
+   {
+    "kind": "gates",
+    "z": 102,
+    "left": {
+     "kind": "subtract",
+     "n": 17
+    },
+    "right": {
+     "kind": "add",
+     "n": 40
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 110,
+    "lo": -0.95,
+    "hi": 0.95,
+    "count": 620
+   },
+   {
+    "kind": "wall",
+    "z": 118,
+    "lo": -0.2668914829903567,
+    "hi": 0.5531085170096434
+   },
+   {
+    "kind": "gates",
+    "z": 126,
+    "left": {
+     "kind": "divide",
+     "n": 2
+    },
+    "right": {
+     "kind": "add",
+     "n": 31
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.407971791971972,
+     "phase": 0.3877900585431997
+    }
+   }
+  ],
+  "finaleZ": 140,
+  "speed": 10.75,
+  "attempt": 0,
+  "finale": {
+   "type": "crowd",
+   "count": 339
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 57
+ },
+ {
+  "level": 26,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "multiply",
+     "n": 2
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 8
+    }
+   },
+   {
+    "kind": "spikes",
+    "z": 22,
+    "lo": -0.5854214505827918,
+    "hi": -0.26542145058279176
+   },
+   {
+    "kind": "squad",
+    "z": 30,
+    "lo": -0.95,
+    "hi": 0.95,
+    "count": 27
+   },
+   {
+    "kind": "crate",
+    "z": 38,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 50,
+    "holds": {
+     "kind": "allies",
+     "n": 9
+    }
+   },
+   {
+    "kind": "blade",
+    "z": 46,
+    "center": 0,
+    "halfWidth": 0.26,
+    "amplitude": 0.55,
+    "speed": 2.2
+   },
+   {
+    "kind": "crate",
+    "z": 54,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 90,
+    "holds": {
+     "kind": "allies",
+     "n": 12
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 54,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 80,
+    "holds": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 62,
+    "left": {
+     "kind": "add",
+     "n": 16
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 21
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 3.062997548690322,
+     "phase": 0.6068834756601109
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 70,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 150,
+    "holds": {
+     "kind": "allies",
+     "n": 15
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 70,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 120,
+    "holds": {
+     "kind": "coins",
+     "n": 25
+    }
+   },
+   {
+    "kind": "barrel",
+    "z": 78,
+    "lo": 0.42000000000000004,
+    "hi": 0.68,
+    "hp": 40
+   },
+   {
+    "kind": "crate",
+    "z": 78,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 160,
+    "holds": {
+     "kind": "allies",
+     "n": 31
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 81,
+    "lo": -0.95,
+    "hi": 0.95,
+    "count": 335
+   },
+   {
+    "kind": "gates",
+    "z": 86,
+    "left": {
+     "kind": "divide",
+     "n": 2
+    },
+    "right": {
+     "kind": "add",
+     "n": 31
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.2345899837428007,
+     "phase": 0.3351014953154058
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 94,
+    "left": {
+     "kind": "subtract",
+     "n": 21
+    },
+    "right": {
+     "kind": "multiply",
+     "n": 2
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 3.3192883557975628,
+     "phase": 0.948706856857616
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 102,
+    "left": {
+     "kind": "add",
+     "n": 13
+    },
+    "right": {
+     "kind": "divide",
+     "n": 3
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 3.2300677674804037,
+     "phase": 0.3137111888761659
+    }
+   },
+   {
+    "kind": "barrel",
+    "z": 110,
+    "lo": -0.68,
+    "hi": -0.42000000000000004,
+    "hp": 120
+   },
+   {
+    "kind": "crate",
+    "z": 110,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 360,
+    "holds": {
+     "kind": "allies",
+     "n": 83
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 113,
+    "lo": -0.95,
+    "hi": 0.95,
+    "count": 903
+   },
+   {
+    "kind": "squad",
+    "z": 118,
+    "lo": 0.21999999999999997,
+    "hi": 0.88,
+    "count": 265
+   },
+   {
+    "kind": "crate",
+    "z": 120.5,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 340,
+    "holds": {
+     "kind": "allies",
+     "n": 83
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 126,
+    "left": {
+     "kind": "add",
+     "n": 71
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 8
+    }
+   }
+  ],
+  "finaleZ": 140,
+  "speed": 10.9,
+  "attempt": 0,
+  "finale": {
+   "type": "crowd",
+   "count": 894
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 145
+ },
+ {
+  "level": 27,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "rate",
+     "n": 50
+    },
+    "right": {
+     "kind": "rate",
+     "n": -25
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 22,
+    "left": {
+     "kind": "multiply",
+     "n": 2
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 12
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.2265277770430982,
+     "phase": 0.9832140517027474
+    }
+   },
+   {
+    "kind": "bridge",
+    "z": 30,
+    "length": 10
+   },
+   {
+    "kind": "squad",
+    "z": 46,
+    "lo": 0.08,
+    "hi": 0.95,
+    "count": 110
+   },
+   {
+    "kind": "crate",
+    "z": 54,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 110,
+    "holds": {
+     "kind": "allies",
+     "n": 11
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 62,
+    "left": {
+     "kind": "add",
+     "n": 19
+    },
+    "right": {
+     "kind": "add",
+     "n": 29
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 3.3376310081695713,
+     "phase": 0.3754679531802242
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 70,
+    "left": {
+     "kind": "divide",
+     "n": 3
+    },
+    "right": {
+     "kind": "add",
+     "n": 18
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.6235673538175703,
+     "phase": 0.9875531189577399
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 78,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 300,
+    "holds": {
+     "kind": "allies",
+     "n": 18
+    }
+   },
+   {
+    "kind": "hammer",
+    "z": 86,
+    "beat": 0.9,
+    "offset": 0.326439747502019
+   },
+   {
+    "kind": "gates",
+    "z": 94,
+    "left": {
+     "kind": "add",
+     "n": 34
+    },
+    "right": {
+     "kind": "rate",
+     "n": -25
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.8975596881466883,
+     "phase": 0.994729009515277
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 102,
+    "lo": -0.9,
+    "hi": -0.32,
+    "hp": 350,
+    "holds": {
+     "kind": "allies",
+     "n": 25
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 102,
+    "lo": -0.29,
+    "hi": 0.29,
+    "hp": 370,
+    "holds": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 102,
+    "lo": 0.32,
+    "hi": 0.9,
+    "hp": 280,
+    "holds": {
+     "kind": "coins",
+     "n": 20
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 110,
+    "left": {
+     "kind": "add",
+     "n": 21
+    },
+    "right": {
+     "kind": "add",
+     "n": 25
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 118,
+    "lo": -0.95,
+    "hi": -0.08,
+    "count": 798
+   },
+   {
+    "kind": "gates",
+    "z": 126,
+    "left": {
+     "kind": "add",
+     "n": 26
+    },
+    "right": {
+     "kind": "add",
+     "n": 38
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.264226200297894,
+     "phase": 0.9809907114862374
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 134,
+    "lo": -0.9,
+    "hi": -0.32,
+    "hp": 560,
+    "holds": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 134,
+    "lo": -0.29,
+    "hi": 0.29,
+    "hp": 540,
+    "holds": {
+     "kind": "allies",
+     "n": 58
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 134,
+    "lo": 0.32,
+    "hi": 0.9,
+    "hp": 480,
+    "holds": {
+     "kind": "coins",
+     "n": 20
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 142,
+    "left": {
+     "kind": "multiply",
+     "n": 3
+    },
+    "right": {
+     "kind": "rate",
+     "n": 25
+    }
+   }
+  ],
+  "finaleZ": 156,
+  "speed": 11.05,
+  "attempt": 0,
+  "finale": {
+   "type": "crowd",
+   "count": 2571
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 417
+ },
+ {
+  "level": 28,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "subtract",
+     "n": 9
+    },
+    "right": {
+     "kind": "add",
+     "n": 21
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 22,
+    "lo": -0.88,
+    "hi": -0.21999999999999997,
+    "count": 40
+   },
+   {
+    "kind": "crate",
+    "z": 24.5,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 65,
+    "holds": {
+     "kind": "allies",
+     "n": 19
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 30,
+    "lo": 0.08,
+    "hi": 0.95,
+    "count": 218
+   },
+   {
+    "kind": "gates",
+    "z": 38,
+    "left": {
+     "kind": "subtract",
+     "n": 20
+    },
+    "right": {
+     "kind": "add",
+     "n": 23
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 46,
+    "lo": 0.08,
+    "hi": 0.95,
+    "count": 277
+   },
+   {
+    "kind": "barrel",
+    "z": 54,
+    "lo": -0.13,
+    "hi": 0.13,
+    "hp": 40
+   },
+   {
+    "kind": "squad",
+    "z": 56,
+    "lo": -0.95,
+    "hi": -0.2,
+    "count": 319
+   },
+   {
+    "kind": "squad",
+    "z": 56,
+    "lo": 0.2,
+    "hi": 0.95,
+    "count": 323
+   },
+   {
+    "kind": "wall",
+    "z": 62,
+    "lo": -0.06784886075619279,
+    "hi": 0.7521511392438073
+   },
+   {
+    "kind": "gates",
+    "z": 70,
+    "left": {
+     "kind": "add",
+     "n": 27
+    },
+    "right": {
+     "kind": "add",
+     "n": 25
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 78,
+    "lo": -0.9,
+    "hi": -0.32,
+    "hp": 160,
+    "holds": {
+     "kind": "allies",
+     "n": 24
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 78,
+    "lo": -0.29,
+    "hi": 0.29,
+    "hp": 150,
+    "holds": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 78,
+    "lo": 0.32,
+    "hi": 0.9,
+    "hp": 140,
+    "holds": {
+     "kind": "coins",
+     "n": 25
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 86,
+    "left": {
+     "kind": "rate",
+     "n": 25
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 13
+    }
+   },
+   {
+    "kind": "barrel",
+    "z": 94,
+    "lo": -0.13,
+    "hi": 0.13,
+    "hp": 85
+   },
+   {
+    "kind": "squad",
+    "z": 96,
+    "lo": -0.95,
+    "hi": -0.2,
+    "count": 601
+   },
+   {
+    "kind": "squad",
+    "z": 96,
+    "lo": 0.2,
+    "hi": 0.95,
+    "count": 731
+   },
+   {
+    "kind": "crate",
+    "z": 102,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 410,
+    "holds": {
+     "kind": "coins",
+     "n": 20
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 102,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 350,
+    "holds": {
+     "kind": "allies",
+     "n": 34
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 110,
+    "left": {
+     "kind": "subtract",
+     "n": 32
+    },
+    "right": {
+     "kind": "add",
+     "n": 42
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 118,
+    "left": {
+     "kind": "rate",
+     "n": 25
+    },
+    "right": {
+     "kind": "add",
+     "n": 21
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 126,
+    "left": {
+     "kind": "add",
+     "n": 37
+    },
+    "right": {
+     "kind": "subtract",
+     "n": 33
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 134,
+    "lo": -0.8,
+    "hi": -0.3,
+    "hp": 860,
+    "holds": {
+     "kind": "allies",
+     "n": 71
+    }
+   }
+  ],
+  "finaleZ": 148,
+  "speed": 11.2,
+  "attempt": 1,
+  "finale": {
+   "type": "crowd",
+   "count": 665
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 109
+ },
+ {
+  "level": 29,
+  "pieces": [
+   {
+    "kind": "gates",
+    "z": 14,
+    "left": {
+     "kind": "subtract",
+     "n": 18
+    },
+    "right": {
+     "kind": "add",
+     "n": 20
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 22,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 90,
+    "holds": {
+     "kind": "allies",
+     "n": 7
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 30,
+    "lo": -0.9,
+    "hi": -0.32,
+    "hp": 50,
+    "holds": {
+     "kind": "allies",
+     "n": 13
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 30,
+    "lo": -0.29,
+    "hi": 0.29,
+    "hp": 85,
+    "holds": {
+     "kind": "times",
+     "n": 2
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 30,
+    "lo": 0.32,
+    "hi": 0.9,
+    "hp": 65,
+    "holds": {
+     "kind": "coins",
+     "n": 30
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 38,
+    "left": {
+     "kind": "multiply",
+     "n": 2
+    },
+    "right": {
+     "kind": "add",
+     "n": 19
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 46,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 320,
+    "holds": {
+     "kind": "allies",
+     "n": 43
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 54,
+    "lo": -0.95,
+    "hi": 0.95,
+    "count": 312
+   },
+   {
+    "kind": "crate",
+    "z": 62,
+    "lo": -0.9,
+    "hi": -0.32,
+    "hp": 290,
+    "holds": {
+     "kind": "allies",
+     "n": 40
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 62,
+    "lo": -0.29,
+    "hi": 0.29,
+    "hp": 230,
+    "holds": {
+     "kind": "coins",
+     "n": 25
+    }
+   },
+   {
+    "kind": "crate",
+    "z": 62,
+    "lo": 0.32,
+    "hi": 0.9,
+    "hp": 250,
+    "holds": {
+     "kind": "allies",
+     "n": 37
+    }
+   },
+   {
+    "kind": "barrel",
+    "z": 70,
+    "lo": -0.68,
+    "hi": -0.42000000000000004,
+    "hp": 130
+   },
+   {
+    "kind": "crate",
+    "z": 70,
+    "lo": 0.3,
+    "hi": 0.8,
+    "hp": 490,
+    "holds": {
+     "kind": "allies",
+     "n": 90
+    }
+   },
+   {
+    "kind": "squad",
+    "z": 73,
+    "lo": -0.95,
+    "hi": 0.95,
+    "count": 1082
+   },
+   {
+    "kind": "gates",
+    "z": 78,
+    "left": {
+     "kind": "subtract",
+     "n": 21
+    },
+    "right": {
+     "kind": "add",
+     "n": 35
+    }
+   },
+   {
+    "kind": "blade",
+    "z": 86,
+    "center": 0,
+    "halfWidth": 0.26,
+    "amplitude": 0.55,
+    "speed": 2.2
+   },
+   {
+    "kind": "barrel",
+    "z": 94,
+    "lo": -0.13,
+    "hi": 0.13,
+    "hp": 150
+   },
+   {
+    "kind": "squad",
+    "z": 96,
+    "lo": -0.95,
+    "hi": -0.2,
+    "count": 1160
+   },
+   {
+    "kind": "squad",
+    "z": 96,
+    "lo": 0.2,
+    "hi": 0.95,
+    "count": 1035
+   },
+   {
+    "kind": "crate",
+    "z": 102,
+    "lo": -0.25,
+    "hi": 0.25,
+    "hp": 700,
+    "holds": {
+     "kind": "rate",
+     "n": 25
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 110,
+    "left": {
+     "kind": "add",
+     "n": 48
+    },
+    "right": {
+     "kind": "rate",
+     "n": -25
+    },
+    "slide": {
+     "amplitude": 0.4,
+     "period": 2.7371258379504386,
+     "phase": 0.2620402629441213
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 118,
+    "left": {
+     "kind": "subtract",
+     "n": 36
+    },
+    "right": {
+     "kind": "add",
+     "n": 49
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 126,
+    "left": {
+     "kind": "add",
+     "n": 61
+    },
+    "right": {
+     "kind": "add",
+     "n": 37
+    }
+   },
+   {
+    "kind": "gates",
+    "z": 134,
+    "left": {
+     "kind": "add",
+     "n": 76
+    },
+    "right": {
+     "kind": "range",
+     "n": 2
+    }
+   }
+  ],
+  "finaleZ": 160,
+  "speed": 11.35,
+  "attempt": 0,
+  "finale": {
+   "type": "boss",
+   "hp": 1418,
+   "slam": 1
+  },
+  "fairness": {
+   "skilled": true,
+   "lazy": []
+  },
+  "par": 410
+ }
+]

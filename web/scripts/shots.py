@@ -2,6 +2,8 @@
 
   python3 web/scripts/shots.py            # serves web/dist under /actual-gameplay/ and walks the screens
 
+  python3 web/scripts/shots.py go= follow=plan-7.json   # play a Crowd Run by a plan (scripts/runner-plan.ts)
+
 Screenshots land in build/webtest/. It is a look at the real pages under the same path prefix
 GitHub Pages uses, with page errors and failed requests printed.
 
@@ -21,6 +23,7 @@ Each argument is one step, done in order:
 """
 import functools
 import http.server
+import json
 import sys
 import threading
 from pathlib import Path
@@ -46,6 +49,43 @@ def serve():
     server = http.server.ThreadingHTTPServer(("127.0.0.1", PORT), handler)
     threading.Thread(target=server.serve_forever, daemon=True).start()
     return server
+
+
+PROGRESS = "(() => { const bar = document.querySelector('.hud .progress i'); return [bar ? parseFloat(bar.style.width) / 100 : 0, !!document.querySelector('.result')]; })()"
+
+
+def follow(page, at, plan):
+    """Put the save in place, open the run, and steer it with one held drag. The plan says where
+    the crowd heads at each share of the run's progress, and the page's own progress bar says how
+    far the run has got, so the drag keeps time with the game however fast the browser draws it.
+    The pictures the plan marks are saved as run<N>-<name>.png, and the result card last."""
+    page.evaluate("save => localStorage.setItem('actual-gameplay/progress', JSON.stringify(save))", plan["save"])
+    page.evaluate("location.hash = '/runner/play'")
+    page.reload()
+    page.wait_for_selector("#scene canvas", timeout=30000)
+    page.wait_for_function("document.querySelector('.hud .progress i') && parseFloat(document.querySelector('.hud .progress i').style.width) > 0", timeout=30000)
+    points, marks, name = plan["points"], list(plan["marks"]), f"run{plan['run']}"
+    # A lane unit is 127.5 canvas points where the crowd runs, and the drag starts with the crowd on the middle line.
+    page.mouse.move(*at(201, 300))
+    page.mouse.down()
+    i, x = 0, 0.0
+    for _ in range(4000):
+        progress, done = page.evaluate(PROGRESS)
+        if done:
+            break
+        while i < len(points) and points[i][0] <= progress + 0.004:
+            x = points[i][1]
+            i += 1
+        page.mouse.move(*at(201 + x * 127.5, 300))
+        while marks and marks[0][0] <= progress:
+            shot = marks.pop(0)[1]
+            page.screenshot(path=str(OUT / f"{name}-{shot}.png"))
+            print("shot", f"{name}-{shot}")
+    page.mouse.up()
+    page.wait_for_selector(".result", timeout=30000)
+    page.wait_for_timeout(700)
+    page.screenshot(path=str(OUT / f"{name}-result.png"))
+    print("shot", f"{name}-result")
 
 
 def main(steps):
@@ -92,6 +132,8 @@ def main(steps):
                 for x, y in pts[1:]:
                     page.mouse.move(*at(x, y), steps=6)
                 page.mouse.up()
+            elif kind == "follow":  # play a Crowd Run by a plan from scripts/runner-plan.ts, in build/webtest/
+                follow(page, at, json.loads((OUT / arg).read_text()))
             elif kind == "until":  # wait until a JavaScript expression is true
                 page.wait_for_function(arg, timeout=30000)
             elif kind == "click":

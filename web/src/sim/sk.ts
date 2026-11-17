@@ -359,7 +359,8 @@ export const pair = (event: ContactEvent, maskA: number, maskB: number): [planck
   return null;
 };
 
-/// The outcome every mode reports, once per attempt.
+/// The outcome every mode reports, once per attempt. A loss can still pay: Crowd Run keeps the
+/// coins its crates gave.
 export type Outcome =
   | { won: true; stars: number; coins: number; score: number }
-  | { won: false; reason: string };
+  | { won: false; reason: string; coins?: number };
