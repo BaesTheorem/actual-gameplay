@@ -2,7 +2,7 @@
 import "./style.css";
 import * as art from "./app/art";
 import * as audio from "./app/audio";
-import { button, h, icon, iconButton, stars, swatch } from "./app/dom";
+import { button, h, iconButton, stars, swatch } from "./app/dom";
 import { Game, setStageScale, warmRenderer } from "./app/game";
 import { dateWords, localDate, streakWords } from "./app/daily";
 import {
@@ -10,14 +10,16 @@ import {
   type LevelMode, type ModeInfo,
 } from "./app/modes";
 import { oddsText } from "./app/odds";
+import { startReel, type Reel } from "./app/reel";
 import { showRunnerHub } from "./app/runnerhub";
 import { dailyResult, dailyStreak, record, recordDaily, results, store, takeHint } from "./app/store";
 import { W } from "./scenes/kit";
 
-const VERSION = "0.1.0";
+const VERSION = "0.2.0";
 const stage = document.getElementById("stage")!;
 const ui = document.getElementById("ui")!;
 let game: Game | null = null;
+let reel: Reel | null = null;
 /// How many screens have been shown. A screen that takes a moment to get ready checks it, so it
 /// does not appear after the player has already moved on.
 let visits = 0;
@@ -99,15 +101,15 @@ const home = () => {
   // The level that is new today, where a mode has one, sits above the modes.
   const today = MODES.flatMap((m) => (m.kind === "levels" && m.daily ? [dailyTile(m, m.daily)] : []));
   const cards = MODES.map((m) => art.frame(h<"button">("button.mode-card", { onclick: () => { audio.play("tap"); go(`/${m.id}`); } },
-    swatch(m.preview[0], m.preview[1], m.swatch, 60),
-    h("div.grow", h("h2", m.title), h("p.muted", m.blurb), h("p.mono", { style: { fontSize: "12px" } }, summary(m))),
-    icon("chevronRight"))));
+    swatch(m.preview[0], m.preview[1], m.swatch, 44),
+    h("div.grow", h("h2", m.title), h("p.mono", { style: { fontSize: "12px" } }, summary(m))))));
   // The ads carry a line in small print: "Not all images represent actual gameplay." Here all of them do.
   const small = h("div.small-print",
     h("div", "All images represent actual gameplay."),
     h("div", "Every \"only X%\" on a level is measured: random play, counted."),
     h("div.mono", `v${VERSION}`));
-  ui.replaceChildren(screen("paper", header, ...today, ...cards, h("div.grow"), small));
+  reel = startReel((modeId, level) => { audio.play("select"); go(`/${modeId}/${level}`); });
+  ui.replaceChildren(screen("paper", header, reel.el, ...today, h("div.modes", ...cards), h("div.grow"), small));
 };
 
 /// One level on the list: its place in the chapter, its stars, and a corner tag when its
@@ -294,6 +296,8 @@ const route = () => {
   visits += 1;
   game?.close();
   game = null;
+  reel?.stop();
+  reel = null;
   stage.style.backgroundImage = "";
   // #/<mode> is a mode's level list (or the runner's hub), #/<mode>/<level id> is one level, and
   // #/<mode>/daily is today's level in a mode that makes one each day.

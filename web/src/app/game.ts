@@ -26,6 +26,9 @@ const renderer = async () => {
   return app;
 };
 
+/// The one canvas, for whoever else draws on the stage: the reel on the home screen.
+export const stageApp = () => renderer();
+
 /// Make the canvas before the first game opens: on a phone the first WebGL start takes a moment.
 export const warmRenderer = () => void renderer();
 

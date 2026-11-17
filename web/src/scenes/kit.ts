@@ -30,6 +30,9 @@ export interface Scene {
   /// Show the way, on a level that stores its solution: `step` is 1 for the first hint taken on
   /// the level, 2 for the second, and so on. A scene with nothing to show leaves this out.
   hint?(step: number): void;
+  /// Where a player who picks at random would press next, or null when there is nothing to
+  /// press now. `random` gives numbers from 0 up to 1. The reel on the home screen plays by it.
+  randomPlay?(random: () => number): Vec | null;
   destroy(): void;
 }
 

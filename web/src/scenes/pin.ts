@@ -496,6 +496,20 @@ export class PinScene implements Scene {
     if (pin) this.sim.pull(pin.id);
   }
 
+  /// A random pull: one of the pulls still to make, each as likely as the next. A group is one pull.
+  randomPlay(random: () => number): Vec | null {
+    if (this.sim.finished || this.sim.dying) return null;
+    const seen = new Set<string>();
+    const left = this.sim.pins.filter((pin) => {
+      if (pin.pulled) return false;
+      if (pin.group === undefined) return true;
+      if (seen.has(pin.group)) return false;
+      seen.add(pin.group);
+      return true;
+    });
+    return left.length > 0 ? left[Math.floor(random() * left.length)].knob : null;
+  }
+
   step() {
     this.sim.frame();
     for (const cue of this.cues) {
