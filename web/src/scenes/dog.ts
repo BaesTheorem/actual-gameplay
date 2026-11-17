@@ -17,7 +17,7 @@ import {
 const TILES = ["block_center", "block_top", "block_left", "block_right", "block_top_left", "block_top_right",
   "horizontal_left", "horizontal_middle", "horizontal_right"];
 export const DOG_ART = [
-  "paper", "background_color_hills", "cloud_1", "cloud_2", "cloud_3", "ui_hive", "bee_a", "bee_b", "saw_a", "saw_b",
+  "hand_point", "paper", "background_color_hills", "cloud_1", "cloud_2", "cloud_3", "ui_hive", "bee_a", "bee_b", "saw_a", "saw_b",
   "spikes", "rock", "block_planks", "clawd_nervous", "clawd_scared", "clawd_excited", "clawd_ko",
   ...["grass", "stone", "dirt", "purple"].flatMap((skin) => TILES.map((part) => `terrain_${skin}_${part}`)),
 ];
@@ -130,13 +130,15 @@ export class DogScene implements Scene {
   private beeLayer = new Container();
   private effects = new Map<Effect, EffectNode>();
   private fx = new Fx(20);
+  /// On the first level, a hand that traces the stroke to draw, until the player starts one.
+  private coach: { hand: Sprite; dots: Graphics; path: Vec[] } | null = null;
   private ghost: Graphics | null = null;
   private ghostAge = 0;
   /// Only a level that stores its solution can show the way.
   hint?: (step: number) => void;
 
   /// `label` is the level's place in its chapter, "1-3".
-  constructor(readonly level: DogLevel, label: string, private onCue: (cue: Cue) => void) {
+  constructor(readonly level: DogLevel, private label: string, private onCue: (cue: Cue) => void) {
     this.title = `${label} ${level.name}`;
     this.sim = new DogSim(level, (cue) => this.cues.push(cue));
     this.root.sortableChildren = true;
@@ -237,6 +239,20 @@ export class DogScene implements Scene {
     root.addChild(this.beeLayer, this.embers, this.live, this.fx.layer);
     const hint = hintLabel(this.level.hint);
     if (hint) root.addChild(hint);
+    const first = solutionStrokes(this.level)[0];
+    if (this.label === "1-1" && first && first.length > 1) {
+      const path = resample(first, 9), dots = new Graphics();
+      for (const p of path) dots.circle(p.x, Y(p.y), 2.2);
+      dots.fill({ color: Pigment.ink, alpha: 0.45 });
+      const hand = new Sprite(art.texture("hand_point"));
+      const anchor = art.entry("hand_point")?.anchor ?? [0.25, 0.78];
+      hand.anchor.set(anchor[0], 1 - anchor[1]);
+      hand.width = hand.height = 54;
+      dots.zIndex = 45;
+      hand.zIndex = 46;
+      root.addChild(dots, hand);
+      this.coach = { hand, dots, path };
+    }
     this.draw(0);
   }
 
@@ -316,6 +332,11 @@ export class DogScene implements Scene {
   outcome() { return this.sim.outcome; }
 
   pointer(type: "down" | "move" | "up", point: Vec) {
+    if (type === "down" && this.coach) {
+      this.coach.hand.destroy();
+      this.coach.dots.destroy();
+      this.coach = null;
+    }
     if (type === "down") this.sim.begin(point);
     else if (type === "move") this.sim.extend(point);
     else this.sim.end();
@@ -412,6 +433,12 @@ export class DogScene implements Scene {
     this.drawEffects();
     this.fx.tick(dt);
     this.root.position.set(this.fx.offset.x, this.fx.offset.y);
+    if (this.coach) {
+      // Along the stroke in a second and a half, a rest at its end, and again.
+      const t = Math.min(1, (this.time % 2.2) / 1.5), path = this.coach.path;
+      const at = path[Math.min(path.length - 1, Math.floor((still ? 1 : t) * (path.length - 1)))];
+      this.coach.hand.position.set(at.x, Y(at.y));
+    }
     if (this.ghost) {
       this.ghostAge += dt;
       const left = HINT_SECONDS + decorative(0.4) - this.ghostAge;
